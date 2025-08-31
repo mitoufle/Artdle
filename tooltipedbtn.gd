@@ -1,10 +1,20 @@
 extends Control
 
+
 @onready var Tooltip_Scn = preload("res://views/tooltip.tscn")
+
+@export_category("meta")
+@export var name1: String
+
+
+@export_category("data")
+@export var line1: PackedScene
+@export var line2: String
+
 
 func _on_mouse_entered() -> void:
 	var Tooltip = Tooltip_Scn.instantiate()
-	Tooltip.show_tooltip(Rect2i( Vector2i(global_position), Vector2i(size)), null, null)
+	
 	
 
 func _on_mouse_exited() -> void:

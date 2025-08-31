@@ -87,7 +87,6 @@ func _on_btn_atelier_pressed() -> void:
 
 func _on_btn_atelier_entered() -> void:
 	
-	var mouse_pos = get_viewport().get_mouse_position()
 	TooltipManager.show_tooltip(tooltip_txt, "10$",btn_atelier.global_position)
 		
 	var anim = painting_screen_instance.get_node("workshop_blink_sign")

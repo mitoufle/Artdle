@@ -1,0 +1,46 @@
+[gd_scene load_steps=7 format=3 uid="uid://c2dtpbqdfvb2n"]
+
+[ext_resource type="Texture2D" uid="uid://d1npvos37rwxn" path="res://artdleAsset/animated_plant.png" id="1_05dws"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qcw2s"]
+atlas = ExtResource("1_05dws")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1ef8b"]
+atlas = ExtResource("1_05dws")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_omm14"]
+atlas = ExtResource("1_05dws")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w03qu"]
+atlas = ExtResource("1_05dws")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rntss"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qcw2s")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1ef8b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_omm14")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w03qu")
+}],
+"loop": true,
+"name": &"default",
+"speed": 4.0
+}]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_rntss")
+autoplay = "default"
+frame_progress = 0.133941

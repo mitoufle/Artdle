@@ -1,22 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://jx6gj886xxbf"]
+[gd_scene load_steps=2 format=3 uid="uid://jx6gj886xxbf"]
 
 [ext_resource type="Script" uid="uid://d4kims7bcr64v" path="res://scripts/Tooltip.gd" id="1_y0rsp"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y0rsp"]
-bg_color = Color(0.696852, 0.574839, 0.460937, 1)
-border_width_left = 3
-border_width_top = 5
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.0687983, 0.0687983, 0.0687982, 1)
-border_blend = true
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-shadow_color = Color(0.133196, 0.133196, 0.133196, 0.6)
-shadow_size = 1
-shadow_offset = Vector2(2, 2)
 
 [node name="Tooltip" type="Control"]
 layout_mode = 3
@@ -27,28 +11,20 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_y0rsp")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 50.0
+mouse_filter = 2
 
-[node name="InfoPopup" type="PopupPanel" parent="UI"]
-unique_name_in_owner = true
-initial_position = 1
-visible = true
-theme_override_styles/panel = SubResource("StyleBoxFlat_y0rsp")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/InfoPopup"]
-offset_left = 2.0
-offset_top = 4.0
-offset_right = 94.0
-offset_bottom = 94.0
-
-[node name="Line1" type="Label" parent="UI/InfoPopup/VBoxContainer"]
+[node name="Line1" type="Label" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 text = "test"
 horizontal_alignment = 1
 
-[node name="Line2" type="RichTextLabel" parent="UI/InfoPopup/VBoxContainer"]
+[node name="Line2" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-bbcode_enabled = true
-text = "zerzrr"
-fit_content = true
+size_flags_horizontal = 4
+text = "test"
 horizontal_alignment = 1
