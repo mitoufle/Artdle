@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://dcm3fck3p2gj7"]
+
+[ext_resource type="Script" uid="uid://daww5r6t5ivr5" path="res://scripts/PaintingView.gd" id="1_tvnqg"]
+[ext_resource type="PackedScene" uid="uid://c1id4y8ipgg7q" path="res://views/paintingscreen.tscn" id="2_tvnqg"]
+
+[node name="PaintingView" type="Control"]
+layout_mode = 3
+anchor_right = 2.0
+anchor_bottom = 2.025
+offset_bottom = -0.200073
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_tvnqg")
+
+[node name="paintingscreen" parent="." instance=ExtResource("2_tvnqg")]
+
+[node name="BtnAddInspiration" type="Button" parent="."]
+z_index = 5
+layout_mode = 2
+offset_left = 514.0
+offset_top = 174.0
+offset_right = 656.0
+offset_bottom = 205.0
+size_flags_horizontal = 4
+text = "Peindre (+1 inspi)"
+
+[node name="BtnBuildStuff" type="Button" parent="."]
+z_index = 5
+layout_mode = 2
+offset_left = 224.0
+offset_top = 256.0
+offset_right = 240.0
+offset_bottom = 273.0
+size_flags_horizontal = 0
+flat = true
+
+[node name="BtnEnhancePainting" type="Button" parent="."]
+layout_mode = 2
+offset_left = 512.0
+offset_top = 113.0
+offset_right = 729.0
+offset_bottom = 144.0
+tooltip_text = "double inspiration from painting"
+text = "enhance painting (50 inspi)"
+
+[node name="btwBuildWorkshop" type="Button" parent="."]
+layout_mode = 0
+offset_left = 208.0
+offset_top = 256.0
+offset_right = 224.0
+offset_bottom = 272.0
+flat = true
