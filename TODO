@@ -1,0 +1,36 @@
+**Project Roadmap: Artdle**
+This document is a list of tasks for the game's development. Features are grouped by category for better organization.
+
+🎨 Core Features (To-Do)
+Next Steps
+[ ] Implement all currency system.
+    [ ] Ascendency points
+    [ ] skill points
+    [ ] painter mastery
+    [ ] Gold
+    [ ] Inspiration
+    [ ] Experience
+[ ] Integrate all painting mechanics and upgrades.
+    [ ] Pixel Canvas
+    [ ] Tool crafting in workshop
+    [ ] painting quests
+    [ ] painting minigame (watch a statick pixel image and reproduce closely it blindly using provided pixel
+    [ ] Idle clicking experience and related enhance & upgrades
+    [ ] Painting success
+    [ ] Painting gear and inventory
+    [ ] gear loot
+[ ] Implement Ascending system
+    [ ] Ascendency view
+    [ ] Ascendency gain relative to gamestate
+    [ ] Ascendency mechanics (what resets and what not)
+    [ ] Ascendency skill tree
+    
+
+🔧 Quality of Life Improvements
+[ ] Display in-game tutorials for new players.
+[ ] Implement the game's save and load system.
+[ ] Add sound effects and ambient music.
+[ ] Improve the user interface to make it more readable.
+
+🐛 Known Bugs
+[ ] (To be filled) List bugs encountered during development.
