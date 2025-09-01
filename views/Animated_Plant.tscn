@@ -19,6 +19,7 @@ atlas = ExtResource("1_05dws")
 region = Rect2(48, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_rntss"]
+resource_local_to_scene = true
 animations = [{
 "frames": [{
 "duration": 1.0,
@@ -43,4 +44,4 @@ animations = [{
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_rntss")
 autoplay = "default"
-frame_progress = 0.133941
+frame_progress = 0.55887

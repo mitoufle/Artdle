@@ -6,7 +6,7 @@ extends Control
 
 
 
-@export var offset: Vector2 = Vector2(-30, -40)
+@export var offset: Vector2 = Vector2(-30, -55)
 @export var fade_duration: float = 0.3
 
 func _ready():

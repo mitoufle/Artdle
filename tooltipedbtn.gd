@@ -8,7 +8,7 @@ extends Control
 
 
 @export_category("data")
-@export var line1: PackedScene
+@export var line1: String
 @export var line2: String
 
 
