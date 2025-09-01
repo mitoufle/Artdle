@@ -1,12 +1,12 @@
 [gd_scene load_steps=20 format=4 uid="uid://c1id4y8ipgg7q"]
 
-[ext_resource type="Texture2D" uid="uid://d3lpgkt54ynyq" path="res://artdleAsset/tileset1.png" id="1_bdtun"]
-[ext_resource type="Texture2D" uid="uid://bpjb8dgobqd07" path="res://artdleAsset/sign_animated.png" id="2_30oyg"]
-[ext_resource type="Texture2D" uid="uid://d3kwl7is6dens" path="res://artdleAsset/tileset2.png" id="2_wonqn"]
-[ext_resource type="PackedScene" uid="uid://c2dtpbqdfvb2n" path="res://views/Animated_Plant.tscn" id="2_xrmmx"]
+[ext_resource type="Texture2D" uid="uid://d3lpgkt54ynyq" path="res://artdleAsset/tileset1.png" id="1_lrvlk"]
+[ext_resource type="PackedScene" uid="uid://c2dtpbqdfvb2n" path="res://Scenes/Animated_Plant.tscn" id="2_gk5ww"]
+[ext_resource type="Texture2D" uid="uid://bpjb8dgobqd07" path="res://artdleAsset/sign_animated.png" id="3_ke80a"]
+[ext_resource type="Texture2D" uid="uid://d3kwl7is6dens" path="res://artdleAsset/tileset2.png" id="4_gp8uw"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wonqn"]
-texture = ExtResource("1_bdtun")
+texture = ExtResource("1_lrvlk")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -69,7 +69,7 @@ texture = ExtResource("1_bdtun")
 sources/0 = SubResource("TileSetAtlasSource_wonqn")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xrmmx"]
-texture = ExtResource("1_bdtun")
+texture = ExtResource("1_lrvlk")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -140,7 +140,7 @@ texture = ExtResource("1_bdtun")
 sources/0 = SubResource("TileSetAtlasSource_xrmmx")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ei51c"]
-texture = ExtResource("1_bdtun")
+texture = ExtResource("1_lrvlk")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -210,7 +210,7 @@ texture = ExtResource("1_bdtun")
 sources/0 = SubResource("TileSetAtlasSource_ei51c")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jua8q"]
-texture = ExtResource("1_bdtun")
+texture = ExtResource("1_lrvlk")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -283,7 +283,7 @@ texture = ExtResource("1_bdtun")
 8:9/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dnbf8"]
-texture = ExtResource("2_30oyg")
+texture = ExtResource("3_ke80a")
 1:0/0 = 0
 0:0/0 = 0
 
@@ -292,11 +292,11 @@ sources/0 = SubResource("TileSetAtlasSource_jua8q")
 sources/1 = SubResource("TileSetAtlasSource_dnbf8")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ei51c"]
-atlas = ExtResource("2_30oyg")
+atlas = ExtResource("3_ke80a")
 region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2o1yp"]
-atlas = ExtResource("2_30oyg")
+atlas = ExtResource("3_ke80a")
 region = Rect2(16, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_jua8q"]
@@ -315,7 +315,7 @@ animations = [{
 }]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_30oyg"]
-texture = ExtResource("2_wonqn")
+texture = ExtResource("4_gp8uw")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -423,7 +423,7 @@ texture = ExtResource("2_wonqn")
 17:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1rb1a"]
-texture = ExtResource("2_30oyg")
+texture = ExtResource("3_ke80a")
 1:0/0 = 0
 0:0/0 = 0
 
@@ -446,7 +446,7 @@ tile_set = SubResource("TileSet_dnbf8")
 tile_map_data = PackedByteArray("AAAyAB4AAAACAAMAAAAzAB4AAAACAAMAAAA0AB4AAAACAAMAAAA1AB4AAAACAAMAAAA2AB4AAAACAAMAAAA3AB4AAAACAAMAAAAxAB8AAAADAAQAAAA4AB8AAAADAAQAAAAwAB8AAAADAAQAAAA5AB8AAAADAAQAAAAvAB8AAAACAAQAAAA6AB8AAAACAAQAAAAzAAsAAAAFAAQAAAAzAAwAAAAFAAUAAAAPAB8AAAADAAQAAAAQAB8AAAADAAQAAAAXACEAAAADAAQAAAAYACEAAAADAAQAAAAZACEAAAADAAQAAAAXABMAAAADAAQAAAAlABYAAAADAAQAAAAkABYAAAADAAQAAAAWABIAAAAAAAQAAAAVABIAAAAAAAQAAAAUABEAAAAAAAQAAAATABEAAAAAAAQAAAASABAAAAABAAQAAAARABAAAAABAAQAAAAKABAAAAAAAAQAAAAIABEAAAAAAAQAAAAHABEAAAAAAAQAAAAGABIAAAAAAAQAAAAFABIAAAAAAAQAAAA+AAkAAAAHAAcAAAAiABwAAAADAAUAAAAiAB0AAAADAAYAAAAiAB4AAAADAAcAAAAkABwAAAADAAYAAAAkAB0AAAADAAcAAAAoABsAAAADAAYAAAAoABwAAAADAAcAAAAgABoAAAADAAYAAAAgABsAAAADAAcAAAAmACIAAAADAAUAAAAmACMAAAADAAYAAAAmACQAAAADAAYAAAAmACUAAAADAAYAAAAmACYAAAADAAYAAAAmACcAAAADAAYAAAAmACgAAAADAAYAAAApACIAAAADAAYAAAApACMAAAADAAYAAAApACUAAAADAAcAAAApACQAAAADAAYAAAALABAAAAABAAQAAAA=")
 tile_set = SubResource("TileSet_2o1yp")
 
-[node name="Node2D" parent="decoration" instance=ExtResource("2_xrmmx")]
+[node name="Node2D" parent="decoration" instance=ExtResource("2_gk5ww")]
 z_index = 4
 position = Vector2(120, 472)
 

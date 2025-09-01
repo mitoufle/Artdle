@@ -1,6 +1,7 @@
 extends Control
 
 # Variables locales pour le coût et la génération
+var Painting_incrementer: float = 1
 var atelier_count: int = 0
 var atelier_cost: int = 10
 var atelier_production: float = 0.2   # inspiration/sec/atelier
@@ -13,8 +14,8 @@ var tooltip_txt = "Workshop"
 
 
 
-@onready var tooltip_scene = preload("res://views/tooltip.tscn")
-@onready var painting_screen_scene = preload("res://views/paintingscreen.tscn")
+@onready var tooltip_scene = preload("res://Scenes/tooltip.tscn")
+@onready var painting_screen_scene = preload("res://Scenes/paintingscreen.tscn")
 @onready var btn_peindre: Button = $BtnAddInspiration
 @onready var btn_atelier: Button = $BtnBuildStuff
 @onready var btn_enhancePainting: Button = $BtnEnhancePainting
@@ -47,7 +48,7 @@ func _process(delta: float) -> void:
 	
 	# Production automatique par atelier
 	if atelier_count > 0:
-		GameState.add_inspiration(atelier_count * atelier_production * delta)
+		GameState.set_inspiration(atelier_count * atelier_production * delta)
 		
 	# reset l'état du blink du paneau
 	if GameState.inspiration >= 10 and not hover:
@@ -67,7 +68,7 @@ func _process(delta: float) -> void:
 func _on_btn_peindre_pressed() -> void:
 	var main_node = get_tree().get_root().get_node("Main")
 	main_node.add_ressource_feedback()
-	GameState.add_inspiration(GameState.enhanceInspi)
+	GameState.set_inspiration(Painting_incrementer)
 	update_ui()
 
 func _on_btn_enhancepainting_pressed() -> void:
@@ -108,7 +109,7 @@ func _on_btn_atelier_exited() -> void:
 
 func update_ui() -> void:
 
-	btn_peindre.text = "Peindre (+ " + str(int(GameState.enhanceInspi)) +  ")"
+	btn_peindre.text = "Peindre (+1)"
 	btn_enhancePainting.text = "enhance painting (" + str(int(enhanseInspiCost)) + "inspi)"
 
 func show_floating_text(text: String):

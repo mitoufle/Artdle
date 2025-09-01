@@ -1,9 +1,9 @@
 [gd_scene load_steps=4 format=4 uid="uid://bnf4km5s1q11t"]
 
-[ext_resource type="Texture2D" uid="uid://d3kwl7is6dens" path="res://artdleAsset/tileset2.png" id="1_orwm5"]
+[ext_resource type="Texture2D" uid="uid://d3kwl7is6dens" path="res://artdleAsset/tileset2.png" id="1_wq2lc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hvpkd"]
-texture = ExtResource("1_orwm5")
+texture = ExtResource("1_wq2lc")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0

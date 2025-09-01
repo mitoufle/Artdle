@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dcm3fck3p2gj7"]
 
 [ext_resource type="Script" uid="uid://daww5r6t5ivr5" path="res://scripts/PaintingView.gd" id="1_tvnqg"]
-[ext_resource type="PackedScene" uid="uid://c1id4y8ipgg7q" path="res://views/paintingscreen.tscn" id="2_tvnqg"]
+[ext_resource type="PackedScene" uid="uid://c1id4y8ipgg7q" path="res://Scenes/paintingscreen.tscn" id="2_tvnqg"]
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3

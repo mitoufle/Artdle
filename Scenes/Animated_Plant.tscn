@@ -1,21 +1,21 @@
 [gd_scene load_steps=7 format=3 uid="uid://c2dtpbqdfvb2n"]
 
-[ext_resource type="Texture2D" uid="uid://d1npvos37rwxn" path="res://artdleAsset/animated_plant.png" id="1_05dws"]
+[ext_resource type="Texture2D" uid="uid://d1npvos37rwxn" path="res://artdleAsset/animated_plant.png" id="1_kcp7g"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qcw2s"]
-atlas = ExtResource("1_05dws")
+atlas = ExtResource("1_kcp7g")
 region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1ef8b"]
-atlas = ExtResource("1_05dws")
+atlas = ExtResource("1_kcp7g")
 region = Rect2(16, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_omm14"]
-atlas = ExtResource("1_05dws")
+atlas = ExtResource("1_kcp7g")
 region = Rect2(32, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_w03qu"]
-atlas = ExtResource("1_05dws")
+atlas = ExtResource("1_kcp7g")
 region = Rect2(48, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_rntss"]

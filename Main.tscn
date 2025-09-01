@@ -35,7 +35,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 
-[node name="BtnAccueil" type="Button" parent="MainLayout/TopBar"]
+[node name="btnAccueil" type="Button" parent="MainLayout/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
@@ -43,7 +43,7 @@ text = "Accueil"
 icon = ExtResource("3_r0du0")
 icon_alignment = 1
 
-[node name="BtnPeinture" type="Button" parent="MainLayout/TopBar"]
+[node name="btnPeinture" type="Button" parent="MainLayout/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
@@ -51,6 +51,10 @@ size_flags_stretch_ratio = 0.0
 text = "Peinture"
 icon = ExtResource("3_r0du0")
 icon_alignment = 1
+
+[node name="btnAscendancy" type="Button" parent="MainLayout/TopBar"]
+layout_mode = 2
+text = "Ascendency"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/TopBar"]
 layout_mode = 2

@@ -1,27 +1,42 @@
 extends Node
 signal state_changed
+signal inspiration_changed(type:String, new_inspiration_value:float)
+signal ascendancy_level_changed(new_ascendancy_level_value:float)
+signal ascendancy_point_changed(new_ascendancy_point_value:float)
 
-var inspiration: float = 0.0
-var prestige: int = 0
-var enhanceInspi: int = 1 
+#Global Currency
+var ascendancy_point: float
+var inspiration: float
+var ascend_level: float
+var paint_mastery: float
+var gold: float
+var Experience: float
+var level: int
 
-var prestigeCost: int = 1000
+#Cost initiate
+var ascendancy_cost: float = 1000
+var level_cost: float = 1000
+var mastery_cost: float = 1000
 
-var global_inspiration_multiplier: float = 1 + prestige/10
+#Multipliers and shinanigans
+var prestige_inspiration_multiplier: float
+var painting_mastery_multiplier: float
 
-func add_inspiration(amount: float):
-	inspiration += amount * global_inspiration_multiplier
-	emit_signal("state_changed")
-	
-func update_inspiration(cost:float):
-	inspiration += cost
-	emit_signal("state_changed")
+func get_inspiration() -> float:
+	return inspiration
+
+func set_inspiration(amount:float):
+	inspiration += amount 
+	inspiration_changed.emit("inspiration",inspiration)
 
 func reset_prestige():
-	if inspiration >= prestigeCost:
-		inspiration = 0
-		enhanceInspi = 1
-		prestige += 1
-		global_inspiration_multiplier = 1 + prestige/10
+	if inspiration >= ascendancy_cost:
+		var remainder = reduce_by_max_multiple(ascendancy_cost,inspiration)
+		
+		
 	
-	
+func reduce_by_max_multiple(cost: int, currency: int) -> int:
+	if currency <= 0:
+		push_error("y must be a positive integer")
+		return cost
+	return cost % currency
