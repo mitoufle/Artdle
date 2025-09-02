@@ -20,10 +20,12 @@ Next Steps
     [ ] Painting gear and inventory
     [ ] gear loot
 [ ] Implement Ascending system
-    [ ] Ascendency view
+    [x] Ascendency view
     [ ] Ascendency gain relative to gamestate
     [ ] Ascendency mechanics (what resets and what not)
     [ ] Ascendency skill tree
+[x] auto ingame custom tooltip on custom buttons
+
     
 
 🔧 Quality of Life Improvements
