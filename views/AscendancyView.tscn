@@ -25,4 +25,5 @@ offset_bottom = -148.0
 theme_type_variation = &"FlatButton"
 text = "Ascend"
 tooltip_scene_path = ExtResource("3_ynd41")
-tooltype_style = "shake"
+custom_tooltip_text = "⭐ Ascending as a legend ⭐"
+tooltype_style = "pulse"

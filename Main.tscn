@@ -53,6 +53,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "Accueil"
 icon = ExtResource("3_r0du0")
+flat = true
 icon_alignment = 1
 
 [node name="btnPeinture" type="Button" parent="MainLayout/TopBar"]
@@ -62,11 +63,15 @@ size_flags_vertical = 0
 size_flags_stretch_ratio = 0.0
 text = "Peinture"
 icon = ExtResource("3_r0du0")
+flat = true
 icon_alignment = 1
 
 [node name="btnAscendancy" type="Button" parent="MainLayout/TopBar"]
 layout_mode = 2
 text = "Ascendency"
+icon = ExtResource("3_r0du0")
+flat = true
+icon_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/TopBar"]
 layout_mode = 2

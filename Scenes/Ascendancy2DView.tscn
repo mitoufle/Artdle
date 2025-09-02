@@ -1,7 +1,10 @@
 [gd_scene load_steps=9 format=4 uid="uid://d35cxm7212g18"]
 
-[ext_resource type="Script" uid="uid://boolduvljx23o" path="res://scripts/Ascendency2DView.gd" id="1_31lut"]
 [ext_resource type="Texture2D" uid="uid://d3kwl7is6dens" path="res://artdleAsset/tileset2.png" id="2_ynd41"]
+
+[sub_resource type="GDScript" id="GDScript_lqryh"]
+script/source = "extends Node2D
+"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_31lut"]
 texture = ExtResource("2_ynd41")
@@ -381,7 +384,7 @@ texture = ExtResource("2_ynd41")
 sources/0 = SubResource("TileSetAtlasSource_ynd41")
 
 [node name="Ascendency2DView" type="Node2D"]
-script = ExtResource("1_31lut")
+script = SubResource("GDScript_lqryh")
 
 [node name="TileMapLayer2" type="TileMapLayer" parent="."]
 position = Vector2(-183, -11)

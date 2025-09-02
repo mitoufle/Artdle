@@ -32,11 +32,11 @@ func _ready() -> void:
 	
 	# connecte la boutons à leurs fonctions
 	btn_peindre.pressed.connect(_on_btn_peindre_pressed)
-	btn_atelier.pressed.connect(_on_btn_atelier_pressed)
+	#btn_atelier.pressed.connect(_on_btn_atelier_pressed)
 	btn_enhancePainting.pressed.connect(_on_btn_enhancepainting_pressed)
 	
-	btn_atelier.mouse_entered.connect(_on_btn_atelier_entered)
-	btn_atelier.mouse_exited.connect(_on_btn_atelier_exited)
+	#btn_atelier.mouse_entered.connect(_on_btn_atelier_entered)
+	#btn_atelier.mouse_exited.connect(_on_btn_atelier_exited)
 	
 	var anim = painting_screen_instance.get_node("workshop_blink_sign")
 	anim.frame = 0
@@ -78,34 +78,13 @@ func _on_btn_enhancepainting_pressed() -> void:
 		GameState.enhanceInspi *= 2
 	update_ui()
 
-func _on_btn_atelier_pressed() -> void:
+func _on_btn_build_workshop_pressed() -> void:
 	
 	if GameState.inspiration >= atelier_cost:
 		GameState.inspiration -= atelier_cost
 		atelier_count += 1
 		atelier_cost = int(atelier_cost * 1.5) # le coût augmente
 		update_ui()
-
-func _on_btn_atelier_entered() -> void:
-	
-	TooltipManager.show_tooltip(tooltip_txt, "10$",btn_atelier.global_position)
-		
-	var anim = painting_screen_instance.get_node("workshop_blink_sign")
-	hover = true
-	anim.stop()
-	anim.frame = 1
-	blinking = false
-
-func _on_btn_atelier_exited() -> void:
-	
-	TooltipManager.hide_tooltip()
-	
-	var anim = painting_screen_instance.get_node("workshop_blink_sign")
-	
-	hover = false
-	anim.stop()
-	anim.frame = 0
-	blinking = false
 
 func update_ui() -> void:
 
