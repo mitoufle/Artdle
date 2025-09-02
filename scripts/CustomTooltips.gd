@@ -4,21 +4,17 @@ class_name CustomTooltips
 @onready var rich_text_label: RichTextLabel = $VBoxContainer/RichTextLabel
 @onready var vbox_container: VBoxContainer  = $VBoxContainer
 
-
+@export var style: String
 
 var max_width = 300
-var _pending_text: String = ""
-
+var time := 0.0
+var base_text := ""
 
 func _ready():
 	# Ensure the RichTextLabel exists.
 	if not rich_text_label:
 		print("Error: RichTextLabel not assigned in the Inspector.")
-		return
-		
-	if _pending_text != "":
-		set_text(_pending_text)
-		_pending_text = ""	
+		return	
 	
 	self.add_theme_color_override("panel", Color(0.1, 0.1, 0.25, 0.9)) # fond bleu foncé semi-transparent
 	self.add_theme_constant_override("corner_radius", 15)
@@ -33,13 +29,42 @@ func _ready():
 	rich_text_label.fit_content = true
 	rich_text_label.mouse_filter = MOUSE_FILTER_IGNORE
 
+
+## Définit le texte de l'infobulle.
+func set_style(new_style: String):
+	style = new_style
+
 ## Définit le texte de l'infobulle.
 func set_text(new_text: String):
-	if rich_text_label:
-		rich_text_label.add_text(new_text)   # ou .text / set_text selon ton usage
-	else:
-		_pending_text = new_text
-		
+		base_text = new_text
+		match style:
+			"wave":
+				rich_text_label.bbcode_text = "[wave]" + base_text + "[/wave]"
+			"shake":
+				rich_text_label.bbcode_text = "[shake]" + base_text + "[/shake]"
+			"rainbow":
+				rich_text_label.bbcode_text = "[rainbow freq=1.0 sat=0.8 val=0.8 speed=1.0]" + base_text + "[/rainbow]"
+			"wave+rainbow":
+				rich_text_label.bbcode_text = "[wave][rainbow freq=1.0 sat=0.8 val=0.8 speed=1.0]" + base_text + "[/rainbow][/wave]"
+			"bold":
+				rich_text_label.bbcode_text = "[b]" + base_text + "[/b]"
+			"italic":
+				rich_text_label.bbcode_text = "[i]" + base_text + "[/i]"
+			"underline":
+				rich_text_label.bbcode_text = "[u]" + base_text + "[/u]"
+			"strikethrough":
+				rich_text_label.bbcode_text = "[s]" + base_text + "[/s]"
+			"outline":
+				rich_text_label.bbcode_text = "[outline]" + base_text + "[/outline]"
+			"shadow":
+				rich_text_label.bbcode_text = "[shadow]" + base_text + "[/shadow]"
+			"scale":
+				rich_text_label.bbcode_text = "[scale=1.5]" + base_text + "[/scale]"
+			"smallcaps":
+				rich_text_label.bbcode_text = "[smallcaps]" + base_text + "[/smallcaps]"
+			_:
+				# fallback : texte simple
+				rich_text_label.bbcode_text = base_text
 
 ## Met à jour la position de l'infobulle pour qu'elle suive le curseur et reste dans l'écran.
 func update_position(cursor_pos: Vector2):

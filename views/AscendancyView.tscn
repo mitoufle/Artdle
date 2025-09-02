@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dqefxqvjsc8jy"]
+[gd_scene load_steps=5 format=3 uid="uid://dqefxqvjsc8jy"]
 
 [ext_resource type="PackedScene" uid="uid://d35cxm7212g18" path="res://Scenes/Ascendancy2DView.tscn" id="1_31lut"]
+[ext_resource type="Script" uid="uid://djjkdvyttryky" path="res://views/AscendancyView.gd" id="1_rdb0t"]
 [ext_resource type="PackedScene" uid="uid://cobsxucq2sb0y" path="res://Scenes/tooltipedbtn.tscn" id="2_ynd41"]
 [ext_resource type="PackedScene" uid="uid://jx6gj886xxbf" path="res://Scenes/CustomTooltip.tscn" id="3_ynd41"]
 
@@ -11,6 +12,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_rdb0t")
 
 [node name="Ascendency2DView" parent="." instance=ExtResource("1_31lut")]
 
@@ -23,4 +25,4 @@ offset_bottom = -148.0
 theme_type_variation = &"FlatButton"
 text = "Ascend"
 tooltip_scene_path = ExtResource("3_ynd41")
-custom_tooltip_text = "This is a <color=red>test</color> tooltip!"
+tooltype_style = "shake"
