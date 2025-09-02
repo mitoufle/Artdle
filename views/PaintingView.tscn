@@ -59,8 +59,8 @@ flat = true
 script = ExtResource("3_hf5x0")
 tooltip_scene_path = ExtResource("4_kfhel")
 custom_tooltip_text = "Build the workshop
-10 Inspiration"
-tooltype_style = "wave"
+[color=yellow]10 Inspiration[/color]"
+tooltype_style = "shake"
 metadata/_custom_type_script = "uid://dvjf8nckqigms"
 
 [connection signal="mouse_entered" from="BtnBuildWorkshop" to="BtnBuildWorkshop" method="_on_mouse_entered"]

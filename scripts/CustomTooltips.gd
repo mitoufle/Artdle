@@ -11,7 +11,7 @@ var vertical_margin = 5
 var max_width = 300
 var time := 0.0
 var base_text := ""
-var default_color = "#67689B"
+var default_color = "#2B2D69"
 
 func _ready():
 	# Ensure the RichTextLabel exists.
@@ -82,7 +82,6 @@ func set_text(new_text: String):
 			_:
 				# fallback : texte simple
 				temp = base_text
-		print("truc")
 		size = get_combined_minimum_size()
 		rich_text_label.bbcode_text = "[color="+default_color+"]" + temp + "[/color]"
 		
