@@ -4,7 +4,7 @@ extends Control
 @onready var btn_accueil: Button     = $MainLayout/TopBar/btnAccueil
 @onready var btn_peinture: Button    = $MainLayout/TopBar/btnPeinture
 @onready var btn_ascendancy: Button  = $MainLayout/TopBar/btnAscendancy
-@onready var content: PanelContainer = $MainLayout/Content
+@onready var content: PanelContainer = $Content
 @onready var lblInspiCount: Label    = $MainLayout/TopBar/lblInspiCount
 @onready var Floating_text_scene     = preload("res://Scenes/floating_text.tscn")
 
@@ -18,18 +18,22 @@ func _ready() -> void:
 	btn_ascendancy.pressed.connect(_on_btn_ascendancy_pressed)
 	GameState.inspiration_changed.connect(update_ui)
 	
-
+	# Get a reference to the autoloaded SceneManager.
+	var scene_manager = get_node("/root/SceneManager")
+	# Pass the SceneContainer node to the manager.
+	SceneManager.set_scene_container(scene_manager)
+	
 	# Charger la vue d’accueil au démarrage
-	load_view("AccueilView.tscn")
+	SceneManager.load_game_scene("res://views/AccueilView.tscn")
 
 func _on_btn_accueil_pressed() -> void:
-	load_view("AccueilView.tscn")
+	SceneManager.load_game_scene("res://views/AccueilView.tscn")
 
 func _on_btn_peinture_pressed() -> void:
-	load_view("PaintingView.tscn")
+	SceneManager.load_game_scene("res://views/PaintingView.tscn")
 	
 func _on_btn_ascendancy_pressed() -> void:
-	load_view("AscendancyView.tscn")
+	SceneManager.load_game_scene("res://views/AscendancyView.tscn")
 	
 func load_view(scene_file: String) -> void:
 	# 1) Vider la zone de contenu (supprimer l’ancienne vue)

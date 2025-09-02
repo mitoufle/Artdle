@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameState="*res://scripts/GameState.gd"
 TooltipManager="*res://scripts/TooltipManager.gd"
+SceneManager="*res://scripts/SceneManager.gd"
 
 [display]
 
