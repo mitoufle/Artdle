@@ -27,6 +27,7 @@ var tooltip_txt = "Workshop"
 #==============================================================================
 
 @onready var canvas_popup_scene = preload("res://Scenes/CanvasPopup.tscn")
+@onready var paintingscreen_instance = $paintingscreen
 
 @onready var btn_peindre: Button = $BtnAddInspiration
 @onready var btn_atelier: Button = $BtnBuildStuff
@@ -40,6 +41,7 @@ var tooltip_txt = "Workshop"
 func _ready() -> void:
 	# --- Instance de la vue du Canvas ---
 	canvas_popup_instance = canvas_popup_scene.instantiate()
+	canvas_popup_instance.hide()
 	add_child(canvas_popup_instance)
 	
 	# --- Connexion des signaux des boutons ---
@@ -47,6 +49,11 @@ func _ready() -> void:
 	btn_enhancePainting.pressed.connect(_on_btn_enhancepainting_pressed)
 	btn_open_canvas.pressed.connect(_on_btn_open_canvas_pressed)
 	
+	# Center the Camera2D in paintingscreen
+	var camera_node = paintingscreen_instance.find_child("Camera2D")
+	if camera_node:
+		camera_node.position = get_size() / 2
+
 	update_ui()
 
 func _process(delta: float) -> void:

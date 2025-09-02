@@ -20,7 +20,7 @@ var unfilled_pixels: Array[Vector2i] = []
 
 # Propriétés du Canvas (pourront être gérées par PaintingView plus tard)
 var resolution_level: int = 1
-var fill_speed_level: int = 50
+var fill_speed_level: int = 1
 var sell_price:       int = 1000
 
 #==============================================================================
@@ -79,7 +79,7 @@ func _on_canvas_fill_timer_timeout():
 	var pixel_pos = unfilled_pixels.pop_at(random_index)
 	
 	# Dessiner le pixel
-	canvas_image.set_pixelv(pixel_pos, Color(randf(), randf(), randf(), snapped(randf(), 0.01)))
+	canvas_image.set_pixelv(pixel_pos, Color(randf(), randf(), randf(), snapped(randf_range(0.6,1), 0.01)))
 	
 	# Mettre à jour la texture
 	canvas_texture.update(canvas_image)

@@ -7,9 +7,9 @@
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3
-anchor_right = 2.0
-anchor_bottom = 2.025
-offset_bottom = -0.200073
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3

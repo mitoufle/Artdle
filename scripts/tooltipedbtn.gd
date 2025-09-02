@@ -21,7 +21,7 @@ func _on_mouse_entered():
   
   # Ajouter l'infobulle à l'arbre de la scène (à la racine)
   # pour qu'elle s'affiche au-dessus de tous les éléments de l'interface utilisateur.
-  get_tree().get_root().add_child(tooltip_instance)
+  get_tree().get_root().get_node("Main").get_node("MainLayout").add_child(tooltip_instance)
 
 func _on_mouse_exited():
  # Si l'infobulle est affichée, la supprimer

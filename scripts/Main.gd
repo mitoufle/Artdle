@@ -1,12 +1,14 @@
 extends Control
 # On récupère des références directes pour éviter les erreurs de chemin plus tard
-@onready var top_bar: HBoxContainer  = $MainLayout/TopBar
-@onready var btn_accueil: Button     = $MainLayout/TopBar/btnAccueil
-@onready var btn_peinture: Button    = $MainLayout/TopBar/btnPeinture
-@onready var btn_ascendancy: Button  = $MainLayout/TopBar/btnAscendancy
-@onready var content: PanelContainer = $Content
-@onready var lblInspiCount: Label    = $MainLayout/TopBar/lblInspiCount
-@onready var Floating_text_scene     = preload("res://Scenes/floating_text.tscn")
+@onready var top_bar: HBoxContainer = $MainLayout/VBoxContainer/TopBar
+@onready var btn_accueil: Button = $MainLayout/VBoxContainer/TopBar/btnAccueil
+@onready var btn_peinture: Button = $MainLayout/VBoxContainer/TopBar/btnPeinture
+@onready var btn_ascendancy: Button = $MainLayout/VBoxContainer/TopBar/btnAscendancy
+@onready var content: PanelContainer = $MainLayout/VBoxContainer/Content
+@onready var bottom_bar = $MainLayout/VBoxContainer/BottomBar
+@onready var lblInspiCount: Label = $MainLayout/VBoxContainer/TopBar/lblInspiCount
+@onready var main_layout: CanvasLayer = $MainLayout
+@onready var Floating_text_scene = preload("res://Scenes/floating_text.tscn")
 
 
 const VIEWS_PATH := "res://views/"
@@ -21,45 +23,30 @@ func _ready() -> void:
 	# Get a reference to the autoloaded SceneManager.
 	var scene_manager = get_node("/root/SceneManager")
 	# Pass the SceneContainer node to the manager.
-	SceneManager.set_scene_container(scene_manager)
+	SceneManager.set_scene_container(content)
 	
 	# Charger la vue d’accueil au démarrage
-	SceneManager.load_game_scene("res://views/AccueilView.tscn")
+	load_view_by_name("AccueilView")
 
 func _on_btn_accueil_pressed() -> void:
-	SceneManager.load_game_scene("res://views/AccueilView.tscn")
+	load_view_by_name("AccueilView")
 
 func _on_btn_peinture_pressed() -> void:
-	SceneManager.load_game_scene("res://views/PaintingView.tscn")
+	load_view_by_name("PaintingView")
 	
 func _on_btn_ascendancy_pressed() -> void:
-	SceneManager.load_game_scene("res://views/AscendancyView.tscn")
+	load_view_by_name("AscendancyView")
 	
-func load_view(scene_file: String) -> void:
-	# 1) Vider la zone de contenu (supprimer l’ancienne vue)
-	for child in content.get_children():
-		child.queue_free()
-
-	# 2) Charger et instancier la nouvelle vue
-	var path := VIEWS_PATH + scene_file
-	var packed_scene := load(path)
-	if packed_scene == null:
-		push_warning("Impossible de charger la vue : " + path)
-		return
-
-	var view_instance: Node = (packed_scene as PackedScene).instantiate()
-	# 3) Ajouter la vue dans la zone de contenu
-	content.add_child(view_instance)
+func load_view_by_name(view_name: String) -> void:
+	SceneManager.load_game_scene(VIEWS_PATH + view_name + ".tscn")
+	bottom_bar.set_view_specific_currencies(view_name)
 
 func update_ui(key:String, value: Variant) -> void:
-	match key:
-		"inspiration":
-			lblInspiCount.text = "inspiration : " + str(round(value * 1000) /1000.0)
-		_:
-			push_warning("Unhandled UI update for key: %s" % key)
+	pass
 
 func add_ressource_feedback(amount: int):
 	var ft = Floating_text_scene.instantiate()
-	add_child(ft)
+	ft.z_index = 10
+	main_layout.add_child(ft)
 	ft.start("+%d" % amount, Color(1,1,0))
 	
