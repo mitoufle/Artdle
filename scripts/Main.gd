@@ -58,7 +58,7 @@ func update_ui(key:String, value: Variant) -> void:
 		_:
 			push_warning("Unhandled UI update for key: %s" % key)
 
-func add_ressource_feedback(amount: int= 1 ):
+func add_ressource_feedback(amount: int):
 	var ft = Floating_text_scene.instantiate()
 	add_child(ft)
 	ft.start("+%d" % amount, Color(1,1,0))

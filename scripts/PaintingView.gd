@@ -1,109 +1,93 @@
 extends Control
 
-# Variables locales pour le coût et la génération
-var Painting_incrementer: float = 1
+#==============================================================================
+# Variables locales à la vue Peinture
+#==============================================================================
+
+# Améliorations et coûts locaux
+var painting_incrementer: float = 1
+var enhanse_inspi_cost: int = 50
+
+# Atelier
 var atelier_count: int = 0
 var atelier_cost: int = 10
 var atelier_production: float = 0.2   # inspiration/sec/atelier
-var enhanseInspiCost: int = 50 
-#var painting_screen_scene = preload("res://views/paintingscreen.tscn")
+
+#==============================================================================
+# Variables internes
+#==============================================================================
+
 var painting_screen_instance
 var blinking = false
 var hover = false
 var tooltip_txt = "Workshop"
 
+#==============================================================================
+# Références OnReady
+#==============================================================================
 
-
-@onready var tooltip_scene = preload("res://Scenes/CustomTooltip.tscn")
 @onready var painting_screen_scene = preload("res://Scenes/paintingscreen.tscn")
+@onready var canvas_view_scene = preload("res://scenes/views/CanvasView.tscn") # Charger notre nouvelle scène
+
 @onready var btn_peindre: Button = $BtnAddInspiration
 @onready var btn_atelier: Button = $BtnBuildStuff
 @onready var btn_enhancePainting: Button = $BtnEnhancePainting
 
-func _ready() -> void:
+#==============================================================================
+# Fonctions Godot
+#==============================================================================
 
-	 # instancie PaintingScreen dans le control node
+func _ready() -> void:
+	# --- Instance de la scène de peinture (arrière-plan) ---
 	painting_screen_instance = painting_screen_scene.instantiate()
 	add_child(painting_screen_instance)
 	
-	# stop l'animation tant qu'on a pas assez d'argent pour acheter l'atelier
-	painting_screen_instance.get_node("workshop_blink_sign").stop()
-	painting_screen_instance.get_node("workshop_blink_sign").frame = 0
+	# --- Instance de la vue du Canvas ---
+	var canvas_instance = canvas_view_scene.instantiate()
+	add_child(canvas_instance)
 	
-	# connecte la boutons à leurs fonctions
+	# --- Connexion des signaux des boutons ---
 	btn_peindre.pressed.connect(_on_btn_peindre_pressed)
-	#btn_atelier.pressed.connect(_on_btn_atelier_pressed)
 	btn_enhancePainting.pressed.connect(_on_btn_enhancepainting_pressed)
 	
-	#btn_atelier.mouse_entered.connect(_on_btn_atelier_entered)
-	#btn_atelier.mouse_exited.connect(_on_btn_atelier_exited)
-	
-	var anim = painting_screen_instance.get_node("workshop_blink_sign")
-	anim.frame = 0
-	update_ui() 
+	update_ui()
 
 func _process(delta: float) -> void:
-	
-	var anim = painting_screen_instance.get_node("workshop_blink_sign")
-	
 	# Production automatique par atelier
 	if atelier_count > 0:
 		GameState.set_inspiration(atelier_count * atelier_production * delta)
 		
-	# reset l'état du blink du paneau
-	if GameState.inspiration >= 10 and not hover:
-		tooltip_txt="Wah, mais en fait tu es Yann! achete cet atelier pour 10 Balles, quasiment rien pour toi!"
-		if not blinking:
-			anim.play()
-			blinking = true
-	else:
-		if blinking:
-			anim.stop()
-			anim.frame = 0
-			blinking = false
-			
 	# Met à jour l'UI chaque frame
 	update_ui()
 
+#==============================================================================
+# Fonctions connectées aux signaux
+#==============================================================================
+
 func _on_btn_peindre_pressed() -> void:
 	var main_node = get_tree().get_root().get_node("Main")
-	main_node.add_ressource_feedback()
-	GameState.set_inspiration(Painting_incrementer)
+	main_node.add_ressource_feedback(painting_incrementer)
+	GameState.set_inspiration(painting_incrementer)
 	update_ui()
 
 func _on_btn_enhancepainting_pressed() -> void:
-	if GameState.inspiration >= enhanseInspiCost:
-		GameState.update_inspiration(-enhanseInspiCost)
-		enhanseInspiCost = enhanseInspiCost * 1.6
-		GameState.enhanceInspi *= 2
+	if GameState.get_inspiration() >= enhanse_inspi_cost:
+		GameState.set_inspiration(-enhanse_inspi_cost)
+		enhanse_inspi_cost = enhanse_inspi_cost * 1.6
+		painting_incrementer *= 2
 	update_ui()
 
 func _on_btn_build_workshop_pressed() -> void:
-	
-	if GameState.inspiration >= atelier_cost:
-		GameState.inspiration -= atelier_cost
+	if GameState.get_inspiration() >= atelier_cost:
+		GameState.set_inspiration(-atelier_cost)
 		atelier_count += 1
-		atelier_cost = int(atelier_cost * 1.5) # le coût augmente
+		atelier_cost = int(atelier_cost * 1.5)
 		update_ui()
 
+#==============================================================================
+# Fonctions UI
+#==============================================================================
+
 func update_ui() -> void:
-
-	btn_peindre.text = "Peindre (+1)"
-	btn_enhancePainting.text = "enhance painting (" + str(int(enhanseInspiCost)) + "inspi)"
-
-func show_floating_text(text: String):
-	var label = Label.new()
-	label.text = text
-	label.modulate = Color(1, 1, 1, 1) # blanc opaque
-	label.position = position
-	
-	add_child(label)
-
-	var tween = get_tree().create_tween()
-	tween.tween_property(label, "position", position + Vector2(0, -50), 0.8) # monte de 50px en 0.8s
-	tween.tween_property(label, "modulate:a", 0.0, 0.8) # disparaît en fondu
-	
-	# supprimer le label quand l’animation est finie
-	tween.finished.connect(func():
-		label.queue_free()
-	)
+	btn_peindre.text = "Peindre (+" + str(painting_incrementer) + ")"
+	btn_enhancePainting.text = "Enhance Painting (" + str(int(enhanse_inspi_cost)) + " inspi)"

@@ -1,7 +1,7 @@
 extends Node2D
 
 
-
+@export var increment_number: float
 @export var float_distance = 50
 @export var float_duration = 0.8
 
