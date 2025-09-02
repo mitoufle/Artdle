@@ -1,6 +1,6 @@
 extends Node
 
-@export var tooltip_scene = preload("res://Scenes/Tooltip.tscn")
+@export var tooltip_scene = preload("res://Scenes/CustomTooltip.tscn")
 var tooltip_instance: Control = null
 
 func show_tooltip(line1: String, line2: String, position: Vector2):

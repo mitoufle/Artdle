@@ -14,7 +14,7 @@ var tooltip_txt = "Workshop"
 
 
 
-@onready var tooltip_scene = preload("res://Scenes/tooltip.tscn")
+@onready var tooltip_scene = preload("res://Scenes/CustomTooltip.tscn")
 @onready var painting_screen_scene = preload("res://Scenes/paintingscreen.tscn")
 @onready var btn_peindre: Button = $BtnAddInspiration
 @onready var btn_atelier: Button = $BtnBuildStuff
