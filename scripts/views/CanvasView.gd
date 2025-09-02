@@ -3,7 +3,7 @@ extends MarginContainer
 #==============================================================================
 # Références aux Nœuds de la Scène
 #==============================================================================
-@onready var canvas_display: TextureRect = $VBoxContainer/CanvasDisplay
+@onready var canvas_display: TextureRect = $VBoxContainer/AspectRatioContainer/CanvasDisplay
 @onready var progress_bar: ProgressBar = $VBoxContainer/ProgressBar
 @onready var sell_button: Button = $VBoxContainer/SellButton
 
@@ -62,6 +62,7 @@ func _initialize_new_canvas():
 	canvas_image.fill(Color.TRANSPARENT)
 	canvas_texture = ImageTexture.create_from_image(canvas_image)
 	canvas_display.texture = canvas_texture
+	canvas_display.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 func _on_canvas_fill_timer_timeout():
 	if current_pixel_count >= max_pixels:

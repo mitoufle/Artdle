@@ -29,6 +29,16 @@ offset_bottom = 346.0
 size_flags_horizontal = 4
 text = "Peindre (+1 inspi)"
 
+[node name="BtnOpenCanvas" type="Button" parent="."]
+z_index = 2
+layout_mode = 2
+offset_left = 516.0
+offset_top = 355.0
+offset_right = 658.0
+offset_bottom = 386.0
+size_flags_horizontal = 4
+text = "Voir le Canvas"
+
 [node name="BtnEnhancePainting" type="Button" parent="."]
 z_index = 1
 layout_mode = 2

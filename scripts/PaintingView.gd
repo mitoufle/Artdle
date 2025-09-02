@@ -17,7 +17,7 @@ var atelier_production: float = 0.2   # inspiration/sec/atelier
 # Variables internes
 #==============================================================================
 
-var painting_screen_instance
+var canvas_popup_instance
 var blinking = false
 var hover = false
 var tooltip_txt = "Workshop"
@@ -26,29 +26,26 @@ var tooltip_txt = "Workshop"
 # Références OnReady
 #==============================================================================
 
-@onready var painting_screen_scene = preload("res://Scenes/paintingscreen.tscn")
-@onready var canvas_view_scene = preload("res://scenes/views/CanvasView.tscn") # Charger notre nouvelle scène
+@onready var canvas_popup_scene = preload("res://Scenes/CanvasPopup.tscn")
 
 @onready var btn_peindre: Button = $BtnAddInspiration
 @onready var btn_atelier: Button = $BtnBuildStuff
 @onready var btn_enhancePainting: Button = $BtnEnhancePainting
+@onready var btn_open_canvas: Button = $BtnOpenCanvas
 
 #==============================================================================
 # Fonctions Godot
 #==============================================================================
 
 func _ready() -> void:
-	# --- Instance de la scène de peinture (arrière-plan) ---
-	painting_screen_instance = painting_screen_scene.instantiate()
-	add_child(painting_screen_instance)
-	
 	# --- Instance de la vue du Canvas ---
-	var canvas_instance = canvas_view_scene.instantiate()
-	add_child(canvas_instance)
+	canvas_popup_instance = canvas_popup_scene.instantiate()
+	add_child(canvas_popup_instance)
 	
 	# --- Connexion des signaux des boutons ---
 	btn_peindre.pressed.connect(_on_btn_peindre_pressed)
 	btn_enhancePainting.pressed.connect(_on_btn_enhancepainting_pressed)
+	btn_open_canvas.pressed.connect(_on_btn_open_canvas_pressed)
 	
 	update_ui()
 
@@ -83,6 +80,9 @@ func _on_btn_build_workshop_pressed() -> void:
 		atelier_count += 1
 		atelier_cost = int(atelier_cost * 1.5)
 		update_ui()
+
+func _on_btn_open_canvas_pressed() -> void:
+	canvas_popup_instance.popup()
 
 #==============================================================================
 # Fonctions UI
