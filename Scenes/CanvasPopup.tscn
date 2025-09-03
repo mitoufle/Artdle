@@ -1,15 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://bde7a8f8d7q7j"]
+[gd_scene load_steps=3 format=3 uid="uid://bde7a8f8d7q7j"]
 
 [ext_resource type="PackedScene" uid="uid://bgj4i508yh306" path="res://Scenes/views/CanvasView.tscn" id="1_abcde"]
+[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="1_sk7dd"]
 
 [node name="CanvasPopup" type="PopupPanel"]
 title = "Canvas"
 initial_position = 2
-size = Vector2i(400, 401)
+size = Vector2i(400, 403)
 visible = true
+theme = ExtResource("1_sk7dd")
 
 [node name="CanvasView" parent="." instance=ExtResource("1_abcde")]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 396.0
-offset_bottom = 397.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 395.0
+offset_bottom = 398.0

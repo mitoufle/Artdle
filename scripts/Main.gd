@@ -43,9 +43,8 @@ func load_view_by_name(view_name: String) -> void:
 func update_ui(key:String, value: Variant) -> void:
 	pass
 
-func add_ressource_feedback(amount: int):
+func add_ressource_feedback(amount: int, icon: Texture2D):
 	var ft = Floating_text_scene.instantiate()
-	ft.z_index = 10
 	main_layout.add_child(ft)
-	ft.start("+%d" % amount, Color(1,1,0))
+	ft.start("+%d" % amount, icon, Color(1,1,0))
 	

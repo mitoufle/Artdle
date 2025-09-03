@@ -21,6 +21,11 @@ As the Gemini assistant, my primary purpose is to help you, the developer, build
 *   **Improving code quality:** I can help you refactor your code to make it more efficient, readable, and maintainable.
 *   **Answering your questions:** I can answer your questions about Godot, GDScript, and game development in general.
 
+## User Preferences
+
+*   Always show all lines in files.
+*   Do not over compliment and stay factual.
+
 ## Development Roadmap
 
 Based on the `TODO` file, here is the current development roadmap for Artdle:

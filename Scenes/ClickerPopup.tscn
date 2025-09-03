@@ -1,0 +1,46 @@
+[gd_scene load_steps=4 format=3 uid="uid://c4tv17mv1f8hl"]
+
+[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="1_abcde"]
+[ext_resource type="Script" uid="uid://ctgo253n0q1wb" path="res://scripts/views/ClickerPopup.gd" id="2_abcde"]
+[ext_resource type="Texture2D" uid="uid://cfxvhn30aj0ap" path="res://artdleAsset/coin.png" id="3_gxb5b"]
+
+[node name="ClickerPopup" type="PopupPanel"]
+title = "Clicker"
+initial_position = 2
+size = Vector2i(300, 400)
+visible = true
+theme = ExtResource("1_abcde")
+script = ExtResource("2_abcde")
+coin_icon = ExtResource("3_gxb5b")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 295.0
+offset_bottom = 395.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ClickPowerLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Click Power: 1"
+
+[node name="AutoclickSpeedLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Autoclick Speed: 0"
+
+[node name="ClickButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Click Me!"
+
+[node name="UpgradeClickPowerButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Upgrade Click Power (10 Gold)"
+
+[node name="UpgradeAutoclickSpeedButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Upgrade Autoclick Speed (50 Gold)"

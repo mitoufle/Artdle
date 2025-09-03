@@ -1,102 +1,58 @@
 extends MarginContainer
 
 #==============================================================================
-# Références aux Nœuds de la Scène
+# Scene References
 #==============================================================================
 @onready var canvas_display: TextureRect = $VBoxContainer/AspectRatioContainer/CanvasDisplay
 @onready var progress_bar: ProgressBar = $VBoxContainer/ProgressBar
 @onready var sell_button: Button = $VBoxContainer/SellButton
 
 #==============================================================================
-# Données & État du Canvas
-#==============================================================================
-var canvas_image: Image
-var canvas_texture: ImageTexture
-var canvas_fill_timer: Timer
-
-var current_pixel_count: int = 0
-var max_pixels: int
-var unfilled_pixels: Array[Vector2i] = []
-
-# Propriétés du Canvas (pourront être gérées par PaintingView plus tard)
-var resolution_level: int = 1
-var fill_speed_level: int = 1
-var sell_price:       int = 1000
-
-#==============================================================================
-# Fonctions Godot
+# Godot Lifecycle
 #==============================================================================
 func _ready():
-	# Préparer un nouveau canvas
-	_initialize_new_canvas()
+	# Connect to GameState signals
+	GameState.canvas_updated.connect(_on_canvas_updated)
+	GameState.canvas_progress_updated.connect(_on_canvas_progress_updated)
+	GameState.canvas_completed.connect(_on_canvas_completed)
 	
-	# Mettre en place le timer
-	canvas_fill_timer = Timer.new()
-	add_child(canvas_fill_timer)
-	canvas_fill_timer.timeout.connect(_on_canvas_fill_timer_timeout)
-	_update_fill_speed()
-	canvas_fill_timer.start()
-	
-	# État initial de l'UI
+	# Initial UI state
 	sell_button.disabled = true
 	sell_button.pressed.connect(_on_sell_button_pressed)
 
+	# Request initial state from GameState
+	if GameState.canvas_texture != null:
+		_on_canvas_updated(GameState.canvas_texture)
+	_on_canvas_progress_updated(GameState.current_pixel_count, GameState.max_pixels)
+	if GameState.current_pixel_count >= GameState.max_pixels:
+		_on_canvas_completed()
+
 #==============================================================================
-# Logique du Canvas
+# Signal Handlers (from GameState)
 #==============================================================================
-func _initialize_new_canvas():
-	var width = 32 * resolution_level
-	var height = 32 * resolution_level
-	max_pixels = width * height
-	current_pixel_count = 0
-	
-	progress_bar.max_value = max_pixels
-	progress_bar.value = 0
-	
-	unfilled_pixels.clear()
-	for y in range(height):
-		for x in range(width):
-			unfilled_pixels.append(Vector2i(x, y))
-	
-	canvas_image = Image.create(width, height, false, Image.FORMAT_RGBA8)
-	canvas_image.fill(Color.TRANSPARENT)
-	canvas_texture = ImageTexture.create_from_image(canvas_image)
-	canvas_display.texture = canvas_texture
+func _on_canvas_updated(new_texture: ImageTexture):
+	canvas_display.texture = new_texture
 	canvas_display.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
-func _on_canvas_fill_timer_timeout():
-	if current_pixel_count >= max_pixels:
-		if not sell_button.disabled:
-			return # Déjà terminé
+func _on_canvas_progress_updated(current_pixels: int, max_pixels: int):
+	progress_bar.max_value = max_pixels
+	progress_bar.value = current_pixels
 
-		print("Canvas terminé !")
-		canvas_fill_timer.stop()
-		sell_button.disabled = false
-		return
+func _on_canvas_completed():
+	sell_button.disabled = false
 
-	# Choisir un pixel au hasard
-	var random_index = randi() % unfilled_pixels.size()
-	var pixel_pos = unfilled_pixels.pop_at(random_index)
-	
-	# Dessiner le pixel
-	canvas_image.set_pixelv(pixel_pos, Color(randf(), randf(), randf(), snapped(randf_range(0.6,1), 0.01)))
-	
-	# Mettre à jour la texture
-	canvas_texture.update(canvas_image)
-	
-	current_pixel_count += 1
-	progress_bar.value = current_pixel_count
-
-func _update_fill_speed():
-	var speed = 1.0 / float(fill_speed_level)
-	canvas_fill_timer.wait_time = speed
-
+#==============================================================================
+# UI Event Handlers
+#==============================================================================
 func _on_sell_button_pressed():
-	print("Vente du canvas !")
-	GameState.set_inspiration(sell_price)
-	# TODO: Ajouter la logique pour donner les récompenses
-	
-	# Réinitialiser pour un nouveau canvas
+	GameState.sell_canvas()
 	sell_button.disabled = true
-	_initialize_new_canvas()
-	canvas_fill_timer.start()
+
+#==============================================================================
+# Public Functions (for upgrades, etc.)
+#==============================================================================
+func upgrade_resolution():
+	GameState.upgrade_resolution()
+
+func upgrade_fill_speed():
+	GameState.upgrade_fill_speed()

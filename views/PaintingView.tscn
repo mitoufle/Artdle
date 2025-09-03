@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://dcm3fck3p2gj7"]
 
-[ext_resource type="Script" uid="uid://daww5r6t5ivr5" path="res://scripts/PaintingView.gd" id="1_tvnqg"]
+[ext_resource type="Script" uid="uid://daww5r6t5ivr5" path="res://scripts/views/PaintingView.gd" id="1_tvnqg"]
 [ext_resource type="PackedScene" uid="uid://c1id4y8ipgg7q" path="res://Scenes/paintingscreen.tscn" id="2_tvnqg"]
 [ext_resource type="Script" uid="uid://dvjf8nckqigms" path="res://scripts/tooltipedbtn.gd" id="3_hf5x0"]
 [ext_resource type="PackedScene" uid="uid://jx6gj886xxbf" path="res://Scenes/CustomTooltip.tscn" id="4_kfhel"]
@@ -19,16 +19,6 @@ script = ExtResource("1_tvnqg")
 
 [node name="paintingscreen" parent="." instance=ExtResource("2_tvnqg")]
 
-[node name="BtnAddInspiration" type="Button" parent="."]
-z_index = 1
-layout_mode = 2
-offset_left = 516.0
-offset_top = 315.0
-offset_right = 658.0
-offset_bottom = 346.0
-size_flags_horizontal = 4
-text = "Peindre (+1 inspi)"
-
 [node name="BtnOpenCanvas" type="Button" parent="."]
 z_index = 2
 layout_mode = 2
@@ -39,15 +29,14 @@ offset_bottom = 386.0
 size_flags_horizontal = 4
 text = "Voir le Canvas"
 
-[node name="BtnEnhancePainting" type="Button" parent="."]
+[node name="BtnOpenClickerPopup" type="Button" parent="."]
 z_index = 1
 layout_mode = 2
 offset_left = 515.0
 offset_top = 278.0
 offset_right = 732.0
 offset_bottom = 309.0
-tooltip_text = "double inspiration from painting"
-text = "enhance painting (50 inspi)"
+text = "Open Clicker"
 
 [node name="BtnBuildStuff" type="Button" parent="."]
 z_index = 5
@@ -76,3 +65,6 @@ metadata/_custom_type_script = "uid://dvjf8nckqigms"
 [connection signal="mouse_entered" from="BtnBuildWorkshop" to="BtnBuildWorkshop" method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="BtnBuildWorkshop" to="BtnBuildWorkshop" method="_on_mouse_exited"]
 [connection signal="pressed" from="BtnBuildWorkshop" to="." method="_on_btn_build_workshop_pressed"]
+
+
+[editable path="BtnBuildWorkshop"]
