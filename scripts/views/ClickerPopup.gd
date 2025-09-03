@@ -3,7 +3,8 @@ extends PopupPanel
 #==============================================================================
 # Exports
 #==============================================================================
-@export var coin_icon: Texture2D
+@export var coin_spritesheet: Texture2D
+@export var inspiration_spritesheet: Texture2D
 
 #==============================================================================
 # Preloads
@@ -43,12 +44,12 @@ func _on_click_stats_changed(new_stats: Dictionary):
 
 func _on_click_button_pressed():
 	GameState.manual_click()
-	show_feedback(GameState.click_power, coin_icon)
+	show_feedback(GameState.click_power, inspiration_spritesheet, 12, 1, "inspiration_rotate")
 
 #==============================================================================
 # Feedback
 #==============================================================================
-func show_feedback(amount: int, icon: Texture2D):
+func show_feedback(amount: int, icon: Texture2D, hframes: int, vframes: int, animation_name: String):
 	var ft = FLOATING_TEXT_SCENE.instantiate()
 	add_child(ft)
-	ft.start("+%d" % amount, icon, Color(1,1,0))
+	ft.start("+%d" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))

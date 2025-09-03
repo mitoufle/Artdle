@@ -1,6 +1,16 @@
 extends MarginContainer
 
 #==============================================================================
+# Exports
+#==============================================================================
+@export var coin_spritesheet: Texture2D
+
+#==============================================================================
+# Preloads
+#==============================================================================
+const FLOATING_TEXT_SCENE = preload("res://Scenes/floating_text.tscn")
+
+#==============================================================================
 # Scene References
 #==============================================================================
 @onready var canvas_display: TextureRect = $VBoxContainer/AspectRatioContainer/CanvasDisplay
@@ -58,3 +68,12 @@ func _on_canvas_upgrade_costs_changed(new_costs: Dictionary):
 func _on_sell_button_pressed():
 	GameState.sell_canvas()
 	sell_button.disabled = true
+	show_feedback(GameState.sell_price, coin_spritesheet, 12, 1, "rotate")
+
+#==============================================================================
+# Feedback
+#==============================================================================
+func show_feedback(amount: int, icon: Texture2D, hframes: int, vframes: int, animation_name: String):
+	var ft = FLOATING_TEXT_SCENE.instantiate()
+	get_parent().add_child(ft)
+	ft.start("+%d" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))

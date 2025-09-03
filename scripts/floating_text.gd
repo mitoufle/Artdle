@@ -1,7 +1,6 @@
 extends Node2D
 
 @export var amount: String
-@export var icon: Texture2D
 
 @export var float_distance = 50
 @export var float_duration = 0.8
@@ -10,11 +9,13 @@ extends Node2D
 @onready var label: Label = $Label
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
-func start(text: String, icon_texture: Texture2D, color: Color = Color(1,1,1,1)):
+func start(text: String, icon_texture: Texture2D, hframes: int, vframes: int, animation_name: String, color: Color = Color(1,1,1,1)):
 	label.text = text
 	sprite.texture = icon_texture
+	sprite.hframes = hframes
+	sprite.vframes = vframes
 	
-	animation_player.play("rotate")
+	animation_player.play(animation_name)
 	
 	global_position = get_global_mouse_position()
 	

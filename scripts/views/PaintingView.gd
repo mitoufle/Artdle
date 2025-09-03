@@ -25,6 +25,7 @@ var clicker_popup_instance
 @onready var paintingscreen_instance = $paintingscreen
 
 @onready var btn_atelier: Button = $BtnBuildStuff
+@onready var btn_debug: Button = $Debug
 @onready var btn_open_canvas: Button = $BtnOpenCanvas
 @onready var btn_open_clicker_popup: Button = $BtnOpenClickerPopup
 
@@ -71,3 +72,9 @@ func _on_btn_open_canvas_pressed() -> void:
 
 func _on_btn_open_clicker_popup_pressed() -> void:
 	clicker_popup_instance.popup()
+
+
+func _on_debug_pressed() -> void:
+	GameState.set_inspiration(1000)
+	GameState.set_gold(1000)
+	GameState.upgr
