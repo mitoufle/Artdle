@@ -11,7 +11,12 @@ Next Steps
     [ ] Inspiration
     [ ] Experience
 [ ] Integrate all painting mechanics and upgrades.
-    [ ] Pixel Canvas
+    [x] Pixel Canvas
+        [ ] Enhance Canvas fill speed
+        [ ] Enhance Canvas resolution
+        [ ] Enhance Canvas storage
+        [ ] Chances to paint Masterpieces
+        [ ] Bulk selling price increase
     [ ] Tool crafting in workshop
     [ ] painting quests
     [ ] painting minigame (watch a statick pixel image and reproduce closely it blindly using provided pixel
