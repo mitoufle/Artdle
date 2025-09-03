@@ -6,7 +6,6 @@ extends Control
 @onready var btn_ascendancy: Button = $MainLayout/VBoxContainer/TopBar/btnAscendancy
 @onready var content: PanelContainer = $MainLayout/VBoxContainer/Content
 @onready var bottom_bar = $MainLayout/VBoxContainer/BottomBar
-@onready var lblInspiCount: Label = $MainLayout/VBoxContainer/TopBar/lblInspiCount
 @onready var main_layout: CanvasLayer = $MainLayout
 @onready var Floating_text_scene = preload("res://Scenes/floating_text.tscn")
 
