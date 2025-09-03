@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cgpj55ih0oweg" path="res://scripts/BottomBar.gd" id="1_abcde"]
 [ext_resource type="PackedScene" uid="uid://d35cxm7212g18" path="res://Scenes/controls/CurrencyDisplay.tscn" id="2_abcde"]
 [ext_resource type="Texture2D" uid="uid://cv2ue1b1apq7e" path="res://artdleAsset/Currency/coin.png" id="3_nah5v"]
-[ext_resource type="Texture2D" uid="uid://b2seg3fcjqe8e" path="res://artdleAsset/fame.png" id="4_twmnm"]
+[ext_resource type="Texture2D" uid="uid://c7v2kbdpg1w7p" path="res://artdleAsset/Currency/fame.png" id="4_nah5v"]
 [ext_resource type="Texture2D" uid="uid://r3o1c0uxigsr" path="res://artdleAsset/Inspiration.png" id="5_d7j78"]
 [ext_resource type="Texture2D" uid="uid://dlnbf30ht7elt" path="res://artdleAsset/Ascendancy_point.png" id="6_2nc8h"]
 [ext_resource type="Texture2D" uid="uid://cxn2f41rg2avp" path="res://artdleAsset/Currency/Painting_mastery.png" id="7_52jlo"]
@@ -36,7 +36,7 @@ icon_texture = ExtResource("3_nah5v")
 [node name="FameDisplay" parent="MarginContainer/HBoxContainer" instance=ExtResource("2_abcde")]
 layout_mode = 2
 currency_type = "fame"
-icon_texture = ExtResource("4_twmnm")
+icon_texture = ExtResource("4_nah5v")
 
 [node name="InspirationDisplay" parent="MarginContainer/HBoxContainer" instance=ExtResource("2_abcde")]
 layout_mode = 2

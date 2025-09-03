@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://bfxoon8q4ff7w"]
+[gd_scene load_steps=7 format=3 uid="uid://bfxoon8q4ff7w"]
 
 [ext_resource type="Script" uid="uid://cep3w0m14p7kl" path="res://scripts/Main.gd" id="1_glv2v"]
 [ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
 [ext_resource type="Texture2D" uid="uid://djcnfw1v5vhx5" path="res://artdleAsset/topbtn.png" id="3_r0du0"]
 [ext_resource type="PackedScene" uid="uid://dpskjp8x1i7x" path="res://Scenes/BottomBar.tscn" id="4_abcde"]
+[ext_resource type="AudioStream" uid="uid://dcly5260fcs41" path="res://artdleAsset/music/ArtdleMainTheme.mp3" id="5_fos0i"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_uu6xs"]
 
@@ -80,3 +81,9 @@ layout_mode = 2
 
 [node name="FeedbackLayer" type="CanvasLayer" parent="."]
 layer = 128
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_fos0i")
+volume_db = -9.657
+autoplay = true
+parameters/looping = false

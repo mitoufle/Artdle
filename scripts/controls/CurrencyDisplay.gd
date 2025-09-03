@@ -21,5 +21,5 @@ func _ready():
 			_on_currency_changed(GameState.fame)
 		# Add other currency types here as needed
 
-func _on_currency_changed(value: float, type: String = ""):
+func _on_currency_changed(value: float):
 	amount_label.text = str(round(value * 1000) / 1000.0)

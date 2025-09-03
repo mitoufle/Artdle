@@ -5,12 +5,12 @@ extends Node2D
 @export var float_distance = 50
 @export var float_duration = 0.8
 
-@onready var sprite: Sprite2D = $Sprite2D
-@onready var label: Label = $Label
+@onready var sprite: Sprite2D                  = $Sprite2D
+@onready var label: Label                      = $Label
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
-func start(text: String, icon_texture: Texture2D, hframes: int, vframes: int, animation_name: String, color: Color = Color(1,1,1,1)):
-	label.text = text
+func start(text: String, icon_texture: Texture2D, hframes: int, vframes: int, animation_name: String, _color: Color = Color(1,1,1,1)):
+	label.text     = text
 	sprite.texture = icon_texture
 	sprite.hframes = hframes
 	sprite.vframes = vframes

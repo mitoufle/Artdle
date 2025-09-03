@@ -47,6 +47,7 @@ script = ExtResource("1_abcde")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_f3tku")
 hframes = 12
+frame = 10
 
 [node name="Label" type="Label" parent="."]
 anchors_preset = 8

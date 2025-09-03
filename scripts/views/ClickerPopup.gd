@@ -13,6 +13,7 @@ const FLOATING_TEXT_SCENE = preload("res://Scenes/floating_text.tscn")
 #==============================================================================
 # Scene References
 #==============================================================================
+@onready var click_sound: AudioStreamPlayer = $ClickSound
 @onready var click_power_label: Label = $VBoxContainer/ClickPowerLabel
 @onready var autoclick_speed_label: Label = $VBoxContainer/AutoclickSpeedLabel
 @onready var click_button: Button = $VBoxContainer/ClickButton
@@ -43,6 +44,7 @@ func _on_click_stats_changed(new_stats: Dictionary):
 
 func _on_click_button_pressed():
 	GameState.manual_click()
+	click_sound.play(0.3)
 	show_feedback(GameState.click_power, inspiration_spritesheet, 12, 1, "inspiration_rotate")
 
 #==============================================================================

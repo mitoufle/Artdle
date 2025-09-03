@@ -19,8 +19,6 @@ func _ready() -> void:
 	btn_peinture.pressed.connect(_on_btn_peinture_pressed)
 	btn_ascendancy.pressed.connect(_on_btn_ascendancy_pressed)
 	
-	# Get a reference to the autoloaded SceneManager.
-	var scene_manager = get_node("/root/SceneManager")
 	# Pass the SceneContainer node to the manager.
 	SceneManager.set_scene_container(content)
 	
@@ -40,7 +38,7 @@ func load_view_by_name(view_name: String) -> void:
 	SceneManager.load_game_scene(VIEWS_PATH + view_name + ".tscn")
 	bottom_bar.set_view_specific_currencies(view_name)
 
-func update_ui(key:String, value: Variant) -> void:
+func update_ui(_key:String, _value: Variant) -> void:
 	pass
 
 func add_ressource_feedback(amount: int, icon: Texture2D):
