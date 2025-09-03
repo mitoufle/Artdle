@@ -18,12 +18,36 @@ Next Steps
         [ ] Chances to paint Masterpieces
         [ ] Bulk selling price increase
     [ ] Tool crafting in workshop
-    [ ] painting quests
-    [ ] painting minigame (watch a statick pixel image and reproduce closely it blindly using provided pixel
+        [ ] create inventory
+        [ ] List of tools to acquire
+            [ ] Hat
+            [ ] Shirt
+            [ ] Pant
+            [ ] Boot
+            [ ] Paintbrush
+            [ ] Pallette
+            [ ] Ring x2
+            [ ] Necklace
+            [ ] Easel
+            [ ] Medals x5
+        [ ] Item tiers and stats
+        [ ] Tier item craft odds
+        [ ] Crafting ressources
+        [ ] Crafting speed
+    [ ] Painters Hiring
+        [ ] Painters tier
+        [ ] Painters stats
+        [ ] Painters passive currency amount
+        [ ] Painters passive currency generation speed
+        [ ] Painters xp & leveling
+        [ ] Painters Quests
     [ ] Idle clicking experience and related enhance & upgrades
+        [ ] Enhance click amount
+        [ ] Enhance click speed
+        [ ] enable autoclick
+        [ ] chances to get random click bonus, boost and upgrades
     [ ] Painting success
-    [ ] Painting gear and inventory
-    [ ] gear loot
+        [ ] list of succes and effects
 [ ] Implement Ascending system
     [x] Ascendency view
     [ ] Ascendency gain relative to gamestate
@@ -31,7 +55,16 @@ Next Steps
     [ ] Ascendency skill tree
 [x] auto ingame custom tooltip on custom buttons
 
-    
+    **V2**
+Painting
+[ ] Combat pannel
+    [ ] mobs
+    [ ] XP
+    [ ] skills
+    [ ] gear loot
+[ ] Craft    
+    [ ] enchants (V2)
+[ ] painting minigame (watch a statick pixel image and reproduce closely it blindly using provided pixel
 
 🔧 Quality of Life Improvements
 [ ] Display in-game tutorials for new players.
