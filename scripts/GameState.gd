@@ -12,6 +12,7 @@ signal paint_mastery_changed(new_paint_mastery_value:float)
 signal canvas_updated(new_texture: ImageTexture)
 signal canvas_progress_updated(current_pixels: int, max_pixels: int)
 signal canvas_completed()
+signal canvas_upgrade_costs_changed(new_costs: Dictionary)
 
 signal click_stats_changed(new_stats: Dictionary)
 
@@ -34,6 +35,9 @@ var level_cost: float = 1000
 var mastery_cost: float = 1000
 var prestige_inspiration_multiplier: float = 1
 var painting_mastery_multiplier: float = 1
+
+var upgrade_resolution_cost: int = 100
+var upgrade_fill_speed_cost: int = 50
 
 #==============================================================================
 # Canvas State & Properties
@@ -165,18 +169,34 @@ func _update_fill_speed():
 
 func sell_canvas():
 	print("Vente du canvas !")
-	set_inspiration(sell_price)
+	set_gold(sell_price)
 	
 	_initialize_new_canvas()
 	canvas_fill_timer.start()
 
 func upgrade_resolution():
-	resolution_level += 1
-	_initialize_new_canvas()
+	if inspiration >= upgrade_resolution_cost:
+		set_inspiration(-upgrade_resolution_cost)
+		resolution_level += 1
+		sell_price = int(sell_price * 1.8)
+		upgrade_resolution_cost = int(upgrade_resolution_cost * 1.5)
+		_initialize_new_canvas()
+		emit_canvas_upgrade_costs()
 
 func upgrade_fill_speed():
-	fill_speed_level += 1
-	_update_fill_speed()
+	if inspiration >= upgrade_fill_speed_cost:
+		set_inspiration(-upgrade_fill_speed_cost)
+		fill_speed_level += 1
+		upgrade_fill_speed_cost = int(upgrade_fill_speed_cost * 1.2)
+		_update_fill_speed()
+		emit_canvas_upgrade_costs()
+
+func emit_canvas_upgrade_costs():
+	var costs = {
+		"resolution_cost": upgrade_resolution_cost,
+		"fill_speed_cost": upgrade_fill_speed_cost
+	}
+	canvas_upgrade_costs_changed.emit(costs)
 
 #==============================================================================
 # Clicker Logic

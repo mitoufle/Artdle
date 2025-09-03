@@ -6,6 +6,11 @@ extends PopupPanel
 @export var coin_icon: Texture2D
 
 #==============================================================================
+# Preloads
+#==============================================================================
+const FLOATING_TEXT_SCENE = preload("res://Scenes/floating_text.tscn")
+
+#==============================================================================
 # Scene References
 #==============================================================================
 @onready var click_power_label: Label = $VBoxContainer/ClickPowerLabel
@@ -38,6 +43,12 @@ func _on_click_stats_changed(new_stats: Dictionary):
 
 func _on_click_button_pressed():
 	GameState.manual_click()
-	var main_node = get_tree().get_root().get_node("Main")
-	if main_node:
-		main_node.add_ressource_feedback(GameState.click_power, coin_icon)
+	show_feedback(GameState.click_power, coin_icon)
+
+#==============================================================================
+# Feedback
+#==============================================================================
+func show_feedback(amount: int, icon: Texture2D):
+	var ft = FLOATING_TEXT_SCENE.instantiate()
+	add_child(ft)
+	ft.start("+%d" % amount, icon, Color(1,1,0))
