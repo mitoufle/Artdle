@@ -3,13 +3,13 @@ extends Node
 #==============================================================================
 # Signals
 #==============================================================================
-signal inspiration_changed(type:String, new_inspiration_value:float)
+signal inspiration_changed(new_inspiration_value:float)
 signal ascendancy_level_changed(new_ascendancy_level_value:float)
 signal ascendancy_point_changed(new_ascendancy_point_value:float)
 signal gold_changed(new_gold_value:float)
+signal paint_mastery_changed(new_paint_mastery_value:float)
 signal fame_changed(new_fame_value:float)
 signal ascended()
-signal paint_mastery_changed(new_paint_mastery_value:float)
 
 signal canvas_updated(new_texture: ImageTexture)
 signal canvas_progress_updated(current_pixels: int, max_pixels: int)
@@ -91,7 +91,7 @@ func get_inspiration() -> float:
 
 func set_inspiration(amount:float):
 	inspiration += amount 
-	inspiration_changed.emit("inspiration", inspiration)
+	inspiration_changed.emit(inspiration)
 
 func set_gold(amount:float):
 	gold += amount

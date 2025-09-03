@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bfxoon8q4ff7w"]
+[gd_scene load_steps=6 format=3 uid="uid://bfxoon8q4ff7w"]
 
 [ext_resource type="Script" uid="uid://cep3w0m14p7kl" path="res://scripts/Main.gd" id="1_glv2v"]
+[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
 [ext_resource type="Texture2D" uid="uid://djcnfw1v5vhx5" path="res://artdleAsset/topbtn.png" id="3_r0du0"]
 [ext_resource type="PackedScene" uid="uid://dpskjp8x1i7x" path="res://Scenes/BottomBar.tscn" id="4_abcde"]
 
@@ -18,6 +19,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
+theme = ExtResource("2_abcde")
 script = ExtResource("1_glv2v")
 
 [node name="MainLayout" type="CanvasLayer" parent="."]

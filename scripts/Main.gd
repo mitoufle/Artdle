@@ -18,7 +18,6 @@ func _ready() -> void:
 	btn_accueil.pressed.connect(_on_btn_accueil_pressed)
 	btn_peinture.pressed.connect(_on_btn_peinture_pressed)
 	btn_ascendancy.pressed.connect(_on_btn_ascendancy_pressed)
-	GameState.inspiration_changed.connect(update_ui)
 	
 	# Get a reference to the autoloaded SceneManager.
 	var scene_manager = get_node("/root/SceneManager")

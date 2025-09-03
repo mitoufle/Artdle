@@ -15,4 +15,5 @@ corner_radius_bottom_left = 5
 
 [resource]
 default_base_scale = 1.03
+Panel/styles/panel = SubResource("StyleBoxFlat_0v81e")
 PopupPanel/styles/panel = SubResource("StyleBoxFlat_0v81e")
