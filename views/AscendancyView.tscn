@@ -2,8 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://d35cxm7212g18" path="res://Scenes/Ascendancy2DView.tscn" id="1_31lut"]
 [ext_resource type="Script" uid="uid://djjkdvyttryky" path="res://scripts/views/AscendancyView.gd" id="1_rdb0t"]
+[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
 [ext_resource type="PackedScene" uid="uid://cobsxucq2sb0y" path="res://Scenes/tooltipedbtn.tscn" id="2_ynd41"]
-[ext_resource type="PackedScene" uid="uid://jx6gj886xxbf" path="res://Scenes/CustomTooltip.tscn" id="3_ynd41"]
 
 [node name="AscendancyView" type="Control"]
 layout_mode = 3
@@ -12,9 +12,33 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_abcde")
 script = ExtResource("1_rdb0t")
 
 [node name="Ascendency2DView" parent="." instance=ExtResource("1_31lut")]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="AscendancyPointsLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Ascendancy Points: 0"
+horizontal_alignment = 1
+
+[node name="AscendCostLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Ascend Cost: 100 Fame"
+horizontal_alignment = 1
+
+[node name="AscendButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Ascend"
 
 [node name="Tooltipedbtn" parent="." instance=ExtResource("2_ynd41")]
 layout_mode = 1
@@ -23,6 +47,5 @@ offset_top = 250.0
 offset_right = -444.0
 offset_bottom = -148.0
 theme_type_variation = &"FlatButton"
-tooltip_scene_path = ExtResource("3_ynd41")
 custom_tooltip_text = "⭐ Ascending as a legend ⭐"
 tooltype_style = "pulse"

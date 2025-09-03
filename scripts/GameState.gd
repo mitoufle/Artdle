@@ -7,6 +7,8 @@ signal inspiration_changed(type:String, new_inspiration_value:float)
 signal ascendancy_level_changed(new_ascendancy_level_value:float)
 signal ascendancy_point_changed(new_ascendancy_point_value:float)
 signal gold_changed(new_gold_value:float)
+signal fame_changed(new_fame_value:float)
+signal ascended()
 signal paint_mastery_changed(new_paint_mastery_value:float)
 
 signal canvas_updated(new_texture: ImageTexture)
@@ -24,6 +26,7 @@ var inspiration: float = 0
 var ascend_level: float = 0
 var paint_mastery: float = 0
 var gold: float = 0
+var fame: float = 0
 var Experience: float = 0
 var level: int = 1
 
@@ -33,6 +36,7 @@ var level: int = 1
 var ascendancy_cost: float = 1000
 var level_cost: float = 1000
 var mastery_cost: float = 1000
+var ascend_cost: float = 100
 var prestige_inspiration_multiplier: float = 1
 var painting_mastery_multiplier: float = 1
 
@@ -93,6 +97,10 @@ func set_gold(amount:float):
 	gold += amount
 	gold_changed.emit(gold)
 
+func set_fame(amount:float):
+	fame += amount
+	fame_changed.emit(fame)
+
 func set_paint_mastery(amount:float):
 	paint_mastery += amount
 	paint_mastery_changed.emit(paint_mastery)
@@ -108,16 +116,46 @@ func set_ascend_level(amount:float):
 #==============================================================================
 # Prestige Logic
 #==============================================================================
-func reset_prestige():
-	if inspiration >= ascendancy_cost:
-		var remainder = reduce_by_max_multiple(ascendancy_cost, inspiration)
-		# ... (logic to be implemented)
+func ascend():
+	if fame >= ascendancy_cost:
+		set_fame(-ascendancy_cost)
+		set_ascendancy_point(1) # Gain 1 ascendancy point
+		
+		# Reset relevant game state
+		inspiration = 0
+		gold = 0
+		
+		resolution_level = 1
+		fill_speed_level = 1
+		sell_price = 1000
+		
+		click_power = 1
+		autoclick_speed = 0.0
+		
+		_initialize_new_canvas()
+		_update_fill_speed()
+		_update_autoclick_timer()
+		
+		ascendancy_cost = int(ascendancy_cost * 2) # Double cost for next ascension
+		
+		ascended.emit()
+		
+		print("Ascended successfully!")
+	else:
+		print("Not enough fame to ascend!")
 
 func reduce_by_max_multiple(cost: int, currency: int) -> int:
 	if currency <= 0:
 		push_error("y must be a positive integer")
 		return cost
 	return cost % currency
+
+func buy_fame_with_gold(amount: float, gold_cost: float):
+	if gold >= gold_cost:
+		set_gold(-gold_cost)
+		set_fame(amount)
+		return true
+	return false
 
 #==============================================================================
 # Canvas Logic
@@ -170,6 +208,7 @@ func _update_fill_speed():
 func sell_canvas():
 	print("Vente du canvas !")
 	set_gold(sell_price)
+	set_fame(1) # Gain 1 fame per canvas sold
 	
 	_initialize_new_canvas()
 	canvas_fill_timer.start()

@@ -26,6 +26,10 @@ theme_override_constants/separation = 20
 layout_mode = 2
 text = "Gold: 0"
 
+[node name="FameLabel" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Fame: 0"
+
 [node name="InspirationLabel" type="Label" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "Inspiration: 0"

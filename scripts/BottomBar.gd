@@ -1,6 +1,7 @@
 extends PanelContainer
 
 @onready var gold_label = $MarginContainer/HBoxContainer/GoldLabel
+@onready var fame_label = $MarginContainer/HBoxContainer/FameLabel
 @onready var inspiration_label = $MarginContainer/HBoxContainer/InspirationLabel
 @onready var ascendancy_point_label = $MarginContainer/HBoxContainer/AscendancyPointLabel
 @onready var paint_mastery_label = $MarginContainer/HBoxContainer/PaintMasteryLabel
@@ -10,10 +11,12 @@ func _ready():
 	GameState.ascendancy_point_changed.connect(update_ascendancy_points)
 	GameState.gold_changed.connect(update_gold)
 	GameState.paint_mastery_changed.connect(update_paint_mastery)
+	GameState.fame_changed.connect(update_fame)
 
 	update_inspiration("inspiration", GameState.inspiration)
 	update_ascendancy_points(GameState.ascendancy_point)
 	update_gold(GameState.gold)
+	update_fame(GameState.fame)
 	update_paint_mastery(GameState.paint_mastery)
 
 func update_inspiration(key:String, value: float):
@@ -24,6 +27,9 @@ func update_ascendancy_points(value: float):
 
 func update_gold(value: float):
 	gold_label.text = "Gold: " + str(value)
+
+func update_fame(value: float):
+	fame_label.text = "Fame: " + str(value)
 
 func update_paint_mastery(value: float):
 	paint_mastery_label.text = "Paint Mastery: " + str(value)

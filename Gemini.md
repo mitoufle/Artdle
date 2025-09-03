@@ -6,8 +6,6 @@ This document outlines the role of the Gemini assistant in the development of th
 
 **Artdle** is a deep art-themed idle game where players embark on an endless journey of artistic progression and mastery. The game is being developed using the **Godot 4** game engine and **GDScript**.
 
-The core gameplay revolves around unlocking and combining different art forms to earn credits and unlock powerful new features, with the ultimate goal of becoming the most renowned artist in the galaxy.
-
 ## Architecture
 
 The global game state is managed by a singleton located at `scripts/GameState.gd`. This file is the single source of truth for all player data, including currencies, upgrades, and progression.
@@ -25,6 +23,7 @@ As the Gemini assistant, my primary purpose is to help you, the developer, build
 
 *   Always show all lines in files.
 *   Do not over compliment and stay factual.
+*   Do not apologize.
 
 ## Development Roadmap
 

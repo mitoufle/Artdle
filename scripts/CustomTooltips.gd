@@ -59,6 +59,8 @@ func set_text(new_text: String):
 				temp = "[b][wave]" + base_text + "[/wave][/b]"
 			"shake":
 				temp = "[shake]" + base_text + "[/shake]"
+			"rainbow+shake":
+				temp = "[rainbow freq=1.0 sat=0.8 val=0.8 speed=1.0][shake]" + base_text + "[/shake][/rainbow]"
 			"rainbow":
 				temp = "[rainbow freq=1.0 sat=0.8 val=0.8 speed=1.0]" + base_text + "[/rainbow]"
 			"wave+rainbow":
@@ -73,8 +75,6 @@ func set_text(new_text: String):
 				temp = "[s]" + base_text + "[/s]"
 			"fade":
 				temp = "[fade]" + base_text + "[/fade]"
-			"shake":
-				temp = "[shake]" + base_text + "[/shake]"
 			"tornado":
 				temp = "[tornado]" + base_text + "[/tornado]"
 			"pulse":

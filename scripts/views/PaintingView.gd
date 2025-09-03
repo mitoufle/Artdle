@@ -75,6 +75,6 @@ func _on_btn_open_clicker_popup_pressed() -> void:
 
 
 func _on_debug_pressed() -> void:
-	GameState.set_inspiration(1000)
-	GameState.set_gold(1000)
-	GameState.upgr
+	GameState.set_inspiration(100000)
+	GameState.set_gold(100000)
+	GameState.set_fame(100)

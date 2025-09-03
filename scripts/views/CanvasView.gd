@@ -25,6 +25,7 @@ const FLOATING_TEXT_SCENE = preload("res://Scenes/floating_text.tscn")
 # Godot Lifecycle
 #==============================================================================
 func _ready():
+	sell_button.disabled = true
 	# Connect to GameState signals
 	GameState.canvas_updated.connect(_on_canvas_updated)
 	GameState.canvas_progress_updated.connect(_on_canvas_progress_updated)
