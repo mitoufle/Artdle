@@ -86,4 +86,4 @@ layer = 128
 stream = ExtResource("5_fos0i")
 volume_db = -9.657
 autoplay = true
-parameters/looping = false
+parameters/looping = true
