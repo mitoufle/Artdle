@@ -20,6 +20,9 @@ signal canvas_storage_upgrade_cost_changed(cost: int)
 
 signal click_stats_changed(new_stats: Dictionary)
 
+signal experience_changed(new_experience_value: float, experience_to_next_level: float)
+signal level_changed(new_level_value: int)
+
 #==============================================================================
 # Global Currency
 #==============================================================================
@@ -29,8 +32,9 @@ var ascend_level: float = 0
 var paint_mastery: float = 0
 var gold: float = 0
 var fame: float = 0
-var Experience: float = 0
+var experience: float = 0
 var level: int = 1
+var experience_to_next_level: float = 100
 
 #==============================================================================
 # Costs & Multipliers
@@ -118,9 +122,19 @@ func set_ascend_level(amount:float):
 	ascend_level += amount
 	ascendancy_level_changed.emit(ascend_level)
 
+func add_experience(amount: float):
+	experience += amount
+	while experience >= experience_to_next_level:
+		level += 1
+		experience -= experience_to_next_level
+		experience_to_next_level = int(experience_to_next_level * 1.5)
+		level_changed.emit(level)
+	experience_changed.emit(experience, experience_to_next_level)
+
+
 #==============================================================================
 # Prestige Logic
-#==============================================================================
+#==============================================================================", 
 func ascend():
 	if fame >= ascendancy_cost:
 		set_fame(-ascendancy_cost)
@@ -322,6 +336,7 @@ func emit_canvas_upgrade_costs():
 #==============================================================================
 func manual_click():
 	set_inspiration(click_power)
+	add_experience(1)
 
 func _on_autoclick_timer_timeout():
 	set_inspiration(click_power)

@@ -19,11 +19,26 @@ func _ready() -> void:
 	btn_peinture.pressed.connect(_on_btn_peinture_pressed)
 	btn_ascendancy.pressed.connect(_on_btn_ascendancy_pressed)
 	
+	GameState.level_changed.connect(_on_level_changed)
+	
 	# Pass the SceneContainer node to the manager.
 	SceneManager.set_scene_container(content)
 	
 	# Charger la vue d’accueil au démarrage
 	load_view_by_name("AccueilView")
+	
+	# Disable buttons at start
+	btn_peinture.disabled = true
+	btn_ascendancy.disabled = true
+
+	# Initial check
+	_on_level_changed(GameState.level)
+
+func _on_level_changed(new_level: int):
+	if new_level >= 2:
+		btn_peinture.disabled = false
+	if new_level >= 5: # Example level for ascendancy
+		btn_ascendancy.disabled = false
 
 func _on_btn_accueil_pressed() -> void:
 	load_view_by_name("AccueilView")

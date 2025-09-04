@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://c4tv17mv1f8hl"]
+[gd_scene load_steps=5 format=3 uid="uid://8kkcuyw441ns"]
 
 [ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="1_abcde"]
 [ext_resource type="Script" uid="uid://ctgo253n0q1wb" path="res://scripts/views/ClickerPopup.gd" id="2_abcde"]

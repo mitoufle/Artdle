@@ -14,20 +14,17 @@ var atelier_production: float = 0.2   # inspiration/sec/atelier
 #==============================================================================
 
 var canvas_popup_instance
-var clicker_popup_instance
 
 #==============================================================================
 # Références OnReady
 #==============================================================================
 
 @onready var canvas_popup_scene = preload("res://Scenes/CanvasPopup.tscn")
-@onready var clicker_popup_scene = preload("res://Scenes/ClickerPopup.tscn")
 @onready var paintingscreen_instance = $paintingscreen
 
 @onready var btn_atelier: Button = $BtnBuildStuff
 @onready var btn_debug: Button = $Debug
 @onready var btn_open_canvas: Button = $BtnOpenCanvas
-@onready var btn_open_clicker_popup: Button = $BtnOpenClickerPopup
 
 #==============================================================================
 # Fonctions Godot
@@ -39,13 +36,8 @@ func _ready() -> void:
 	canvas_popup_instance.hide()
 	add_child(canvas_popup_instance)
 	
-	clicker_popup_instance = clicker_popup_scene.instantiate()
-	clicker_popup_instance.hide()
-	add_child(clicker_popup_instance)
-	
 	# --- Connexion des signaux des boutons ---
 	btn_open_canvas.pressed.connect(_on_btn_open_canvas_pressed)
-	btn_open_clicker_popup.pressed.connect(_on_btn_open_clicker_popup_pressed)
 	
 	# Center the Camera2D in paintingscreen
 	var camera_node = paintingscreen_instance.find_child("Camera2D")
@@ -70,11 +62,7 @@ func _on_btn_build_workshop_pressed() -> void:
 func _on_btn_open_canvas_pressed() -> void:
 	canvas_popup_instance.popup()
 
-func _on_btn_open_clicker_popup_pressed() -> void:
-	clicker_popup_instance.popup()
-
-
 func _on_debug_pressed() -> void:
-	GameState.set_inspiration(100000)
-	GameState.set_gold(100000)
-	GameState.set_fame(100)
+	GameState.set_inspiration(100000000)
+	GameState.set_gold(100000000)
+	GameState.set_fame(100000)

@@ -29,15 +29,6 @@ offset_bottom = 386.0
 size_flags_horizontal = 4
 text = "Voir le Canvas"
 
-[node name="BtnOpenClickerPopup" type="Button" parent="."]
-z_index = 1
-layout_mode = 2
-offset_left = 515.0
-offset_top = 278.0
-offset_right = 732.0
-offset_bottom = 309.0
-text = "Open Clicker"
-
 [node name="BtnBuildStuff" type="Button" parent="."]
 z_index = 5
 layout_mode = 2
