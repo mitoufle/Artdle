@@ -16,13 +16,9 @@ const FLOATING_TEXT_SCENE = preload("res://Scenes/floating_text.tscn")
 @onready var click_sound: AudioStreamPlayer = $ClickSound
 @onready var click_power_label: Label = $Layout/ClickPowerLabel
 @onready var autoclick_speed_label: Label = $Layout/AutoclickSpeedLabel
-@onready var click_button: Button = $Layout/ClickButton
+@onready var click_button: TextureButton = $ClickButton
 @onready var upgrade_click_power_button: Button = $Layout/UpgradeClickPowerButton
 @onready var upgrade_autoclick_speed_button: Button = $Layout/UpgradeAutoclickSpeedButton
-
-@onready var lbl_prestigeCount: Label = $Layout/LblPrestigeCount
-@onready var lbl_prestigeCost: Label = $Layout/LblPrestigeCost
-@onready var btn_prestige: Button = $Layout/BtnPrestige
 
 #==============================================================================
 # Godot Lifecycle

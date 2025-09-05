@@ -10,6 +10,7 @@ extends Node2D
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
 func start(text: String, icon_texture: Texture2D, hframes: int, vframes: int, animation_name: String, _color: Color = Color(1,1,1,1)):
+	set_as_top_level(true)
 	label.text     = text
 	sprite.texture = icon_texture
 	sprite.hframes = hframes

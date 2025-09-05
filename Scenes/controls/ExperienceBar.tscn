@@ -5,12 +5,8 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xmwac"]
 
 [node name="ExperienceBar" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
 script = ExtResource("1_wus8h")
 
 [node name="ProgressBar" type="ProgressBar" parent="."]

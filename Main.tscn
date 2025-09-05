@@ -31,10 +31,9 @@ layer = 110
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -17.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 15
+theme_override_constants/separation = 8
 
 [node name="TopBar" type="HBoxContainer" parent="MainLayout/VBoxContainer"]
 z_index = 11
@@ -79,10 +78,13 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_uu6xs")
 
-[node name="BottomBar" parent="MainLayout/VBoxContainer" instance=ExtResource("4_abcde")]
+[node name="BottomGroup" type="VBoxContainer" parent="MainLayout/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 3
 
-[node name="ExperienceBar" parent="MainLayout/VBoxContainer" instance=ExtResource("6_abcde")]
+[node name="ExperienceBar" parent="MainLayout/VBoxContainer/BottomGroup" instance=ExtResource("6_abcde")]
+
+[node name="BottomBar" parent="MainLayout/VBoxContainer/BottomGroup" instance=ExtResource("4_abcde")]
 layout_mode = 2
 
 [node name="FeedbackLayer" type="CanvasLayer" parent="."]

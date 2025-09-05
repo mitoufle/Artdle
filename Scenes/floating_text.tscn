@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://cwsffgghd287c"]
 
-[ext_resource type="Script" uid="uid://ch8wtr3xhjsxd" path="res://scripts/floating_text.gd" id="1_abcde"]
+[ext_resource type="Script" uid="uid://ch8wtr3xhjsxd" path="res://scripts/tooling/floating_text.gd" id="1_abcde"]
 [ext_resource type="Texture2D" uid="uid://biw68xk07wuqp" path="res://artdleAsset/animated/animated_coin_12.png" id="2_f3tku"]
 
 [sub_resource type="Animation" id="Animation_inspiration_rotate"]

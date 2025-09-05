@@ -1,8 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://humenayfn7bx"]
+[gd_scene load_steps=9 format=4 uid="uid://humenayfn7bx"]
 
 [ext_resource type="Script" uid="uid://ntrvcxp73t7u" path="res://scripts/views/AccueilView.gd" id="1_p65rg"]
 [ext_resource type="Texture2D" uid="uid://duau5nvw76sb4" path="res://artdleAsset/animated/animated_inspiration_12.png" id="2_gxb5b"]
 [ext_resource type="AudioStream" uid="uid://2n3ak2uejqjr" path="res://artdleAsset/music/currency_click.mp3" id="3_f85xh"]
+[ext_resource type="Texture2D" uid="uid://d3ow8ian6vw4x" path="res://artdleAsset/Buttons/accueil_tree.png" id="3_x1hua"]
+[ext_resource type="PackedScene" uid="uid://d35vi3s221qtp" path="res://accueil_2d_view.tscn" id="4_g1ugx"]
+[ext_resource type="Texture2D" uid="uid://bawukqqh2d810" path="res://artdleAsset/Buttons/accueil_tree_hover.png" id="4_t0b4w"]
+[ext_resource type="Script" uid="uid://6mw433bd10tf" path="res://scripts/tooling/CreateClickMask.gd" id="5_t0b4w"]
+
+[sub_resource type="BitMap" id="BitMap_t0b4w"]
+data = {
+"data": PackedByteArray("AMD/AQAAAP//DwAA/v//BwD4////AeD///9/AP////8P+P////+B/////x/8/////+P/////f/7/////9//////////////////////////////////////////////////////////v///////8/////4////////z/////5/////8//v/////h/////w/+////P+D/////Af7///8HwP/7/z8A8If//wEA8OD/AAAAH/4HAADw438AAAB+/gcAAODvfwAAAPz/BwAAgP9/AAAA8P8HAAAA/n8AAADA/w8AAAD4/wAAAAD/HwAAAPj/AQAAgP8fAAAA+P8BAACA/x8AAA=="),
+"size": Vector2i(44, 47)
+}
 
 [node name="AccueilView" type="Control"]
 layout_mode = 3
@@ -16,7 +26,25 @@ size_flags_vertical = 3
 script = ExtResource("1_p65rg")
 inspiration_spritesheet = ExtResource("2_gxb5b")
 
+[node name="Accueil2DView" parent="." instance=ExtResource("4_g1ugx")]
+
+[node name="ClickButton" type="TextureButton" parent="."]
+layout_mode = 2
+offset_left = 534.0
+offset_top = 29.0
+offset_right = 834.0
+offset_bottom = 305.0
+scale = Vector2(2.07013, 2.07013)
+size_flags_vertical = 3
+texture_normal = ExtResource("3_x1hua")
+texture_pressed = ExtResource("3_x1hua")
+texture_hover = ExtResource("4_t0b4w")
+texture_click_mask = SubResource("BitMap_t0b4w")
+stretch_mode = 0
+script = ExtResource("5_t0b4w")
+
 [node name="Layout" type="VBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -38,32 +66,15 @@ text = "Click Power: 1"
 layout_mode = 2
 text = "Autoclick Speed: 0"
 
-[node name="ClickButton" type="Button" parent="Layout"]
-layout_mode = 2
-size_flags_vertical = 3
-text = "Click Me!"
-
 [node name="UpgradeClickPowerButton" type="Button" parent="Layout"]
+z_index = 1
 layout_mode = 2
 text = "Upgrade Click Power (10 Gold)"
 
 [node name="UpgradeAutoclickSpeedButton" type="Button" parent="Layout"]
+z_index = 1
 layout_mode = 2
 text = "Upgrade Autoclick Speed (50 Gold)"
-
-[node name="LblPrestigeCount" type="Label" parent="Layout"]
-layout_mode = 2
-text = "Prestige : 0"
-
-[node name="BtnPrestige" type="Button" parent="Layout"]
-layout_mode = 2
-text = "Prestige (1000 inspi)
-"
-
-[node name="LblPrestigeCost" type="Label" parent="Layout"]
-layout_mode = 2
-text = "0.1 inspi multiplier"
-horizontal_alignment = 1
 
 [node name="ClickSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_f85xh")

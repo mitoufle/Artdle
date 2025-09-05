@@ -5,7 +5,7 @@ extends Control
 @onready var btn_peinture: Button = $MainLayout/VBoxContainer/TopBar/btnPeinture
 @onready var btn_ascendancy: Button = $MainLayout/VBoxContainer/TopBar/btnAscendancy
 @onready var content: PanelContainer = $MainLayout/VBoxContainer/Content
-@onready var bottom_bar = $MainLayout/VBoxContainer/BottomBar
+@onready var bottom_bar = $MainLayout/VBoxContainer/BottomGroup/BottomBar
 @onready var main_layout: CanvasLayer = $MainLayout
 @onready var feedback_layer: CanvasLayer = $FeedbackLayer
 @onready var Floating_text_scene = preload("res://Scenes/floating_text.tscn")
@@ -59,5 +59,6 @@ func update_ui(_key:String, _value: Variant) -> void:
 func add_ressource_feedback(amount: int, icon: Texture2D):
 	var ft = Floating_text_scene.instantiate()
 	feedback_layer.add_child(ft)
+	ft.set_as_top_level(true)
 	ft.start("+%d" % amount, icon, Color(1,1,0))
 	
