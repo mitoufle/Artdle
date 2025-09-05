@@ -19,6 +19,7 @@ const FLOATING_TEXT_SCENE = preload("res://Scenes/floating_text.tscn")
 @onready var click_button: TextureButton = $ClickButton
 @onready var upgrade_click_power_button: Button = $Layout/UpgradeClickPowerButton
 @onready var upgrade_autoclick_speed_button: Button = $Layout/UpgradeAutoclickSpeedButton
+@onready var btn_debug: Button = $Debug
 
 #==============================================================================
 # Godot Lifecycle
@@ -55,9 +56,9 @@ func show_feedback(amount: int, icon: Texture2D, hframes: int, vframes: int, ani
 	add_child(ft)
 	ft.start("+%d" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))
 
-#func _on_btn_prestige_pressed() -> void:
-#	GameState.reset_prestige()
-#	update_ui()
-
-#func update_ui() -> void:
+func _on_debug_pressed() -> void:
+	GameState.set_inspiration(100000000)
+	GameState.set_gold(100000000)
+	GameState.set_fame(100000)
+	GameState.set_level(10)
 #

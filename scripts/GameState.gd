@@ -27,12 +27,12 @@ signal level_changed(new_level_value: int)
 # Global Currency
 #==============================================================================
 var ascendancy_point: float = 0
-var inspiration: float = 0
+var inspiration: float = 100
 var ascend_level: float = 0
 var paint_mastery: float = 0
 var gold: float = 0
 var fame: float = 0
-var experience: float = 0
+var experience: float = 95
 var level: int = 1
 var experience_to_next_level: float = 100
 
@@ -109,6 +109,10 @@ func set_gold(amount:float):
 func set_fame(amount:float):
 	fame += amount
 	fame_changed.emit(fame)
+
+func set_level(amount:float):
+	level += amount
+	level_changed.emit(level)
 
 func set_paint_mastery(amount:float):
 	paint_mastery += amount
