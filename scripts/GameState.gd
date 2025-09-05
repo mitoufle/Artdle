@@ -120,6 +120,7 @@ func set_paint_mastery(amount:float):
 
 func set_ascendancy_point(amount:float):
 	ascendancy_point += amount
+	print("GameState: Ascendancy point changed to ", ascendancy_point) # DEBUG
 	ascendancy_point_changed.emit(ascendancy_point)
 
 func set_ascend_level(amount:float):
@@ -143,6 +144,7 @@ func ascend():
 	if fame >= ascendancy_cost:
 		set_fame(-ascendancy_cost)
 		set_ascendancy_point(1) # Gain 1 ascendancy point
+		set_ascend_level(1) # Gain 1 ascendancy level
 		
 		# Reset relevant game state
 		inspiration = 0
@@ -163,7 +165,7 @@ func ascend():
 		
 		ascended.emit()
 		
-		print("Ascended successfully!")
+		print("Ascended successfully!" + str(ascendancy_point))
 	else:
 		print("Not enough fame to ascend!")
 

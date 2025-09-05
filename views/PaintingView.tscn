@@ -1,9 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://dcm3fck3p2gj7"]
+[gd_scene load_steps=3 format=3 uid="uid://dcm3fck3p2gj7"]
 
 [ext_resource type="Script" uid="uid://daww5r6t5ivr5" path="res://scripts/views/PaintingView.gd" id="1_tvnqg"]
 [ext_resource type="PackedScene" uid="uid://c1id4y8ipgg7q" path="res://Scenes/paintingscreen.tscn" id="2_tvnqg"]
-[ext_resource type="Script" uid="uid://dvjf8nckqigms" path="res://scripts/tooltipedbtn.gd" id="3_hf5x0"]
-[ext_resource type="PackedScene" uid="uid://jx6gj886xxbf" path="res://Scenes/CustomTooltip.tscn" id="4_kfhel"]
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3
@@ -39,20 +37,6 @@ offset_bottom = 217.0
 size_flags_horizontal = 0
 flat = true
 
-[node name="BtnBuildWorkshop" type="Button" parent="."]
-layout_mode = 0
-offset_left = 123.0
-offset_top = 296.0
-offset_right = 145.0
-offset_bottom = 317.0
-flat = true
-script = ExtResource("3_hf5x0")
-tooltip_scene_path = ExtResource("4_kfhel")
-custom_tooltip_text = "Build the workshop
-[color=yellow]10 Inspiration[/color]"
-tooltype_style = "shake"
-metadata/_custom_type_script = "uid://dvjf8nckqigms"
-
 [node name="Debug" type="Button" parent="."]
 layout_mode = 0
 offset_left = 834.0
@@ -61,7 +45,4 @@ offset_right = 842.0
 offset_bottom = 272.0
 text = "debug"
 
-[connection signal="mouse_entered" from="BtnBuildWorkshop" to="BtnBuildWorkshop" method="_on_mouse_entered"]
-[connection signal="mouse_exited" from="BtnBuildWorkshop" to="BtnBuildWorkshop" method="_on_mouse_exited"]
-[connection signal="pressed" from="BtnBuildWorkshop" to="." method="_on_btn_build_workshop_pressed"]
 [connection signal="pressed" from="Debug" to="." method="_on_debug_pressed"]

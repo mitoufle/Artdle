@@ -399,6 +399,7 @@ tile_map_data = PackedByteArray("AAAAAAAAAAAGAAAAAAAAAAEAAAAGAAAAAAAAAAIAAAAGAAA
 tile_set = SubResource("TileSet_70fqa")
 
 [node name="TileMapLayer3" type="TileMapLayer" parent="."]
+visible = false
 position = Vector2(172, 115)
 scale = Vector2(6.10206, 6.02801)
 tile_map_data = PackedByteArray("AAAEAAIAAAABAAkAAAA=")

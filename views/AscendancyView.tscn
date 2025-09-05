@@ -1,9 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://dqefxqvjsc8jy"]
+[gd_scene load_steps=9 format=4 uid="uid://dqefxqvjsc8jy"]
 
 [ext_resource type="PackedScene" uid="uid://bljid654oh7lv" path="res://Scenes/Ascendancy2DView.tscn" id="1_31lut"]
 [ext_resource type="Script" uid="uid://djjkdvyttryky" path="res://scripts/views/AscendancyView.gd" id="1_rdb0t"]
 [ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
 [ext_resource type="PackedScene" uid="uid://cobsxucq2sb0y" path="res://Scenes/tooltipedbtn.tscn" id="2_ynd41"]
+[ext_resource type="Texture2D" uid="uid://gyc687j1sg02" path="res://artdleAsset/Buttons/Ascendancy_gate.png" id="5_mdj6m"]
+[ext_resource type="Texture2D" uid="uid://crpf48jy6dd0w" path="res://artdleAsset/Buttons/Ascendancy_gate_hover.png" id="6_55mb7"]
+[ext_resource type="PackedScene" uid="uid://jx6gj886xxbf" path="res://Scenes/CustomTooltip.tscn" id="7_mdj6m"]
+
+[sub_resource type="BitMap" id="BitMap_mdj6m"]
+data = {
+"data": PackedByteArray("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/v8BAAAAAAAA8P//PwAAAAAAAPj///8AAAAAAID/////AQAAAADA/////wMAAAAAwP////8PAAAAAOD/////DwAAAADA/////x8AAAAA/P////8/AAAAAP7/////fwAAAAD///////8AAACA////////AAAAwP///////wEAAMD///////8DAADg////////AwAA8P///////wcAAPD///////8HAADw////////DwAA+P///////w8AAPz///////8fAAD8////////HwAA/P///////x8AAPz///////8/AAD+////////PwAA/v///////z8AAP7///////8/AAD+////////fwAA/v///////38AAP7///////9/AAD+////////fwAA/v///////38AAP7///////9/AAD+////////fwAA/v///////38AAP7///////9/AAD+////////fwAA/v///////38AAP7///////9/AAD+/////////wAA/P///////z8AAP7///////9/AAD+/////////wAA/v////////8AAP7///////9/AAD+////////fwAA/P///////z8AAP7///////9/AAD+////////fwAA/v///////38AAPz///////8/AAD+////////fwAA/v///////38AAP////////9/AAD+////////fwAA//////////8AAP7///////9/AA=="),
+"size": Vector2i(80, 64)
+}
 
 [node name="AscendancyView" type="Control"]
 layout_mode = 3
@@ -17,35 +26,35 @@ script = ExtResource("1_rdb0t")
 
 [node name="Ascendency2DView" parent="." instance=ExtResource("1_31lut")]
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
+[node name="AscendButton" parent="." instance=ExtResource("2_ynd41")]
+layout_mode = 1
+offset_left = -252.0
+offset_top = -179.0
+offset_right = -172.0
+offset_bottom = -115.0
+scale = Vector2(6.18621, 6.18621)
+texture_normal = ExtResource("5_mdj6m")
+texture_pressed = ExtResource("5_mdj6m")
+texture_hover = ExtResource("6_55mb7")
+texture_click_mask = SubResource("BitMap_mdj6m")
+custom_texture = ExtResource("5_mdj6m")
+button_text = ""
+tooltip_scene_path = ExtResource("7_mdj6m")
+custom_tooltip_text = "Ascend as a legend"
+tooltype_style = "pulse"
 
-[node name="AscendancyPointsLabel" type="Label" parent="VBoxContainer"]
+[node name="AscendancyPointsLabel" type="Label" parent="."]
 layout_mode = 2
+offset_top = 553.0
+offset_right = 1200.0
+offset_bottom = 576.0
 text = "Ascendancy Points: 0"
 horizontal_alignment = 1
 
-[node name="AscendCostLabel" type="Label" parent="VBoxContainer"]
+[node name="AscendCostLabel" type="Label" parent="."]
 layout_mode = 2
+offset_top = 576.0
+offset_right = 1200.0
+offset_bottom = 599.0
 text = "Ascend Cost: 100 Fame"
 horizontal_alignment = 1
-
-[node name="AscendButton" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Ascend"
-
-[node name="Tooltipedbtn" parent="." instance=ExtResource("2_ynd41")]
-layout_mode = 1
-offset_left = 461.0
-offset_top = 250.0
-offset_right = -444.0
-offset_bottom = -148.0
-theme_type_variation = &"FlatButton"
-custom_tooltip_text = "⭐ Ascending as a legend ⭐"
-tooltype_style = "pulse"

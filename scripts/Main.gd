@@ -1,9 +1,9 @@
 extends Control
 # On récupère des références directes pour éviter les erreurs de chemin plus tard
 @onready var top_bar: HBoxContainer = $MainLayout/VBoxContainer/TopBar
-@onready var btn_accueil: Button = $MainLayout/VBoxContainer/TopBar/btnAccueil
-@onready var btn_peinture: Button = $MainLayout/VBoxContainer/TopBar/btnPeinture
-@onready var btn_ascendancy: Button = $MainLayout/VBoxContainer/TopBar/btnAscendancy
+@onready var btn_accueil = $MainLayout/VBoxContainer/TopBar/btnAccueil
+@onready var btn_peinture = $MainLayout/VBoxContainer/TopBar/btnPeinture
+@onready var btn_ascendancy = $MainLayout/VBoxContainer/TopBar/btnAscendancy
 @onready var content: PanelContainer = $MainLayout/VBoxContainer/Content
 @onready var bottom_bar = $MainLayout/VBoxContainer/BottomGroup/BottomBar
 @onready var main_layout: CanvasLayer = $MainLayout

@@ -1,9 +1,9 @@
 extends Control
 
 @onready var ascendency2d_view_instance = $Ascendency2DView
-@onready var ascendancy_points_label: Label = $VBoxContainer/AscendancyPointsLabel
-@onready var ascend_cost_label: Label = $VBoxContainer/AscendCostLabel
-@onready var ascend_button: Button = $VBoxContainer/AscendButton
+@onready var ascendancy_points_label: Label = $AscendancyPointsLabel
+@onready var ascend_cost_label: Label = $AscendCostLabel
+@onready var ascend_button: TextureButton = $AscendButton
 
 func _ready():
 	var camera_node = ascendency2d_view_instance.find_child("Camera2D")
@@ -20,7 +20,7 @@ func _ready():
 
 	update_ui()
 
-func update_ui():
+func update_ui(_value = null):
 	ascendancy_points_label.text = "Ascendancy Points: %d" % GameState.ascendancy_point
 	ascend_cost_label.text = "Ascend Cost: %d Fame" % GameState.ascendancy_cost
 

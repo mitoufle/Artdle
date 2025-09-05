@@ -1,15 +1,30 @@
-[gd_scene load_steps=2 format=3 uid="uid://cobsxucq2sb0y"]
+[gd_scene load_steps=3 format=3 uid="uid://cobsxuc2sb0y"]
 
-[ext_resource type="Script" uid="uid://dvjf8nckqigms" path="res://scripts/tooltipedbtn.gd" id="1_4c6ly"]
+[ext_resource type="Script" path="res://scripts/tooltipedbtn.gd" id="1_4c6ly"]
+[ext_resource type="FontFile" path="res://artdleAsset/Font/Tiny_Talk.ttf" id="2_abcde"]
 
-[node name="Tooltipedbtn" type="Button"]
+[node name="Tooltipedbtn" type="TextureButton"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4c6ly")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_4c6ly")
-custom_tooltip_text = "Ceci est un bouton custom ✨"
+theme_override_fonts/font = ExtResource("2_abcde")
+theme_override_font_sizes/font_size = 16
+text = "Button"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

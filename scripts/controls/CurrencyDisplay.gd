@@ -8,7 +8,7 @@ extends HBoxContainer
 
 func _ready():
 	icon_node.texture = icon_texture
-	
+	print("CurrencyDisplay: _ready() called for currency_type: ", currency_type) # DEBUG
 	match currency_type:
 		"inspiration":
 			GameState.inspiration_changed.connect(_on_currency_changed)
@@ -19,7 +19,11 @@ func _ready():
 		"fame":
 			GameState.fame_changed.connect(_on_currency_changed)
 			_on_currency_changed(GameState.fame)
+		"ascendancy_point":
+			# Connection moved to BottomBar.gd
+			_on_currency_changed(GameState.ascendancy_point) # Initial update
 		# Add other currency types here as needed
 
 func _on_currency_changed(value: float):
+	print("CurrencyDisplay: Received signal for ", currency_type, " with value ", value) # DEBUG
 	amount_label.text = str(round(value * 1000) / 1000.0)
