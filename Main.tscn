@@ -1,9 +1,12 @@
-[gd_scene load_steps=12 format=4 uid="uid://bfxoon8q4ff7w"]
+[gd_scene load_steps=15 format=4 uid="uid://bfxoon8q4ff7w"]
 
 [ext_resource type="Script" uid="uid://cep3w0m14p7kl" path="res://scripts/Main.gd" id="1_glv2v"]
 [ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
+[ext_resource type="Script" uid="uid://dx5oxc6rp3ol7" path="res://scripts/QuickSaveTest.gd" id="2_quick_save"]
+[ext_resource type="Script" uid="uid://bd2375rkcw6kw" path="res://scripts/TestSavePersistence.gd" id="3_persistence_test"]
 [ext_resource type="Texture2D" uid="uid://djcnfw1v5vhx5" path="res://artdleAsset/topbtn.png" id="3_r0du0"]
 [ext_resource type="PackedScene" uid="uid://dpskjp8x1i7x" path="res://Scenes/BottomBar.tscn" id="4_abcde"]
+[ext_resource type="Script" uid="uid://cvo078vtf7noo" path="res://scripts/TestXPBarFix.gd" id="4_xp_bar_test"]
 [ext_resource type="AudioStream" uid="uid://dcly5260fcs41" path="res://artdleAsset/music/ArtdleMainTheme.mp3" id="5_fos0i"]
 [ext_resource type="PackedScene" uid="uid://07vj2f7mwea" path="res://Scenes/controls/ExperienceBar.tscn" id="6_abcde"]
 [ext_resource type="PackedScene" uid="uid://cobsxucq2sb0y" path="res://Scenes/tooltipedbtn.tscn" id="7_abcde"]
@@ -65,33 +68,18 @@ layout_mode = 2
 texture_normal = ExtResource("3_r0du0")
 texture_click_mask = SubResource("BitMap_lgr22")
 button_text = "Accueil"
-font_size = null
-font_color = null
-h_align = null
-v_align = null
-autowrap_mode = null
 
 [node name="btnPeinture" parent="MainLayout/VBoxContainer/TopBar" instance=ExtResource("7_abcde")]
 layout_mode = 2
 texture_normal = ExtResource("3_r0du0")
 texture_click_mask = SubResource("BitMap_trn2v")
 button_text = "Peinture"
-font_size = null
-font_color = null
-h_align = null
-v_align = null
-autowrap_mode = null
 
 [node name="btnAscendancy" parent="MainLayout/VBoxContainer/TopBar" instance=ExtResource("7_abcde")]
 layout_mode = 2
 texture_normal = ExtResource("3_r0du0")
 texture_click_mask = SubResource("BitMap_03owx")
 button_text = "Ascendency"
-font_size = null
-font_color = null
-h_align = null
-v_align = null
-autowrap_mode = null
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/VBoxContainer/TopBar"]
 layout_mode = 2
@@ -121,3 +109,12 @@ stream = ExtResource("5_fos0i")
 volume_db = -9.657
 autoplay = true
 parameters/looping = true
+
+[node name="QuickSaveTest" type="Node" parent="."]
+script = ExtResource("2_quick_save")
+
+[node name="TestSavePersistence" type="Node" parent="."]
+script = ExtResource("3_persistence_test")
+
+[node name="TestXPBarFix" type="Node" parent="."]
+script = ExtResource("4_xp_bar_test")

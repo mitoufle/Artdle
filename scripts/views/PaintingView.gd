@@ -1,68 +1,110 @@
-extends Control
+extends BaseView
+class_name PaintingView
+
+## Vue de peinture - Atelier et système de canvas
+## Gère la production automatique et l'interface de peinture
 
 #==============================================================================
-# Variables locales à la vue Peinture
+# Constants
 #==============================================================================
+const CANVAS_POPUP_SCENE = preload("res://Scenes/CanvasPopup.tscn")
+const DEBUG_CURRENCY_AMOUNT = 100000000
 
-# Atelier
+# Atelier Configuration
+const ATELIER_BASE_COST = 10
+const ATELIER_PRODUCTION_RATE = 0.2  # inspiration/sec/atelier
+const ATELIER_COST_MULTIPLIER = 1.5
+
+#==============================================================================
+# Workshop State
+#==============================================================================
 var atelier_count: int = 0
-var atelier_cost: int = 10
-var atelier_production: float = 0.2   # inspiration/sec/atelier
+var atelier_cost: int = ATELIER_BASE_COST
 
 #==============================================================================
-# Variables internes
+# UI References
 #==============================================================================
+var canvas_popup_instance: PopupPanel
 
-var canvas_popup_instance
-
-#==============================================================================
-# Références OnReady
-#==============================================================================
-
-@onready var canvas_popup_scene = preload("res://Scenes/CanvasPopup.tscn")
 @onready var paintingscreen_instance = $paintingscreen
-
 @onready var btn_atelier: Button = $BtnBuildStuff
 @onready var btn_debug: Button = $Debug
 @onready var btn_open_canvas: Button = $BtnOpenCanvas
 
 #==============================================================================
-# Fonctions Godot
+# Godot Lifecycle
 #==============================================================================
+func _process(delta: float) -> void:
+	_process_workshop_production(delta)
 
-func _ready() -> void:
-	# --- Instance des popups ---
-	canvas_popup_instance = canvas_popup_scene.instantiate()
+#==============================================================================
+# BaseView Overrides
+#==============================================================================
+func _initialize_view() -> void:
+	# Initialization specific to PaintingView
+	pass
+
+func _connect_view_signals() -> void:
+	if not btn_open_canvas.pressed.is_connected(_on_open_canvas_pressed):
+		btn_open_canvas.pressed.connect(_on_open_canvas_pressed)
+	if not btn_atelier.pressed.is_connected(_on_build_workshop_pressed):
+		btn_atelier.pressed.connect(_on_build_workshop_pressed)
+	if not btn_debug.pressed.is_connected(_on_debug_pressed):
+		btn_debug.pressed.connect(_on_debug_pressed)
+
+func _initialize_ui() -> void:
+	# Initialize canvas popup
+	canvas_popup_instance = CANVAS_POPUP_SCENE.instantiate()
 	canvas_popup_instance.hide()
 	add_child(canvas_popup_instance)
 	
-	# --- Connexion des signaux des boutons ---
-	btn_open_canvas.pressed.connect(_on_btn_open_canvas_pressed)
-	
-	# Center the Camera2D in paintingscreen
-	var camera_node = paintingscreen_instance.find_child("Camera2D")
-	if camera_node:
-		camera_node.position = get_size() / 2
+	# Center camera - wait for next frame to ensure nodes are ready
+	call_deferred("center_camera_in_child", paintingscreen_instance)
 
-func _process(delta: float) -> void:
-	# Production automatique par atelier
+func get_class_name() -> String:
+	return "PaintingView"
+
+#==============================================================================
+# Workshop Production
+#==============================================================================
+func _process_workshop_production(delta: float) -> void:
 	if atelier_count > 0:
-		GameState.set_inspiration(atelier_count * atelier_production * delta)
+		var production = atelier_count * ATELIER_PRODUCTION_RATE * delta
+		GameState.currency_manager.add_currency("inspiration", production)
 
 #==============================================================================
-# Fonctions connectées aux signaux
+# Signal Handlers
 #==============================================================================
-
-func _on_btn_build_workshop_pressed() -> void:
-	if GameState.get_inspiration() >= atelier_cost:
-		GameState.set_inspiration(-atelier_cost)
+func _on_build_workshop_pressed() -> void:
+	if GameState.currency_manager.has_enough("inspiration", atelier_cost):
+		GameState.currency_manager.subtract_currency("inspiration", atelier_cost)
 		atelier_count += 1
-		atelier_cost = int(atelier_cost * 1.5)
+		atelier_cost = int(atelier_cost * ATELIER_COST_MULTIPLIER)
+		GameState.logger.info("Workshop built! Total workshops: %d" % atelier_count, "PaintingView")
+	else:
+		GameState.logger.warning("Insufficient inspiration to build workshop (need %d)" % atelier_cost, "PaintingView")
 
-func _on_btn_open_canvas_pressed() -> void:
+func _on_open_canvas_pressed() -> void:
 	canvas_popup_instance.popup()
+	GameState.logger.debug("Canvas popup opened", "PaintingView")
 
 func _on_debug_pressed() -> void:
-	GameState.set_inspiration(100000000)
-	GameState.set_gold(100000000)
-	GameState.set_fame(100000)
+	GameState.currency_manager.set_currency("inspiration", DEBUG_CURRENCY_AMOUNT)
+	GameState.currency_manager.set_currency("gold", DEBUG_CURRENCY_AMOUNT)
+	GameState.currency_manager.set_currency("fame", DEBUG_CURRENCY_AMOUNT)
+	GameState.logger.info("Debug mode activated - currencies set", "PaintingView")
+
+#==============================================================================
+# Public API
+#==============================================================================
+## Récupère le nombre d'ateliers
+func get_workshop_count() -> int:
+	return atelier_count
+
+## Récupère le coût du prochain atelier
+func get_next_workshop_cost() -> int:
+	return atelier_cost
+
+## Récupère la production totale par seconde
+func get_total_production_per_second() -> float:
+	return atelier_count * ATELIER_PRODUCTION_RATE

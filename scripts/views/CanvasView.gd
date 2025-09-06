@@ -43,12 +43,22 @@ func _ready():
 	upgrade_canvas_storage_button.pressed.connect(Callable(GameState, "upgrade_canvas_storage"))
 
 	# Request initial state from GameState
-	if GameState.canvas_texture != null:
-		_on_canvas_updated(GameState.canvas_texture)
-	_on_canvas_progress_updated(GameState.current_pixel_count, GameState.max_pixels)
-	_on_canvas_upgrade_costs_changed({"resolution_cost": GameState.upgrade_resolution_cost, "fill_speed_cost": GameState.upgrade_fill_speed_cost})
-	_on_canvas_storage_changed(GameState.stored_canvases, GameState.canvas_storage_level)
-	_on_canvas_storage_upgrade_cost_changed(GameState.canvas_storage_cost)
+	var canvas_texture = GameState.canvas_manager.get_canvas_texture()
+	if canvas_texture != null:
+		_on_canvas_updated(canvas_texture)
+	
+	var pixel_info = GameState.canvas_manager.get_pixel_info()
+	_on_canvas_progress_updated(pixel_info.current, pixel_info.max)
+	
+	var upgrade_costs = GameState.canvas_manager.get_upgrade_costs()
+	_on_canvas_upgrade_costs_changed(upgrade_costs)
+	
+	var storage_info = GameState.canvas_manager.get_storage_info()
+	_on_canvas_storage_changed(storage_info.stored, storage_info.level)
+	
+	var storage_cost = GameState.canvas_manager.get_storage_upgrade_cost()
+	_on_canvas_storage_upgrade_cost_changed(storage_cost)
+	
 	_update_sell_button_state() # Call here for initial state
 
 #==============================================================================
@@ -59,8 +69,11 @@ func _on_canvas_updated(new_texture: ImageTexture):
 	canvas_display.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 func _update_sell_button_state():
-	var canvas_completed = GameState.current_pixel_count >= GameState.max_pixels
-	var has_stored_canvases = GameState.stored_canvases > 0
+	var pixel_info = GameState.canvas_manager.get_pixel_info()
+	var storage_info = GameState.canvas_manager.get_storage_info()
+	
+	var canvas_completed = pixel_info.current >= pixel_info.max
+	var has_stored_canvases = storage_info.stored > 0
 	
 	sell_button.disabled = not (canvas_completed or has_stored_canvases)
 

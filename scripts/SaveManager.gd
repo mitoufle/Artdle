@@ -1,0 +1,230 @@
+extends Node
+class_name SaveManager
+
+## Gestionnaire de sauvegarde pour le jeu Artdle
+## Gère la sérialisation et désérialisation des données de jeu
+
+#==============================================================================
+# Configuration
+#==============================================================================
+const SAVE_FILE_PATH = "user://artdle_save.json"
+const SAVE_VERSION = "1.0"
+
+#==============================================================================
+# Signals
+#==============================================================================
+signal save_completed(success: bool)
+signal load_completed(success: bool)
+signal save_data_cleared()
+
+#==============================================================================
+# Public API
+#==============================================================================
+
+## Sauvegarde les données de jeu
+func save_game() -> bool:
+	var save_data = _collect_save_data()
+	
+	var basic_keys: Array[String] = ["version", "timestamp"]
+	if not GameState.data_validator.validate_config_dict(save_data, basic_keys):
+		GameState.logger.error("Save data validation failed")
+		save_completed.emit(false)
+		return false
+	
+	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
+	if not file:
+		GameState.logger.error("Failed to open save file for writing: %s" % SAVE_FILE_PATH)
+		save_completed.emit(false)
+		return false
+	
+	var json_string = JSON.stringify(save_data, "\t")
+	file.store_string(json_string)
+	file.close()
+	
+	GameState.logger.info("Game saved successfully", "SaveManager")
+	save_completed.emit(true)
+	return true
+
+## Charge les données de jeu
+func load_game() -> bool:
+	if not FileAccess.file_exists(SAVE_FILE_PATH):
+		GameState.logger.warning("No save file found, starting new game")
+		load_completed.emit(false)
+		return false
+	
+	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
+	if not file:
+		GameState.logger.error("Failed to open save file for reading: %s" % SAVE_FILE_PATH)
+		load_completed.emit(false)
+		return false
+	
+	var json_string = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var parse_result = json.parse(json_string)
+	
+	if parse_result != OK:
+		GameState.logger.error("Failed to parse save file JSON")
+		load_completed.emit(false)
+		return false
+	
+	var save_data = json.data
+	if not _validate_save_data(save_data):
+		GameState.logger.error("Save data validation failed")
+		load_completed.emit(false)
+		return false
+	
+	_apply_save_data(save_data)
+	GameState.logger.info("Game loaded successfully", "SaveManager")
+	load_completed.emit(true)
+	return true
+
+## Supprime le fichier de sauvegarde
+func clear_save() -> bool:
+	if FileAccess.file_exists(SAVE_FILE_PATH):
+		var dir = DirAccess.open("user://")
+		if dir:
+			dir.remove(SAVE_FILE_PATH)
+			GameState.logger.info("Save file cleared", "SaveManager")
+			save_data_cleared.emit()
+			return true
+	
+	GameState.logger.warning("No save file to clear")
+	return false
+
+## Vérifie si une sauvegarde existe
+func has_save_file() -> bool:
+	return FileAccess.file_exists(SAVE_FILE_PATH)
+
+## Récupère les informations de la sauvegarde
+func get_save_info() -> Dictionary:
+	if not has_save_file():
+		return {
+			"success": false,
+			"message": "No save file found"
+		}
+	
+	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
+	if not file:
+		return {
+			"success": false,
+			"message": "Failed to open save file"
+		}
+	
+	var json_string = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var parse_result = json.parse(json_string)
+	
+	if parse_result != OK:
+		return {
+			"success": false,
+			"message": "Failed to parse save file"
+		}
+	
+	var save_data = json.data
+	var file_size = json_string.length()
+	var timestamp = save_data.get("timestamp", 0)
+	var date_string = Time.get_datetime_string_from_unix_time(timestamp)
+	
+	return {
+		"success": true,
+		"data": {
+			"version": save_data.get("version", "unknown"),
+			"date": date_string,
+			"timestamp": timestamp,
+			"size": file_size,
+			"level": save_data.get("experience", {}).get("level", 0),
+			"ascendancy_points": save_data.get("currencies", {}).get("ascendancy_points", 0)
+		}
+	}
+
+#==============================================================================
+# Private Methods
+#==============================================================================
+
+func _collect_save_data() -> Dictionary:
+	var timestamp = Time.get_unix_time_from_system()
+	
+	return {
+		"version": SAVE_VERSION,
+		"timestamp": timestamp,
+		"currencies": GameState.currency_manager.get_all_currencies(),
+		"experience": {
+			"experience": GameState.experience_manager.get_experience(),
+			"level": GameState.experience_manager.get_level(),
+			"experience_to_next_level": GameState.experience_manager.get_experience_to_next_level()
+		},
+		"canvas": {
+			"resolution_level": GameState.canvas_manager.resolution_level,
+			"fill_speed_level": GameState.canvas_manager.fill_speed_level,
+			"sell_price": GameState.canvas_manager.sell_price,
+			"stored_canvases": GameState.canvas_manager.stored_canvases,
+			"canvas_storage_level": GameState.canvas_manager.canvas_storage_level,
+			"upgrade_resolution_cost": GameState.canvas_manager.upgrade_resolution_cost,
+			"upgrade_fill_speed_cost": GameState.canvas_manager.upgrade_fill_speed_cost,
+			"canvas_storage_cost": GameState.canvas_manager.canvas_storage_cost
+		},
+		"clicker": {
+			"click_power": GameState.clicker_manager.click_power,
+			"autoclick_speed": GameState.clicker_manager.autoclick_speed
+		},
+		"ascension": {
+			"ascendancy_cost": GameState.ascension_manager.ascendancy_cost,
+			"ascend_level": GameState.ascension_manager.ascend_level
+		}
+	}
+
+func _validate_save_data(save_data: Dictionary) -> bool:
+	var required_keys: Array[String] = ["version", "timestamp", "currencies", "experience", "canvas", "clicker", "ascension"]
+	
+	if not GameState.data_validator.validate_config_dict(save_data, required_keys):
+		return false
+	
+	# Vérifier la version
+	if save_data.get("version") != SAVE_VERSION:
+		GameState.logger.warning("Save file version mismatch: %s vs %s" % [save_data.get("version"), SAVE_VERSION])
+	
+	return true
+
+func _apply_save_data(save_data: Dictionary) -> void:
+	# Restaurer les devises
+	var currencies = save_data.get("currencies", {})
+	for currency_type in currencies.keys():
+		GameState.currency_manager.set_currency(currency_type, currencies[currency_type])
+	
+	# Restaurer l'expérience
+	var experience_data = save_data.get("experience", {})
+	GameState.experience_manager.set_experience(experience_data.get("experience", GameConfig.DEFAULT_EXPERIENCE))
+	GameState.experience_manager.set_level(experience_data.get("level", GameConfig.DEFAULT_LEVEL))
+	GameState.experience_manager.set_experience_to_next_level(experience_data.get("experience_to_next_level", GameConfig.DEFAULT_EXPERIENCE_TO_NEXT_LEVEL))
+	
+	# Restaurer le canvas
+	var canvas_data = save_data.get("canvas", {})
+	GameState.canvas_manager.set_resolution_level(canvas_data.get("resolution_level", GameConfig.BASE_RESOLUTION_LEVEL))
+	GameState.canvas_manager.set_fill_speed_level(canvas_data.get("fill_speed_level", GameConfig.BASE_FILL_SPEED_LEVEL))
+	GameState.canvas_manager.set_sell_price(canvas_data.get("sell_price", GameConfig.BASE_SELL_PRICE))
+	GameState.canvas_manager.set_stored_canvases(canvas_data.get("stored_canvases", 0))
+	GameState.canvas_manager.set_canvas_storage_level(canvas_data.get("canvas_storage_level", GameConfig.BASE_CANVAS_STORAGE_LEVEL))
+	GameState.canvas_manager.set_upgrade_resolution_cost(canvas_data.get("upgrade_resolution_cost", GameConfig.BASE_RESOLUTION_UPGRADE_COST))
+	GameState.canvas_manager.set_upgrade_fill_speed_cost(canvas_data.get("upgrade_fill_speed_cost", GameConfig.BASE_FILL_SPEED_UPGRADE_COST))
+	GameState.canvas_manager.set_canvas_storage_cost(canvas_data.get("canvas_storage_cost", GameConfig.BASE_CANVAS_STORAGE_UPGRADE_COST))
+	
+	# Restaurer le clicker
+	var clicker_data = save_data.get("clicker", {})
+	GameState.clicker_manager.set_click_power(clicker_data.get("click_power", GameConfig.BASE_CLICK_POWER))
+	GameState.clicker_manager.set_autoclick_speed(clicker_data.get("autoclick_speed", GameConfig.BASE_AUTOCLICK_SPEED))
+	
+	# Restaurer l'ascension
+	var ascension_data = save_data.get("ascension", {})
+	GameState.ascension_manager.set_ascendancy_cost(ascension_data.get("ascendancy_cost", GameConfig.BASE_ASCENDANCY_COST))
+	GameState.ascension_manager.set_ascend_level(ascension_data.get("ascend_level", GameConfig.DEFAULT_ASCEND_LEVEL))
+	
+	# Réinitialiser le canvas
+	GameState.canvas_manager._initialize_new_canvas()
+	GameState.canvas_manager._update_fill_speed()
+	
+	# Réinitialiser l'autoclick
+	GameState.clicker_manager._update_autoclick_timer()

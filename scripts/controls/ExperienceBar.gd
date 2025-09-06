@@ -8,8 +8,8 @@ func _ready():
 	GameState.level_changed.connect(_on_level_changed)
 	
 	# Initial setup
-	_on_experience_changed(GameState.experience, GameState.experience_to_next_level)
-	_on_level_changed(GameState.level)
+	_on_experience_changed(GameState.experience_manager.get_experience(), GameState.experience_manager.get_experience_to_next_level())
+	_on_level_changed(GameState.experience_manager.get_level())
 
 func _on_experience_changed(new_experience: float, experience_to_next_level: float):
 	progress_bar.max_value = experience_to_next_level

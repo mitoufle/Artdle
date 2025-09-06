@@ -14,7 +14,7 @@ extends Control
 const VIEWS_PATH := "res://views/"
 
 func _ready() -> void:
-	# Connexions des signaux des boutons (tu peux aussi les connecter dans l’éditeur)
+	# Connexions des signaux des boutons (tu peux aussi les connecter dans l'éditeur)
 	btn_accueil.pressed.connect(_on_btn_accueil_pressed)
 	btn_peinture.pressed.connect(_on_btn_peinture_pressed)
 	btn_ascendancy.pressed.connect(_on_btn_ascendancy_pressed)
@@ -24,15 +24,26 @@ func _ready() -> void:
 	# Pass the SceneContainer node to the manager.
 	SceneManager.set_scene_container(content)
 	
-	# Charger la vue d’accueil au démarrage
+	# Charger la sauvegarde au démarrage
+	load_save_on_startup()
+	
+	# Charger la vue d'accueil au démarrage
 	load_view_by_name("AccueilView")
 	
 	# Disable buttons at start
 	btn_peinture.disabled = true
 	btn_ascendancy.disabled = true
 
-	# Initial check
-	_on_level_changed(GameState.level)
+	# Initial check - utiliser call_deferred pour s'assurer que tout est prêt
+	call_deferred("_update_ui_after_load")
+
+func _update_ui_after_load() -> void:
+	# Mettre à jour l'UI après le chargement de la sauvegarde
+	_on_level_changed(GameState.experience_manager.get_level())
+	
+	# Forcer la mise à jour de la barre d'XP en émettant les signaux
+	GameState.experience_manager.emit_experience_changed()
+	GameState.experience_manager.emit_level_changed()
 
 func _on_level_changed(new_level: int):
 	if new_level >= 2:
@@ -61,4 +72,38 @@ func add_ressource_feedback(amount: int, icon: Texture2D):
 	feedback_layer.add_child(ft)
 	ft.set_as_top_level(true)
 	ft.start("+%d" % amount, icon, Color(1,1,0))
+
+#==============================================================================
+# Save System
+#==============================================================================
+
+## Charge la sauvegarde au démarrage du jeu
+func load_save_on_startup() -> void:
+	if GameState.has_save_file():
+		var success = GameState.load_game()
+		if success:
+			print("✅ Sauvegarde chargée au démarrage")
+		else:
+			print("❌ Échec du chargement de la sauvegarde")
+	else:
+		print("ℹ️ Aucune sauvegarde trouvée, démarrage avec les valeurs par défaut")
+
+## Sauvegarde automatique périodique
+func _on_autosave_timer_timeout() -> void:
+	var success = GameState.save_game()
+	if success:
+		print("💾 Sauvegarde automatique réussie")
+	else:
+		print("❌ Échec de la sauvegarde automatique")
+
+## Sauvegarde à la fermeture du jeu
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		print("🔄 Fermeture du jeu - Sauvegarde en cours...")
+		var success = GameState.save_game()
+		if success:
+			print("✅ Sauvegarde finale réussie")
+		else:
+			print("❌ Échec de la sauvegarde finale")
+		get_tree().quit()
 	

@@ -1,41 +1,87 @@
-extends Control
+extends BaseView
+class_name AscendancyView
 
+## Vue d'ascendance - Système de prestige et d'ascension
+## Gère l'interface d'ascension et l'accès à l'arbre de compétences
+
+#==============================================================================
+# Constants
+#==============================================================================
+const SKILL_TREE_SCENE_PATH = "res://views/SkillTreeView.tscn"
+
+#==============================================================================
+# UI References
+#==============================================================================
 @onready var ascendency2d_view_instance = $Ascendency2DView
 @onready var ascendancy_points_label: Label = $AscendancyPointsLabel
 @onready var ascend_cost_label: Label = $AscendCostLabel
 @onready var ascend_button: TextureButton = $AscendButton
 @onready var skill_tree_button: TextureButton = $SkillTreeButton
 
+#==============================================================================
+# BaseView Overrides
+#==============================================================================
+func _initialize_view() -> void:
+	# Initialization specific to AscendancyView
+	pass
 
-func _ready():
-	var camera_node = ascendency2d_view_instance.find_child("Camera2D")
-	if camera_node:
-		camera_node.position = get_size() / 2
-
+func _connect_view_signals() -> void:
 	# Connect to GameState signals
-	GameState.fame_changed.connect(update_ui)
-	GameState.ascendancy_point_changed.connect(update_ui)
-	GameState.ascended.connect(update_ui)
-
+	GameState.fame_changed.connect(_on_currency_changed)
+	GameState.ascendancy_point_changed.connect(_on_currency_changed)
+	GameState.ascended.connect(_on_ascended)
+	
 	# Connect UI signals
-	ascend_button.pressed.connect(GameState.ascend)
+	ascend_button.pressed.connect(_on_ascend_button_pressed)
+	
 	if skill_tree_button:
 		skill_tree_button.pressed.connect(_on_skill_tree_button_pressed)
-		print("AscendancyView: Skill Tree button signal connected successfully.") # DEBUG
+		GameState.logger.debug("Skill Tree button signal connected successfully", "AscendancyView")
 	else:
-		print("AscendancyView: ERROR: Skill Tree button node not found!") # DEBUG
+		GameState.logger.error("Skill Tree button node not found!", "AscendancyView")
 
-	update_ui()
+func _initialize_ui() -> void:
+	# Center camera
+	center_camera_in_child(ascendency2d_view_instance)
+	_update_ui()
 
-func update_ui(_value = null):
-	ascendancy_points_label.text = "Ascendancy Points: %d" % GameState.ascendancy_point
-	ascend_cost_label.text = "Ascend Cost: %d Fame" % GameState.ascendancy_cost
+func get_class_name() -> String:
+	return "AscendancyView"
 
-	if GameState.fame >= GameState.ascendancy_cost:
-		ascend_button.disabled = false
-	else:
-		ascend_button.disabled = true
+#==============================================================================
+# Signal Handlers
+#==============================================================================
+func _on_currency_changed(_value = null) -> void:
+	_update_ui()
+
+func _on_ascended() -> void:
+	_update_ui()
+	GameState.logger.info("Ascension completed!", "AscendancyView")
+
+func _on_ascend_button_pressed() -> void:
+	var success = GameState.ascension_manager.ascend()
+	if not success:
+		GameState.logger.warning("Ascension failed - insufficient fame", "AscendancyView")
 
 func _on_skill_tree_button_pressed() -> void:
-	print("AscendancyView: Skill Tree button pressed. Loading SkillTreeView.tscn...") # DEBUG
-	SceneManager.load_game_scene("res://views/SkillTreeView.tscn")
+	GameState.logger.debug("Loading SkillTreeView", "AscendancyView")
+	SceneManager.load_game_scene(SKILL_TREE_SCENE_PATH)
+
+#==============================================================================
+# UI Updates
+#==============================================================================
+func _update_ui() -> void:
+	var ascendancy_points = GameState.ascension_manager.get_ascendancy_points()
+	var ascendancy_cost = GameState.ascension_manager.get_ascendancy_cost()
+	var can_ascend = GameState.ascension_manager.can_ascend()
+	
+	ascendancy_points_label.text = "Ascendancy Points: %d" % ascendancy_points
+	ascend_cost_label.text = "Ascend Cost: %d Fame" % ascendancy_cost
+	ascend_button.disabled = not can_ascend
+
+#==============================================================================
+# Public API
+#==============================================================================
+## Force la mise à jour de l'UI
+func update_ui() -> void:
+	_update_ui()
