@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://cobsxuc2sb0y"]
+[gd_scene load_steps=3 format=3 uid="uid://cobsxucq2sb0y"]
 
-[ext_resource type="Script" path="res://scripts/tooltipedbtn.gd" id="1_4c6ly"]
-[ext_resource type="FontFile" path="res://artdleAsset/Font/Tiny_Talk.ttf" id="2_abcde"]
+[ext_resource type="Script" uid="uid://dvjf8nckqigms" path="res://scripts/tooltipedbtn.gd" id="1_4c6ly"]
+[ext_resource type="FontFile" uid="uid://bj42nhxgoiu2" path="res://artdleAsset/Font/Tiny_Talk.ttf" id="2_abcde"]
 
 [node name="Tooltipedbtn" type="TextureButton"]
 anchors_preset = 8
@@ -20,8 +20,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("2_abcde")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 10
 text = "Button"
 horizontal_alignment = 1
 vertical_alignment = 1

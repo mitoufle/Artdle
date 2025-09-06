@@ -1,17 +1,25 @@
-[gd_scene load_steps=9 format=4 uid="uid://dqefxqvjsc8jy"]
+[gd_scene load_steps=12 format=4 uid="uid://dqefxqvjsc8jy"]
 
-[ext_resource type="PackedScene" uid="uid://bljid654oh7lv" path="res://Scenes/Ascendancy2DView.tscn" id="1_31lut"]
-[ext_resource type="Script" uid="uid://djjkdvyttryky" path="res://scripts/views/AscendancyView.gd" id="1_rdb0t"]
-[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
-[ext_resource type="PackedScene" uid="uid://cobsxucq2sb0y" path="res://Scenes/tooltipedbtn.tscn" id="2_ynd41"]
-[ext_resource type="Texture2D" uid="uid://gyc687j1sg02" path="res://artdleAsset/Buttons/Ascendancy_gate.png" id="5_mdj6m"]
-[ext_resource type="Texture2D" uid="uid://crpf48jy6dd0w" path="res://artdleAsset/Buttons/Ascendancy_gate_hover.png" id="6_55mb7"]
-[ext_resource type="PackedScene" uid="uid://jx6gj886xxbf" path="res://Scenes/CustomTooltip.tscn" id="7_mdj6m"]
+[ext_resource type="PackedScene" uid="uid://bljid654oh7lv" path="res://Scenes/Ascendancy2DView.tscn" id="1"]
+[ext_resource type="Script" uid="uid://djjkdvyttryky" path="res://scripts/views/AscendancyView.gd" id="2"]
+[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="3"]
+[ext_resource type="PackedScene" uid="uid://cobsxucq2sb0y" path="res://Scenes/tooltipedbtn.tscn" id="4"]
+[ext_resource type="Texture2D" uid="uid://gyc687j1sg02" path="res://artdleAsset/Buttons/Ascendancy_gate.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://cqs674x8ktaec" path="res://artdleAsset/Buttons/label_brown_long.png" id="5_55mb7"]
+[ext_resource type="Texture2D" uid="uid://crpf48jy6dd0w" path="res://artdleAsset/Buttons/Ascendancy_gate_hover.png" id="6"]
+[ext_resource type="PackedScene" uid="uid://jx6gj886xxbf" path="res://Scenes/CustomTooltip.tscn" id="7"]
+[ext_resource type="Texture2D" uid="uid://wsd0gwtx4lgk" path="res://artdleAsset/Buttons/label_brown_long_hover.png" id="9_jbkff"]
 
-[sub_resource type="BitMap" id="BitMap_mdj6m"]
+[sub_resource type="BitMap" id="BitMap_jbkff"]
 data = {
 "data": PackedByteArray("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/v8BAAAAAAAA8P//PwAAAAAAAPj///8AAAAAAID/////AQAAAADA/////wMAAAAAwP////8PAAAAAOD/////DwAAAADA/////x8AAAAA/P////8/AAAAAP7/////fwAAAAD///////8AAACA////////AAAAwP///////wEAAMD///////8DAADg////////AwAA8P///////wcAAPD///////8HAADw////////DwAA+P///////w8AAPz///////8fAAD8////////HwAA/P///////x8AAPz///////8/AAD+////////PwAA/v///////z8AAP7///////8/AAD+////////fwAA/v///////38AAP7///////9/AAD+////////fwAA/v///////38AAP7///////9/AAD+////////fwAA/v///////38AAP7///////9/AAD+////////fwAA/v///////38AAP7///////9/AAD+/////////wAA/P///////z8AAP7///////9/AAD+/////////wAA/v////////8AAP7///////9/AAD+////////fwAA/P///////z8AAP7///////9/AAD+////////fwAA/v///////38AAPz///////8/AAD+////////fwAA/v///////38AAP////////9/AAD+////////fwAA//////////8AAP7///////9/AA=="),
 "size": Vector2i(80, 64)
+}
+
+[sub_resource type="BitMap" id="BitMap_bi60q"]
+data = {
+"data": PackedByteArray("AMD//////////wMAAOD//////////wcAAPD//////////w8AAPz//////////z8A/////////////////////////////////v////////////9//P////////////8/+P////////////8f+P////////////8f+P////////////8f+P////////////8f/P////////////8//n8AAAAAAAAAAP5//z8AAAAAAAAAAPz/fwAAAAAAAAAAAAD+"),
+"size": Vector2i(96, 16)
 }
 
 [node name="AscendancyView" type="Control"]
@@ -21,27 +29,49 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("2_abcde")
-script = ExtResource("1_rdb0t")
+theme = ExtResource("3")
+script = ExtResource("2")
 
-[node name="Ascendency2DView" parent="." instance=ExtResource("1_31lut")]
+[node name="Ascendency2DView" parent="." instance=ExtResource("1")]
 
-[node name="AscendButton" parent="." instance=ExtResource("2_ynd41")]
+[node name="AscendButton" parent="." instance=ExtResource("4")]
 layout_mode = 1
 offset_left = -252.0
 offset_top = -179.0
 offset_right = -172.0
 offset_bottom = -115.0
 scale = Vector2(6.18621, 6.18621)
-texture_normal = ExtResource("5_mdj6m")
-texture_pressed = ExtResource("5_mdj6m")
-texture_hover = ExtResource("6_55mb7")
-texture_click_mask = SubResource("BitMap_mdj6m")
-custom_texture = ExtResource("5_mdj6m")
+texture_normal = ExtResource("5")
+texture_pressed = ExtResource("5")
+texture_hover = ExtResource("6")
+texture_click_mask = SubResource("BitMap_jbkff")
+custom_texture = ExtResource("5")
 button_text = ""
-tooltip_scene_path = ExtResource("7_mdj6m")
+font_size = 0
+font_color = Color(1, 1, 1, 1)
+h_align = 1
+v_align = 1
+tooltip_scene_path = ExtResource("7")
 custom_tooltip_text = "Ascend as a legend"
 tooltype_style = "pulse"
+
+[node name="SkillTreeButton" parent="." instance=ExtResource("4")]
+layout_mode = 1
+offset_left = -168.0
+offset_top = -192.0
+offset_right = 122.0
+offset_bottom = -147.0
+texture_normal = ExtResource("5_55mb7")
+texture_pressed = ExtResource("5_55mb7")
+texture_hover = ExtResource("9_jbkff")
+texture_click_mask = SubResource("BitMap_bi60q")
+custom_texture = ExtResource("5_55mb7")
+button_text = "ascendancy skills"
+font_size = 9
+font_color = Color(0, 0, 0, 1)
+h_align = 1
+v_align = 0
+autowrap_mode = 3
 
 [node name="AscendancyPointsLabel" type="Label" parent="."]
 layout_mode = 2

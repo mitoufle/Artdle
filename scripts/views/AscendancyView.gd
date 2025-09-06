@@ -4,6 +4,8 @@ extends Control
 @onready var ascendancy_points_label: Label = $AscendancyPointsLabel
 @onready var ascend_cost_label: Label = $AscendCostLabel
 @onready var ascend_button: TextureButton = $AscendButton
+@onready var skill_tree_button: TextureButton = $SkillTreeButton
+
 
 func _ready():
 	var camera_node = ascendency2d_view_instance.find_child("Camera2D")
@@ -17,6 +19,11 @@ func _ready():
 
 	# Connect UI signals
 	ascend_button.pressed.connect(GameState.ascend)
+	if skill_tree_button:
+		skill_tree_button.pressed.connect(_on_skill_tree_button_pressed)
+		print("AscendancyView: Skill Tree button signal connected successfully.") # DEBUG
+	else:
+		print("AscendancyView: ERROR: Skill Tree button node not found!") # DEBUG
 
 	update_ui()
 
@@ -28,3 +35,7 @@ func update_ui(_value = null):
 		ascend_button.disabled = false
 	else:
 		ascend_button.disabled = true
+
+func _on_skill_tree_button_pressed() -> void:
+	print("AscendancyView: Skill Tree button pressed. Loading SkillTreeView.tscn...") # DEBUG
+	SceneManager.load_game_scene("res://views/SkillTreeView.tscn")

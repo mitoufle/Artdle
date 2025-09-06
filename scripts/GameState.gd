@@ -37,6 +37,75 @@ var level: int = 1
 var experience_to_next_level: float = 100
 
 #==============================================================================
+# Skill Tree Data
+#==============================================================================
+const SKILL_TREE_DATA = {
+	"Devotion": {
+		"effect": "Periodically pray to the tree of wisdom to get passive inspiration income",
+		"cost": 1,
+		"cost_multiplier": 1.0, # na
+		"multiple_buy": false,
+		"parent": null, # root
+		"unlocked": false,
+		"level": 0
+	},
+	"Icon influence": {
+		"effect": "Unlock Painting",
+		"cost": 2,
+		"cost_multiplier": 1.0, # na
+		"multiple_buy": false,
+		"parent": "Devotion",
+		"unlocked": false,
+		"level": 0
+	},
+	"Capitalist": {
+		"effect": "your canvas sell for higher prices",
+		"cost": 2,
+		"cost_multiplier": 2.0, # e2
+		"multiple_buy": true,
+		"parent": "Icon influence",
+		"unlocked": false,
+		"level": 0
+	},
+	"Swift brush": {
+		"effect": "Unlock an upgrade to speed up canvas completion",
+		"cost": 10,
+		"cost_multiplier": 1.0, # na
+		"multiple_buy": false,
+		"parent": "Capitalist",
+		"unlocked": false,
+		"level": 0
+	},
+	"Storage room": {
+		"effect": "Unlock an upgrade to be able to store canvas once completed and bulk sell",
+		"cost": 15,
+		"cost_multiplier": 1.0, # na
+		"multiple_buy": false,
+		"parent": "Capitalist",
+		"unlocked": false,
+		"level": 0
+	},
+	"Taylorism": {
+		"effect": "Increase gold and inspiration gain while painting",
+		"cost": 2,
+		"cost_multiplier": 2.0, # e2
+		"multiple_buy": true,
+		"parent": "Capitalist",
+		"unlocked": false,
+		"level": 0
+	},
+	"Megalomania": {
+		"effect": "Unlock an upgrade to be able to paint bigger canvas",
+		"cost": 25,
+		"cost_multiplier": 1.0, # na
+		"multiple_buy": false,
+		"parent": "Capitalist",
+		"unlocked": false,
+		"level": 0
+	}
+}
+
+#==============================================================================
 # Costs & Multipliers
 #==============================================================================
 var ascendancy_cost: float = 1000
@@ -110,7 +179,7 @@ func set_fame(amount:float):
 	fame += amount
 	fame_changed.emit(fame)
 
-func set_level(amount:float):
+func set_level(amount:int):
 	level += amount
 	level_changed.emit(level)
 

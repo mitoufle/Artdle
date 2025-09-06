@@ -65,18 +65,33 @@ layout_mode = 2
 texture_normal = ExtResource("3_r0du0")
 texture_click_mask = SubResource("BitMap_lgr22")
 button_text = "Accueil"
+font_size = null
+font_color = null
+h_align = null
+v_align = null
+autowrap_mode = null
 
 [node name="btnPeinture" parent="MainLayout/VBoxContainer/TopBar" instance=ExtResource("7_abcde")]
 layout_mode = 2
 texture_normal = ExtResource("3_r0du0")
 texture_click_mask = SubResource("BitMap_trn2v")
 button_text = "Peinture"
+font_size = null
+font_color = null
+h_align = null
+v_align = null
+autowrap_mode = null
 
 [node name="btnAscendancy" parent="MainLayout/VBoxContainer/TopBar" instance=ExtResource("7_abcde")]
 layout_mode = 2
 texture_normal = ExtResource("3_r0du0")
 texture_click_mask = SubResource("BitMap_03owx")
 button_text = "Ascendency"
+font_size = null
+font_color = null
+h_align = null
+v_align = null
+autowrap_mode = null
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/VBoxContainer/TopBar"]
 layout_mode = 2

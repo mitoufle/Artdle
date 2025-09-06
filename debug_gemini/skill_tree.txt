@@ -1,0 +1,11 @@
+Skill name | Skill effect | skill cost | skill cost increase multiplier | multiple buy | skill parent
+
+
+Devotion	| Periodically pray to the tree of wisdom to get passive inspiration income 	| 1 	| na	| false | root
+Icon influence	| Unlock Painting 								| 2 	| na	| false | Devotion
+Capitalist	| your canvas sell for higher prices  						| 2 	| e2	| true 	| Icon Influence
+Swift brush	| Unlock an upgrade to speed up canvas completion 				| 10 	| na	| false | Capitalist
+Storage room 	| Unlock an upgrade to be able to store canvas once completed and bulk sell 	| 15 	| na	| false | Capitalist
+Taylorism	| Increase gold and inspiration gain while painting 				| 2 	| e2	| true 	| Capitalist
+Megalomania 	| Unlock an upgrade to be able to paint bigger canvas				| 25 	| na 	| false | Capitalist
+
