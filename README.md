@@ -36,6 +36,12 @@ Note: This game is currently a work in progress. The following instructions are 
 
 To get started with the project, simply clone the repository and open it with the Godot 4 editor.
 
+## 📚 Documentation
+
+- **[Keybinds Documentation](KEYBINDS_DOCUMENTATION.md)** - Complete list of all keyboard shortcuts and controls
+- **[Save System Test Guide](SAVE_SYSTEM_TEST_GUIDE.md)** - Guide for testing the save/load system
+- **[Refactoring Summary](REFACTORING_FINAL_SUMMARY.md)** - Complete refactoring documentation
+
 Clone the repository:
 
 git clone [https://github.com/your-username/artdle.git](https://github.com/your-username/artdle.git)

@@ -68,9 +68,25 @@ Painting
 
 🔧 Quality of Life Improvements
 [ ] Display in-game tutorials for new players.
-[ ] Implement the game's save and load system.
+[x] Implement the game's save and load system.
 [ ] Add sound effects and ambient music.
 [ ] Improve the user interface to make it more readable.
+
+## ⌨️ Raccourcis Clavier (Développement)
+
+### **Test de Sauvegarde**
+- **F1** : Sauvegarder
+- **F2** : Charger
+- **F3** : Supprimer sauvegarde
+- **F4** : Infos sauvegarde
+- **F5** : **RESET COMPLET** (confirmation requise)
+- **F10** : Test avec données
+- **F11** : Test persistance
+- **F12** : Test barre d'XP
+
+### **Documentation**
+- **[KEYBINDS_DOCUMENTATION.md](KEYBINDS_DOCUMENTATION.md)** - Documentation complète des raccourcis
+- **[SAVE_SYSTEM_TEST_GUIDE.md](SAVE_SYSTEM_TEST_GUIDE.md)** - Guide de test du système de sauvegarde
 
 🐛 Known Bugs
 [ ] (To be filled) List bugs encountered during development.
