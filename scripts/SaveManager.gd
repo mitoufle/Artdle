@@ -174,11 +174,24 @@ func _collect_save_data() -> Dictionary:
 		"ascension": {
 			"ascendancy_cost": GameState.ascension_manager.ascendancy_cost,
 			"ascend_level": GameState.ascension_manager.ascend_level
+		},
+		"skill_tree": {
+			"unlocked_skills": GameState.skill_tree_manager.get_unlocked_skills(),
+			"skill_levels": _collect_skill_levels()
+		},
+		"passive_income": {
+			"sources": GameState.passive_income_manager.get_passive_sources()
 		}
 	}
 
+func _collect_skill_levels() -> Dictionary:
+	var skill_levels = {}
+	for skill_name in GameState.skill_tree_manager.skills.keys():
+		skill_levels[skill_name] = GameState.skill_tree_manager.get_skill_level(skill_name)
+	return skill_levels
+
 func _validate_save_data(save_data: Dictionary) -> bool:
-	var required_keys: Array[String] = ["version", "timestamp", "currencies", "experience", "canvas", "clicker", "ascension"]
+	var required_keys: Array[String] = ["version", "timestamp", "currencies", "experience", "canvas", "clicker", "ascension", "skill_tree", "passive_income"]
 	
 	if not GameState.data_validator.validate_config_dict(save_data, required_keys):
 		return false
@@ -222,9 +235,51 @@ func _apply_save_data(save_data: Dictionary) -> void:
 	GameState.ascension_manager.set_ascendancy_cost(ascension_data.get("ascendancy_cost", GameConfig.BASE_ASCENDANCY_COST))
 	GameState.ascension_manager.set_ascend_level(ascension_data.get("ascend_level", GameConfig.DEFAULT_ASCEND_LEVEL))
 	
+	# Restaurer l'arbre de compétences
+	var skill_tree_data = save_data.get("skill_tree", {})
+	_restore_skill_tree(skill_tree_data)
+	
+	# Restaurer les revenus passifs
+	var passive_income_data = save_data.get("passive_income", {})
+	_restore_passive_income(passive_income_data)
+	
 	# Réinitialiser le canvas
 	GameState.canvas_manager._initialize_new_canvas()
 	GameState.canvas_manager._update_fill_speed()
 	
 	# Réinitialiser l'autoclick
 	GameState.clicker_manager._update_autoclick_timer()
+
+func _restore_skill_tree(skill_tree_data: Dictionary) -> void:
+	var skill_levels = skill_tree_data.get("skill_levels", {})
+	
+	# Restaurer les niveaux des skills
+	for skill_name in skill_levels.keys():
+		var level = skill_levels[skill_name]
+		if level > 0 and GameState.skill_tree_manager.skills.has(skill_name):
+			var skill = GameState.skill_tree_manager.skills[skill_name]
+			skill.level = level
+			skill.unlocked = true
+			
+			# Appliquer l'effet du skill pour chaque niveau
+			for i in range(level):
+				GameState.skill_tree_manager._apply_skill_effect(skill)
+
+func _restore_passive_income(passive_income_data: Dictionary) -> void:
+	var sources = passive_income_data.get("sources", {})
+	
+	# Restaurer chaque source de revenu passif
+	for source_name in sources.keys():
+		var source_data = sources[source_name]
+		GameState.passive_income_manager.add_passive_income(
+			source_name,
+			source_data.get("currency_type", "inspiration"),
+			source_data.get("amount", 1.0),
+			source_data.get("interval", 5.0)
+		)
+		
+		# Restaurer l'état enabled/disabled
+		GameState.passive_income_manager.set_passive_income_enabled(
+			source_name,
+			source_data.get("enabled", true)
+		)

@@ -75,18 +75,21 @@ Painting
 ## ⌨️ Raccourcis Clavier (Développement)
 
 ### **Test de Sauvegarde**
-- **F1** : Sauvegarder
-- **F2** : Charger
-- **F3** : Supprimer sauvegarde
-- **F4** : Infos sauvegarde
-- **F5** : **RESET COMPLET** (confirmation requise)
-- **F10** : Test avec données
-- **F11** : Test persistance
-- **F12** : Test barre d'XP
+- **1** : Sauvegarder
+- **2** : Charger
+- **3** : Supprimer sauvegarde
+- **4** : Infos sauvegarde
+- **5** : **RESET COMPLET** (confirmation requise)
+- **6** : Points d'ascension
+- **7** : Test feedback
+- **8** : Test persistance
+- **9** : Test barre d'XP
+- **0** : Test avec données
 
 ### **Documentation**
 - **[KEYBINDS_DOCUMENTATION.md](KEYBINDS_DOCUMENTATION.md)** - Documentation complète des raccourcis
 - **[SAVE_SYSTEM_TEST_GUIDE.md](SAVE_SYSTEM_TEST_GUIDE.md)** - Guide de test du système de sauvegarde
+- **[SKILLS_DOCUMENTATION.md](SKILLS_DOCUMENTATION.md)** - Guide complet du système de skills
 
 🐛 Known Bugs
 [ ] (To be filled) List bugs encountered during development.

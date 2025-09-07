@@ -100,9 +100,10 @@ func _on_canvas_storage_upgrade_cost_changed(cost: int):
 # UI Event Handlers
 #==============================================================================
 func _on_sell_button_pressed():
+	var sell_price = GameState.canvas_manager.sell_price
 	GameState.sell_canvas()
 	_update_sell_button_state() # Update button state after selling
-	show_feedback(GameState.sell_price, coin_spritesheet, 12, 1, "rotate")
+	show_feedback(sell_price, coin_spritesheet, 12, 1, "rotate")
 
 #==============================================================================
 # Feedback

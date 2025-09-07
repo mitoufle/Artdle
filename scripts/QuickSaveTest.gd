@@ -7,27 +7,40 @@ var reset_confirmation_pending = false
 
 func _ready():
 	print("=== TEST RAPIDE DE SAUVEGARDE ===")
-	print("F1: Sauvegarder")
-	print("F2: Charger")
-	print("F3: Supprimer sauvegarde")
-	print("F4: Afficher infos sauvegarde")
-	print("F5: RESET COMPLET DU JEU")
-	print("F10: Test avec données de test")
+	print("1: Sauvegarder")
+	print("2: Charger")
+	print("3: Supprimer sauvegarde")
+	print("4: Afficher infos sauvegarde")
+	print("5: RESET COMPLET DU JEU")
+	print("6: Donner points d'ascension")
+	print("7: Test feedback")
+	print("8: Test inventaire et craft")
+	print("Ctrl+9: Activer Devotion (revenu passif)")
+	print("0: Test avec données de test")
 
 func _input(event):
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
-			KEY_F1:
+			KEY_1:
 				test_save()
-			KEY_F2:
+			KEY_2:
 				test_load()
-			KEY_F3:
+			KEY_3:
 				test_clear()
-			KEY_F4:
+			KEY_4:
 				test_info()
-			KEY_F5:
+			KEY_5:
 				reset_game_completely()
-			KEY_F10:
+			KEY_6:
+				give_ascendancy_points()
+			KEY_7:
+				test_feedback()
+			KEY_8:
+				test_inventory_craft()
+			KEY_9:
+				if event.ctrl_pressed:
+					activate_devotion()
+			KEY_0:
 				test_with_data()
 
 func test_save():
@@ -130,6 +143,8 @@ func reset_game_completely():
 	GameState.canvas_manager.reset_canvas()
 	GameState.clicker_manager.reset_clicker()
 	GameState.ascension_manager.reset_ascension()
+	GameState.skill_tree_manager.reset_skills()
+	GameState.passive_income_manager.reset_passive_income()
 	
 	# Supprimer la sauvegarde
 	GameState.clear_save()
@@ -141,3 +156,116 @@ func reset_game_completely():
 	print("✅ Reset complet terminé !")
 	print("Toutes les données ont été remises à zéro")
 	print("La sauvegarde a été supprimée")
+
+func give_ascendancy_points():
+	print("\n--- POINTS D'ASCENSION ---")
+	
+	# Donner 50 points d'ascension pour tester
+	GameState.currency_manager.add_currency("ascendancy_points", 50)
+	
+	var current_points = GameState.currency_manager.get_currency("ascendancy_points")
+	print("✅ 50 points d'ascension ajoutés")
+	print("Points d'ascension actuels: %d" % current_points)
+	print("💡 Allez dans Ascendancy > Skill Tree pour acheter des compétences")
+
+func test_feedback():
+	print("\n--- TEST FEEDBACK ---")
+	
+	# Test différents types de feedback
+	GameState.feedback_manager.show_feedback("Test feedback simple!", Color.WHITE)
+	GameState.feedback_manager.show_feedback("Test feedback vert!", Color.GREEN)
+	GameState.feedback_manager.show_feedback("Test feedback rouge!", Color.RED)
+	
+	# Test feedback de devise
+	GameState.feedback_manager.show_currency_feedback(100, "inspiration")
+	GameState.feedback_manager.show_currency_feedback(50, "gold")
+	
+	print("✅ Tests de feedback lancés")
+	print("💡 Regardez l'écran pour voir les effets visuels")
+
+func test_inventory_craft():
+	print("\n--- TEST INVENTAIRE ET CRAFT ---")
+	
+	# Donner de l'or pour tester
+	GameState.currency_manager.add_currency("gold", 1000)
+	print("✅ 1000 gold ajouté")
+	
+	# Tester le craft d'un item
+	var success = GameState.craft_manager.start_craft(InventoryManager.ItemType.HAT, 1)
+	if success:
+		print("✅ Craft de chapeau démarré!")
+		print("💡 Allez dans l'atelier pour voir le progrès")
+	else:
+		print("❌ Impossible de démarrer le craft")
+	
+	# Afficher les informations de l'atelier
+	var workshop_level = GameState.craft_manager.get_workshop_level()
+	var upgrade_cost = GameState.craft_manager.get_upgrade_cost()
+	var tier_chances = GameState.craft_manager.get_tier_chances()
+	
+	print("🏭 Niveau de l'atelier: %d" % workshop_level)
+	print("💰 Coût d'amélioration: %d gold" % upgrade_cost)
+	print("🎲 Chances de tiers:")
+	for tier in tier_chances.keys():
+		var tier_name = _get_tier_name(tier)
+		var chance = tier_chances[tier] * 100
+		print("  %s: %.1f%%" % [tier_name, chance])
+	
+	print("💡 Allez dans l'inventaire et l'atelier pour tester!")
+
+func _get_tier_name(tier: InventoryManager.ItemTier) -> String:
+	match tier:
+		InventoryManager.ItemTier.TIER_1: return "Normal"
+		InventoryManager.ItemTier.TIER_2: return "Magic"
+		InventoryManager.ItemTier.TIER_3: return "Rare"
+		InventoryManager.ItemTier.TIER_4: return "Epic"
+		InventoryManager.ItemTier.TIER_5: return "Legendary"
+		_: return "Unknown"
+
+func activate_devotion():
+	print("\n--- ACTIVATION DEVOTION ---")
+	
+	# Acheter le skill Devotion
+	var success = GameState.skill_tree_manager.buy_skill("Devotion")
+	if success:
+		var level = GameState.skill_tree_manager.get_skill_level("Devotion")
+		print("✅ Devotion niveau %d activé!" % level)
+		
+		# Vérifier le niveau maximum
+		if level >= 5:
+			print("🎯 Niveau maximum atteint! (5/5)")
+		
+		# Afficher les effets selon le niveau (avec évolution dynamique)
+		var player_level = GameState.experience_manager.get_level()
+		var base_amount = 1.0
+		var base_interval = 5.0
+		
+		# Calculer les effets actuels
+		if level >= 2:
+			base_amount *= player_level
+		if level >= 3:
+			base_interval = max(0.1, 5.0 - (player_level * 0.2))  # Scaling plus rapide
+		if level >= 4:
+			base_amount *= 2.0
+		
+		match level:
+			1:
+				print("Effet: 1 inspiration toutes les 5 secondes")
+			2:
+				print("Effet: %d inspiration toutes les 5 secondes (ÉVOLUE avec votre niveau!)" % int(base_amount))
+			3:
+				print("Effet: %d inspiration toutes les %.1f secondes (rythme ÉVOLUTIF!)" % [int(base_amount), base_interval])
+			4:
+				print("Effet: %d inspiration toutes les %.1f secondes (gain doublé + ÉVOLUTIF!)" % [int(base_amount), base_interval])
+			5:
+				print("Effet: %d inspiration toutes les %.1f secondes + 0.1%% conservée à l'ascension (ÉVOLUTIF!)" % [int(base_amount), base_interval])
+		
+		print("💡 Le revenu passif s'améliore automatiquement quand vous montez de niveau!")
+		print("💡 Regardez les tooltips dans l'écran skill tree pour voir les effets détaillés!")
+	else:
+		var current_level = GameState.skill_tree_manager.get_skill_level("Devotion")
+		if current_level >= 5:
+			print("❌ Devotion niveau maximum atteint! (5/5)")
+		else:
+			print("❌ Impossible d'acheter Devotion")
+			print("Points d'ascension nécessaires: %d" % GameState.skill_tree_manager.get_skill_cost("Devotion"))

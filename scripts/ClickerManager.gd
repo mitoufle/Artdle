@@ -15,6 +15,9 @@ signal click_stats_changed(new_stats: Dictionary)
 var click_power: int = GameConfig.BASE_CLICK_POWER
 var autoclick_speed: float = GameConfig.BASE_AUTOCLICK_SPEED
 var autoclick_timer: Timer
+var autoclick_enabled: bool = false
+var autoclick_base_interval: float = 5.0  # 5 secondes de base
+var autoclick_speed_multiplier: float = 1.0
 
 #==============================================================================
 # Godot Lifecycle
@@ -59,8 +62,11 @@ func upgrade_autoclick_speed() -> bool:
 
 ## Active ou désactive l'autoclick
 func set_autoclick_enabled(enabled: bool) -> void:
+	autoclick_enabled = enabled
+	
 	if enabled:
-		autoclick_speed = max(autoclick_speed, 1.0)
+		# Calculer la vitesse d'autoclick basée sur les améliorations
+		_calculate_autoclick_speed()
 	else:
 		autoclick_speed = 0.0
 	
@@ -71,6 +77,8 @@ func set_autoclick_enabled(enabled: bool) -> void:
 func reset_clicker() -> void:
 	click_power = GameConfig.BASE_CLICK_POWER
 	autoclick_speed = GameConfig.BASE_AUTOCLICK_SPEED
+	autoclick_enabled = false
+	autoclick_speed_multiplier = 1.0
 	_update_autoclick_timer()
 	_emit_click_stats()
 
@@ -78,7 +86,9 @@ func reset_clicker() -> void:
 func get_click_stats() -> Dictionary:
 	return {
 		"click_power": click_power,
-		"autoclick_speed": autoclick_speed
+		"autoclick_speed": autoclick_speed,
+		"autoclick_enabled": autoclick_enabled,
+		"autoclick_interval": autoclick_base_interval / autoclick_speed_multiplier if autoclick_enabled else 0.0
 	}
 
 #==============================================================================
@@ -95,11 +105,42 @@ func _on_autoclick_timer_timeout() -> void:
 	GameState.experience_manager.add_experience(GameConfig.EXPERIENCE_PER_CLICK)
 
 func _update_autoclick_timer() -> void:
-	if autoclick_speed > 0:
+	if autoclick_enabled and autoclick_speed > 0:
 		autoclick_timer.wait_time = 1.0 / autoclick_speed
 		autoclick_timer.start()
 	else:
 		autoclick_timer.stop()
+
+## Calcule la vitesse d'autoclick basée sur les améliorations
+func _calculate_autoclick_speed() -> void:
+	if not autoclick_enabled:
+		autoclick_speed = 0.0
+		return
+	
+	# Vitesse de base : 1 clic toutes les 5 secondes
+	var base_speed = 1.0 / autoclick_base_interval
+	
+	# Appliquer le multiplicateur de vitesse
+	autoclick_speed = base_speed * autoclick_speed_multiplier
+
+## Améliore la vitesse d'autoclick (appelé par les skills)
+func upgrade_autoclick_speed_multiplier(amount: float) -> void:
+	autoclick_speed_multiplier += amount
+	if autoclick_enabled:
+		_calculate_autoclick_speed()
+		_update_autoclick_timer()
+	_emit_click_stats()
+
+## Récupère le multiplicateur de vitesse d'autoclick
+func get_autoclick_speed_multiplier() -> float:
+	return autoclick_speed_multiplier
+
+## Définit le multiplicateur de vitesse d'autoclick (pour la sauvegarde)
+func set_autoclick_speed_multiplier(value: float) -> void:
+	autoclick_speed_multiplier = value
+	if autoclick_enabled:
+		_calculate_autoclick_speed()
+		_update_autoclick_timer()
 
 #==============================================================================
 # Public API Methods

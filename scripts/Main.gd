@@ -106,4 +106,14 @@ func _notification(what):
 		else:
 			print("❌ Échec de la sauvegarde finale")
 		get_tree().quit()
+
+func _input(event):
+	# Raccourcis clavier pour les tests
+	if event.is_action_pressed("ui_accept"):  # Entrée
+		_run_integration_test()
+
+func _run_integration_test():
+	print("🧪 Lancement du test complet...")
+	var test = preload("res://scripts/TestCompleteSystem.gd").new()
+	add_child(test)
 	

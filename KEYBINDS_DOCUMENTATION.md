@@ -10,24 +10,27 @@ Ce document répertorie tous les raccourcis clavier disponibles dans le projet A
 
 | Touche | Fonction | Description | Fichier |
 |--------|----------|-------------|---------|
-| **F1** | `test_save()` | Sauvegarde l'état actuel du jeu | `scripts/QuickSaveTest.gd` |
-| **F2** | `test_load()` | Charge la dernière sauvegarde | `scripts/QuickSaveTest.gd` |
-| **F3** | `test_clear()` | Supprime le fichier de sauvegarde | `scripts/QuickSaveTest.gd` |
-| **F4** | `test_info()` | Affiche les informations de sauvegarde | `scripts/QuickSaveTest.gd` |
-| **F5** | `reset_game_completely()` | **RESET COMPLET** du jeu (confirmation requise) | `scripts/QuickSaveTest.gd` |
-| **F10** | `test_with_data()` | Ajoute des données de test et sauvegarde | `scripts/QuickSaveTest.gd` |
+| **1** | `test_save()` | Sauvegarde l'état actuel du jeu | `scripts/QuickSaveTest.gd` |
+| **2** | `test_load()` | Charge la dernière sauvegarde | `scripts/QuickSaveTest.gd` |
+| **3** | `test_clear()` | Supprime le fichier de sauvegarde | `scripts/QuickSaveTest.gd` |
+| **4** | `test_info()` | Affiche les informations de sauvegarde | `scripts/QuickSaveTest.gd` |
+| **5** | `reset_game_completely()` | **RESET COMPLET** du jeu (confirmation requise) | `scripts/QuickSaveTest.gd` |
+| **6** | `give_ascendancy_points()` | Donne 50 points d'ascension pour tester | `scripts/QuickSaveTest.gd` |
+| **7** | `test_feedback()` | Teste le système de feedback visuel | `scripts/QuickSaveTest.gd` |
+| **Ctrl+9** | `activate_devotion()` | Active/améliore le skill Devotion (5 niveaux, revenu passif) | `scripts/QuickSaveTest.gd` |
+| **0** | `test_with_data()` | Ajoute des données de test et sauvegarde | `scripts/QuickSaveTest.gd` |
 
 ### **Test de Persistance** (`TestSavePersistence.gd`)
 
 | Touche | Fonction | Description | Fichier |
 |--------|----------|-------------|---------|
-| **F11** | `test_save_persistence()` | Test complet de persistance des données | `scripts/TestSavePersistence.gd` |
+| **8** | `test_save_persistence()` | Test complet de persistance des données | `scripts/TestSavePersistence.gd` |
 
 ### **Test Barre d'XP** (`TestXPBarFix.gd`)
 
 | Touche | Fonction | Description | Fichier |
 |--------|----------|-------------|---------|
-| **F12** | `test_xp_bar_initialization()` | Test manuel de la barre d'XP | `scripts/TestXPBarFix.gd` |
+| **9** | `test_xp_bar_initialization()` | Test manuel de la barre d'XP | `scripts/TestXPBarFix.gd` |
 
 ## 🎯 Raccourcis de Jeu
 
@@ -55,27 +58,27 @@ Ce document répertorie tous les raccourcis clavier disponibles dans le projet A
 
 | Touche | Fonction | Description | Sécurité |
 |--------|----------|-------------|----------|
-| **F5** | Reset Complet | Remet tout le jeu à zéro | Double confirmation + timeout 5s |
+| **5** | Reset Complet | Remet tout le jeu à zéro | Double confirmation + timeout 5s |
 
 ### **Système de Sauvegarde**
 
 | Touche | Fonction | Description | Sécurité |
 |--------|----------|-------------|----------|
-| **F1** | Sauvegarder | Sauvegarde immédiate | Aucune |
-| **F2** | Charger | Chargement immédiat | Aucune |
-| **F3** | Supprimer | Suppression immédiate | Aucune |
-| **F4** | Infos | Affichage des infos | Aucune |
+| **1** | Sauvegarder | Sauvegarde immédiate | Aucune |
+| **2** | Charger | Chargement immédiat | Aucune |
+| **3** | Supprimer | Suppression immédiate | Aucune |
+| **4** | Infos | Affichage des infos | Aucune |
 
 ## 📊 Catégorisation par Priorité
 
 ### **🔴 Critique (Développement)**
-- **F5** : Reset complet (avec confirmation)
-- **F1-F4** : Gestion de sauvegarde
+- **5** : Reset complet (avec confirmation)
+- **1-4** : Gestion de sauvegarde
 
 ### **🟡 Important (Test)**
-- **F10** : Test avec données
-- **F11** : Test de persistance
-- **F12** : Test barre d'XP
+- **0** : Test avec données
+- **8** : Test de persistance
+- **9** : Test barre d'XP
 
 ### **🟢 Standard (Jeu)**
 - **Boutons UI** : Navigation normale
@@ -129,12 +132,12 @@ Ce document répertorie tous les raccourcis clavier disponibles dans le projet A
 ## ⚠️ Notes Importantes
 
 ### **Conflits Évités**
-- **F5-F9** : Évités (utilisés par Godot Editor)
-- **F1-F4, F10-F12** : Utilisés pour les tests
+- **Touches F** : Évitées (utilisées par Godot Editor)
+- **Touches numériques 0-9** : Utilisées pour les tests
 - **Boutons UI** : Pas de conflit avec les raccourcis
 
 ### **Développement vs Production**
-- **Tous les raccourcis F1-F12** : Développement uniquement
+- **Tous les raccourcis numériques 0-9** : Développement uniquement
 - **Boutons UI** : Production
 - **Scripts de test** : Peuvent être désactivés en production
 

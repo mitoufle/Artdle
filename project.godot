@@ -26,10 +26,6 @@ window/size/viewport_width=1200
 window/size/viewport_height=800
 mouse_cursor/custom_image="uid://p7gnpt45ola2"
 
-[gui]
-
-theme/custom_font="uid://bj42nhxgoiu2"
-
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

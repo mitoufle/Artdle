@@ -41,6 +41,7 @@ To get started with the project, simply clone the repository and open it with th
 - **[Keybinds Documentation](KEYBINDS_DOCUMENTATION.md)** - Complete list of all keyboard shortcuts and controls
 - **[Save System Test Guide](SAVE_SYSTEM_TEST_GUIDE.md)** - Guide for testing the save/load system
 - **[Refactoring Summary](REFACTORING_FINAL_SUMMARY.md)** - Complete refactoring documentation
+- **[Skills Documentation](SKILLS_DOCUMENTATION.md)** - Complete guide to the skill system
 
 Clone the repository:
 

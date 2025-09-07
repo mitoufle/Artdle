@@ -34,6 +34,10 @@ var canvas_manager: CanvasManager
 var clicker_manager: ClickerManager
 var ascension_manager: AscensionManager
 var experience_manager: ExperienceManager
+var skill_tree_manager: SkillTreeManager
+var passive_income_manager: PassiveIncomeManager
+var inventory_manager: InventoryManager
+var craft_manager: CraftManager
 var data_validator: DataValidator
 var logger: GameLogger
 var save_manager: SaveManager
@@ -244,6 +248,10 @@ func _initialize_managers() -> void:
 	clicker_manager = ClickerManager.new()
 	ascension_manager = AscensionManager.new()
 	experience_manager = ExperienceManager.new()
+	skill_tree_manager = SkillTreeManager.new()
+	passive_income_manager = PassiveIncomeManager.new()
+	inventory_manager = InventoryManager.new()
+	craft_manager = CraftManager.new()
 	data_validator = DataValidator.new()
 	logger = GameLogger.new()
 	save_manager = SaveManager.new()
@@ -255,6 +263,10 @@ func _initialize_managers() -> void:
 	add_child(clicker_manager)
 	add_child(ascension_manager)
 	add_child(experience_manager)
+	add_child(skill_tree_manager)
+	add_child(passive_income_manager)
+	add_child(inventory_manager)
+	add_child(craft_manager)
 	add_child(data_validator)
 	add_child(logger)
 	add_child(save_manager)
@@ -280,6 +292,7 @@ func _connect_manager_signals() -> void:
 	
 	experience_manager.experience_changed.connect(_on_experience_changed)
 	experience_manager.level_changed.connect(_on_level_changed)
+	experience_manager.level_changed.connect(_on_level_changed_for_devotion)
 	
 	# Connecter les signaux d'ascension
 	ascension_manager.ascendancy_level_changed.connect(_on_ascendancy_level_changed)
@@ -330,6 +343,10 @@ func _on_experience_changed(new_experience: float, experience_to_next_level: flo
 
 func _on_level_changed(new_level: int) -> void:
 	level_changed.emit(new_level)
+
+func _on_level_changed_for_devotion(new_level: int) -> void:
+	# Mettre à jour le revenu passif de Devotion quand le niveau change
+	skill_tree_manager.update_devotion_passive_income()
 
 func _on_ascendancy_level_changed(new_level: float) -> void:
 	ascendancy_level_changed.emit(new_level)

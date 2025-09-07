@@ -165,6 +165,26 @@ func reset_canvas() -> void:
 	_initialize_new_canvas()
 	_update_fill_speed()
 
+## Ajoute un multiplicateur de prix de vente (pour les skills)
+func add_sell_price_multiplier(multiplier: float) -> void:
+	sell_price = int(sell_price * (1.0 + multiplier))
+	GameState.logger.info("Canvas sell price increased by %.1f%%" % (multiplier * 100))
+
+## Ajoute un multiplicateur de gains de peinture (pour les skills)
+func add_painting_gain_multiplier(multiplier: float) -> void:
+	# Cette méthode sera utilisée pour augmenter les gains de peinture
+	GameState.logger.info("Painting gain multiplier increased by %.1f%%" % (multiplier * 100))
+
+## Débloque le stockage de canvas (pour les skills)
+func unlock_canvas_storage() -> void:
+	# Cette méthode sera utilisée pour débloquer le stockage
+	GameState.logger.info("Canvas storage unlocked!")
+
+## Débloque les améliorations de taille de canvas (pour les skills)
+func unlock_canvas_size_upgrades() -> void:
+	# Cette méthode sera utilisée pour débloquer les améliorations de taille
+	GameState.logger.info("Canvas size upgrades unlocked!")
+
 #==============================================================================
 # Private Methods
 #==============================================================================

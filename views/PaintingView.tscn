@@ -20,10 +20,10 @@ script = ExtResource("1_tvnqg")
 [node name="BtnOpenCanvas" type="Button" parent="."]
 z_index = 2
 layout_mode = 2
-offset_left = 516.0
-offset_top = 355.0
-offset_right = 658.0
-offset_bottom = 386.0
+offset_left = 50.0
+offset_top = 217.0
+offset_right = 282.0
+offset_bottom = 257.0
 size_flags_horizontal = 4
 text = "Voir le Canvas"
 
@@ -45,4 +45,26 @@ offset_right = 842.0
 offset_bottom = 272.0
 text = "debug"
 
+[node name="BtnInventory" type="Button" parent="."]
+z_index = 2
+layout_mode = 2
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 150.0
+offset_bottom = 80.0
+size_flags_horizontal = 0
+text = "Inventory"
+
+[node name="BtnCraft" type="Button" parent="."]
+z_index = 2
+layout_mode = 2
+offset_left = 50.0
+offset_top = 135.0
+offset_right = 190.0
+offset_bottom = 175.0
+size_flags_horizontal = 0
+text = "Workshop"
+
 [connection signal="pressed" from="Debug" to="." method="_on_debug_pressed"]
+[connection signal="pressed" from="BtnInventory" to="." method="_on_inventory_pressed"]
+[connection signal="pressed" from="BtnCraft" to="." method="_on_craft_pressed"]

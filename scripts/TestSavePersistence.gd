@@ -5,8 +5,8 @@ extends Node
 
 func _ready():
 	print("=== TEST DE PERSISTANCE DE SAUVEGARDE ===")
-	print("Appuyez sur F11 pour exécuter le test de persistance")
-	print("F1: Sauvegarder | F2: Charger | F3: Supprimer | F4: Infos | F11: Test Persistance")
+	print("Appuyez sur 8 pour exécuter le test de persistance")
+	print("1: Sauvegarder | 2: Charger | 3: Supprimer | 4: Infos | 8: Test Persistance")
 
 func test_save_persistence():
 	print("\n1. Configuration des données de test...")
@@ -76,6 +76,6 @@ func test_save_persistence():
 func _input(event):
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
-			KEY_F11:
+			KEY_8:
 				print("=== TEST RAPIDE DE PERSISTANCE ===")
 				await test_save_persistence()

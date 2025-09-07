@@ -7,15 +7,15 @@ func _ready():
 	print("Ce script teste que la barre d'XP s'affiche correctement après le chargement d'une sauvegarde")
 	print("")
 	print("Instructions:")
-	print("1. Sauvegardez avec F1 (ajoutez de l'XP avec F10 si nécessaire)")
+	print("1. Sauvegardez avec 1 (ajoutez de l'XP avec 0 si nécessaire)")
 	print("2. Rechargez le jeu")
 	print("3. Vérifiez que la barre d'XP affiche le bon pourcentage")
 	print("")
-	print("Appuyez sur F12 pour tester manuellement")
+	print("Appuyez sur 9 pour tester manuellement")
 
 func _input(event):
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_F12:
+		if event.keycode == KEY_9:
 			test_xp_bar_initialization()
 
 func test_xp_bar_initialization():

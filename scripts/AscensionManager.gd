@@ -67,8 +67,18 @@ func reset_ascension() -> void:
 #==============================================================================
 
 func _reset_game_systems() -> void:
+	# Vérifier si Devotion niveau 5 est actif
+	var devotion_level = GameState.skill_tree_manager.get_skill_level("Devotion")
+	var inspiration_to_keep = 0.0
+	
+	if devotion_level >= 5:
+		# Garder 0.1% de l'inspiration actuelle
+		var current_inspiration = GameState.currency_manager.get_currency("inspiration")
+		inspiration_to_keep = current_inspiration * 0.001  # 0.1%
+		GameState.logger.info("Devotion level 5: Keeping %.1f inspiration (0.1% of %.1f)" % [inspiration_to_keep, current_inspiration])
+	
 	# Réinitialiser les devises principales
-	GameState.currency_manager.set_currency("inspiration", 0)
+	GameState.currency_manager.set_currency("inspiration", inspiration_to_keep)
 	GameState.currency_manager.set_currency("gold", 0)
 	
 	# Réinitialiser le canvas

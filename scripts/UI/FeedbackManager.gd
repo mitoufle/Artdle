@@ -76,6 +76,11 @@ func show_ascension_feedback(ascendancy_points: float, position: Vector2 = Vecto
 func show_custom_feedback(text: String, icon: Texture2D, position: Vector2 = Vector2.ZERO, color: Color = Color.WHITE) -> void:
 	_show_feedback(text, icon, position, color)
 
+## Affiche un feedback simple avec texte et couleur (méthode de convenance)
+func show_feedback(text: String, color: Color = Color.WHITE, position: Vector2 = Vector2.ZERO) -> void:
+	var icon = preload("res://artdleAsset/Currency/coin.png")  # Icône par défaut
+	show_custom_feedback(text, icon, position, color)
+
 ## Affiche un feedback de canvas vendu
 func show_canvas_sold_feedback(gold_gained: int, fame_gained: int, position: Vector2 = Vector2.ZERO) -> void:
 	# Show gold feedback
@@ -107,8 +112,8 @@ func _show_feedback(text: String, icon: Texture2D, position: Vector2, color: Col
 	# Add to instances array
 	feedback_instances.append(ft)
 	
-	# Connect finished signal to cleanup
-	ft.finished.connect(_on_feedback_finished.bind(ft))
+	# The floating text will automatically queue_free itself when the tween finishes
+	# No need to connect a finished signal
 
 func _cleanup_feedback_instances() -> void:
 	# Remove finished instances
@@ -116,12 +121,14 @@ func _cleanup_feedback_instances() -> void:
 		var instance = feedback_instances[i]
 		if not is_instance_valid(instance) or instance.is_queued_for_deletion():
 			feedback_instances.remove_at(i)
+	
+	# Limit the number of feedback instances
+	while feedback_instances.size() > max_feedback_instances:
+		var oldest_instance = feedback_instances.pop_front()
+		if is_instance_valid(oldest_instance):
+			oldest_instance.queue_free()
 
-func _on_feedback_finished(instance: Node) -> void:
-	# Remove from instances array
-	var index = feedback_instances.find(instance)
-	if index != -1:
-		feedback_instances.remove_at(index)
+# Note: _on_feedback_finished removed because floating_text automatically queue_frees itself
 
 func _get_currency_icon(currency_type: String) -> Texture2D:
 	match currency_type:
