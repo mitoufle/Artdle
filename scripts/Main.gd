@@ -111,9 +111,25 @@ func _input(event):
 	# Raccourcis clavier pour les tests
 	if event.is_action_pressed("ui_accept"):  # Entrée
 		_run_integration_test()
+	elif event.is_action_pressed("ui_cancel"):  # Échap
+		_test_bonus_system()
+	elif event.is_action_pressed("ui_select"):  # Espace
+		_test_bonus_debug()
 
 func _run_integration_test():
 	print("🧪 Lancement du test complet...")
 	var test = preload("res://scripts/TestCompleteSystem.gd").new()
 	add_child(test)
+
+func _test_bonus_system():
+	print("🎯 Lancement du test du système de bonus...")
+	var test = preload("res://scripts/TestBonusSystem.gd").new()
+	add_child(test)
+
+func _test_bonus_debug():
+	print("🔍 Lancement du diagnostic des bonus...")
+	var test = preload("res://scripts/TestBonusDebug.gd").new()
+	add_child(test)
+
+
 	

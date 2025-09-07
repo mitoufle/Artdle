@@ -4,6 +4,84 @@ extends Node
 ## Utilise des managers spécialisés pour une meilleure organisation
 
 #==============================================================================
+# Big Number Management
+#==============================================================================
+const BigNumberManager = preload("res://scripts/BigNumberManager.gd")
+const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
+
+#==============================================================================
+# Bonus System
+#==============================================================================
+
+## Applique les bonus d'équipement à un gain de devise
+func apply_currency_bonus(currency_type: String, base_amount: float) -> float:
+	if not inventory_manager:
+		return base_amount
+	
+	var bonuses = inventory_manager.get_total_bonuses()
+	var bonus_multiplier = 1.0
+	
+	# Appliquer les bonus spécifiques à chaque type de devise
+	match currency_type:
+		"inspiration":
+			bonus_multiplier = _get_inspiration_bonus(bonuses)
+		"gold":
+			bonus_multiplier = _get_gold_bonus(bonuses)
+		"fame":
+			bonus_multiplier = _get_fame_bonus(bonuses)
+		"ascendancy_points":
+			bonus_multiplier = _get_ascendancy_bonus(bonuses)
+		"paint_mastery":
+			bonus_multiplier = _get_paint_mastery_bonus(bonuses)
+		_:
+			bonus_multiplier = _get_generic_bonus(bonuses)
+	
+	var final_amount = base_amount * bonus_multiplier
+	logger.debug("Currency bonus: %s %.2f -> %.2f (%.2fx)" % [currency_type, base_amount, final_amount, bonus_multiplier])
+	return final_amount
+
+## Récupère le multiplicateur de bonus pour l'inspiration
+func _get_inspiration_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	if bonuses.has("inspiration_gain"):
+		multiplier *= bonuses["inspiration_gain"]
+	return multiplier
+
+## Récupère le multiplicateur de bonus pour l'or
+func _get_gold_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	if bonuses.has("gold_gain"):
+		multiplier *= bonuses["gold_gain"]
+	return multiplier
+
+## Récupère le multiplicateur de bonus pour la renommée
+func _get_fame_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	# Pas de stat spécifique pour la renommée dans les items
+	# Utiliser les bonus génériques si disponibles
+	return multiplier
+
+## Récupère le multiplicateur de bonus pour l'ascendancy
+func _get_ascendancy_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	if bonuses.has("ascendancy_gain"):
+		multiplier *= bonuses["ascendancy_gain"]
+	return multiplier
+
+## Récupère le multiplicateur de bonus pour l'expérience
+func _get_paint_mastery_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	if bonuses.has("experience_gain"):
+		multiplier *= bonuses["experience_gain"]
+	return multiplier
+
+## Récupère le multiplicateur de bonus générique
+func _get_generic_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	# Pas de bonus générique dans les items actuels
+	return multiplier
+
+#==============================================================================
 # Signals (Legacy - pour compatibilité avec l'UI existante)
 #==============================================================================
 signal inspiration_changed(new_inspiration_value: float)
@@ -171,14 +249,37 @@ func set_level(amount: int) -> void:
 	experience_manager.set_level(amount)
 
 func add_experience(amount: float) -> void:
+	var old_level = experience_manager.get_level()
 	experience_manager.add_experience(amount)
+	var new_level = experience_manager.get_level()
+	
+	# Donner 1 renommée par niveau gagné
+	var levels_gained = new_level - old_level
+	if levels_gained > 0:
+		var fame_gained = levels_gained * 1.0
+		currency_manager.add_currency_raw("fame", fame_gained)
+		logger.info("Level up! Gained %d levels and %d fame" % [levels_gained, fame_gained])
 
 # Canvas Methods (Legacy)
-func sell_canvas() -> void:
+func sell_canvas() -> Dictionary:
 	var result = canvas_manager.sell_canvas()
 	if result.canvases_sold > 0:
-		currency_manager.add_currency("gold", result.gold_gained)
-		currency_manager.add_currency("fame", result.fame_gained)
+		# Appliquer les bonus d'équipement
+		var bonus_gold = apply_currency_bonus("gold", result.gold_gained)
+		var bonus_fame = apply_currency_bonus("fame", result.canvases_sold * GameConfig.BASE_FAME_PER_CANVAS)
+		
+		# Ajouter les devises avec bonus
+		currency_manager.add_currency_raw("gold", bonus_gold)
+		currency_manager.add_currency_raw("fame", bonus_fame)
+		
+		# Retourner les montants avec bonus pour le feedback
+		return {
+			"canvases_sold": result.canvases_sold,
+			"gold_gained": bonus_gold,
+			"fame_gained": bonus_fame
+		}
+	
+	return result
 
 func upgrade_resolution() -> void:
 	canvas_manager.upgrade_resolution()

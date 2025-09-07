@@ -7,13 +7,13 @@ class_name GameConfig
 #==============================================================================
 # Currency Defaults
 #==============================================================================
-const DEFAULT_INSPIRATION: float = 100.0
+const DEFAULT_INSPIRATION: float = 0.0
 const DEFAULT_GOLD: float = 0.0
 const DEFAULT_FAME: float = 0.0
 const DEFAULT_ASCENDANCY_POINTS: float = 0.0
 const DEFAULT_ASCEND_LEVEL: float = 0.0
 const DEFAULT_PAINT_MASTERY: float = 0.0
-const DEFAULT_EXPERIENCE: float = 95.0
+const DEFAULT_EXPERIENCE: float = 0.0
 const DEFAULT_LEVEL: int = 1
 const DEFAULT_EXPERIENCE_TO_NEXT_LEVEL: float = 100.0
 
@@ -22,6 +22,7 @@ const DEFAULT_EXPERIENCE_TO_NEXT_LEVEL: float = 100.0
 #==============================================================================
 const BASE_CANVAS_SIZE: int = 32
 const BASE_SELL_PRICE: int = 1000
+const BASE_FAME_PER_CANVAS: int = 10
 const BASE_RESOLUTION_LEVEL: int = 1
 const BASE_FILL_SPEED_LEVEL: int = 1
 const BASE_CANVAS_STORAGE_LEVEL: int = 0

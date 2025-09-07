@@ -2,6 +2,11 @@ extends Node
 class_name ClickerManager
 
 ## Gère le système de clic et d'autoclick
+
+#==============================================================================
+# Big Number Management
+#==============================================================================
+const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
 ## Sépare la logique de clic du GameState principal
 
 #==============================================================================
@@ -31,12 +36,21 @@ func _ready():
 
 ## Effectue un clic manuel
 func manual_click() -> Dictionary:
-	GameState.currency_manager.add_currency("inspiration", click_power)
-	GameState.experience_manager.add_experience(GameConfig.EXPERIENCE_PER_CLICK)
+	# Appliquer les bonus d'équipement via GameState
+	var bonus_inspiration = GameState.apply_currency_bonus("inspiration", click_power)
+	print("inspiration bonus")
+	print(bonus_inspiration)
+	
+	# L'expérience gagnée = inspiration gagnée
+	var bonus_experience = bonus_inspiration
+	
+	# Ajouter les devises avec bonus
+	GameState.currency_manager.add_currency_raw("inspiration", bonus_inspiration)
+	GameState.experience_manager.add_experience(bonus_experience)
 	
 	return {
-		"inspiration_gained": click_power,
-		"experience_gained": GameConfig.EXPERIENCE_PER_CLICK
+		"inspiration_gained": bonus_inspiration,
+		"experience_gained": bonus_experience
 	}
 
 ## Améliore la puissance de clic
@@ -101,8 +115,15 @@ func _setup_autoclick_timer() -> void:
 	autoclick_timer.timeout.connect(_on_autoclick_timer_timeout)
 
 func _on_autoclick_timer_timeout() -> void:
-	GameState.currency_manager.add_currency("inspiration", click_power)
-	GameState.experience_manager.add_experience(GameConfig.EXPERIENCE_PER_CLICK)
+	# Appliquer les bonus d'équipement via GameState
+	var bonus_inspiration = GameState.apply_currency_bonus("inspiration", click_power)
+	
+	# L'expérience gagnée = inspiration gagnée
+	var bonus_experience = bonus_inspiration
+	
+	# Ajouter les devises avec bonus
+	GameState.currency_manager.add_currency_raw("inspiration", bonus_inspiration)
+	GameState.experience_manager.add_experience(bonus_experience)
 
 func _update_autoclick_timer() -> void:
 	if autoclick_enabled and autoclick_speed > 0:

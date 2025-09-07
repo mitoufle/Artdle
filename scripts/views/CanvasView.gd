@@ -100,15 +100,17 @@ func _on_canvas_storage_upgrade_cost_changed(cost: int):
 # UI Event Handlers
 #==============================================================================
 func _on_sell_button_pressed():
-	var sell_price = GameState.canvas_manager.sell_price
-	GameState.sell_canvas()
+	var result = GameState.sell_canvas()
 	_update_sell_button_state() # Update button state after selling
-	show_feedback(sell_price, coin_spritesheet, 12, 1, "rotate")
+	
+	# Afficher le feedback avec le montant réel gagné
+	if result.canvases_sold > 0:
+		show_feedback(result.gold_gained, coin_spritesheet, 12, 1, "rotate")
 
 #==============================================================================
 # Feedback
 #==============================================================================
-func show_feedback(amount: int, icon: Texture2D, hframes: int, vframes: int, animation_name: String):
+func show_feedback(amount: float, icon: Texture2D, hframes: int, vframes: int, animation_name: String):
 	var ft = FLOATING_TEXT_SCENE.instantiate()
 	get_parent().add_child(ft)
-	ft.start("+%d" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))
+	ft.start("+%.0f" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))

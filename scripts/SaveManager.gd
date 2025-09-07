@@ -283,3 +283,58 @@ func _restore_passive_income(passive_income_data: Dictionary) -> void:
 			source_name,
 			source_data.get("enabled", true)
 		)
+
+#==============================================================================
+# New Game Methods
+#==============================================================================
+
+## Réinitialise complètement le jeu (nouvelle partie)
+func reset_game() -> bool:
+	GameState.logger.info("Starting new game - resetting all data", "SaveManager")
+	
+	# Réinitialiser tous les managers
+	_reset_all_managers()
+	
+	# Effacer la sauvegarde
+	var clear_success = clear_save()
+	
+	# Sauvegarder l'état initial
+	var save_success = save_game()
+	
+	if clear_success and save_success:
+		GameState.logger.info("New game started successfully", "SaveManager")
+		return true
+	else:
+		GameState.logger.error("Failed to start new game", "SaveManager")
+		return false
+
+## Réinitialise tous les managers aux valeurs par défaut
+func _reset_all_managers() -> void:
+	# Réinitialiser les devises
+	GameState.currency_manager.reset_all_currencies()
+	
+	# Réinitialiser l'expérience
+	GameState.experience_manager.reset_experience()
+	
+	# Réinitialiser le canvas
+	GameState.canvas_manager.reset_canvas()
+	
+	# Réinitialiser le clicker
+	GameState.clicker_manager.reset_clicker()
+	
+	# Réinitialiser l'ascension
+	GameState.ascension_manager.reset_ascension()
+	
+	# Réinitialiser l'inventaire
+	GameState.inventory_manager.reset_inventory()
+	
+	# Réinitialiser l'atelier
+	GameState.craft_manager.reset_workshop()
+	
+	# Réinitialiser l'arbre de compétences
+	GameState.skill_tree_manager.reset_skill_tree()
+	
+	# Réinitialiser le revenu passif
+	GameState.passive_income_manager.reset_passive_income()
+	
+	GameState.logger.info("All managers reset to default values", "SaveManager")

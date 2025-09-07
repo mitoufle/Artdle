@@ -121,6 +121,55 @@ custom_minimum_size = Vector2(0, 250)
 layout_mode = 2
 size_flags_vertical = 10
 
+[node name="CraftedItemVBox" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CraftedItemTitle" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox"]
+layout_mode = 2
+text = "Last Crafted Item"
+horizontal_alignment = 1
+
+[node name="CraftedItemName" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox"]
+layout_mode = 2
+text = "No item crafted yet"
+horizontal_alignment = 1
+
+[node name="CraftedItemStats" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CraftedItemTier" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats"]
+layout_mode = 2
+text = "Tier: -"
+horizontal_alignment = 1
+
+[node name="CraftedItemType" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats"]
+layout_mode = 2
+text = "Type: -"
+horizontal_alignment = 1
+
+[node name="CraftedItemBonuses" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CraftedItemBonusesTitle" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats/CraftedItemBonuses"]
+layout_mode = 2
+text = "Bonuses:"
+horizontal_alignment = 1
+
+[node name="CraftedItemBonusesList" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats/CraftedItemBonuses"]
+layout_mode = 2
+size_flags_vertical = 3
+
 [node name="CraftButton" type="Button" parent="VBoxContainer"]
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2

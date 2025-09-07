@@ -23,6 +23,7 @@ const DEBUG_LEVEL_AMOUNT = 10
 @onready var click_power_label: Label = $Layout/ClickPowerLabel
 @onready var autoclick_speed_label: Label = $Layout/AutoclickSpeedLabel
 @onready var click_button: TextureButton = $ClickButton
+@onready var new_game_button: Button = $Layout/NewGameButton
 @onready var upgrade_click_power_button: Button = $Layout/UpgradeClickPowerButton
 @onready var upgrade_autoclick_speed_button: Button = $Layout/UpgradeAutoclickSpeedButton
 @onready var btn_debug: Button = $debug
@@ -41,6 +42,8 @@ func _connect_view_signals() -> void:
 	# Connect UI signals
 	if not click_button.pressed.is_connected(_on_click_button_pressed):
 		click_button.pressed.connect(_on_click_button_pressed)
+	if not new_game_button.pressed.is_connected(_on_new_game_pressed):
+		new_game_button.pressed.connect(_on_new_game_pressed)
 	if not upgrade_click_power_button.pressed.is_connected(_on_upgrade_click_power_pressed):
 		upgrade_click_power_button.pressed.connect(_on_upgrade_click_power_pressed)
 	if not upgrade_autoclick_speed_button.pressed.is_connected(_on_upgrade_autoclick_speed_pressed):
@@ -78,6 +81,38 @@ func _on_upgrade_autoclick_speed_pressed() -> void:
 	if not success:
 		GameState.logger.warning("Failed to upgrade autoclick speed - insufficient funds", "AccueilView")
 
+func _on_new_game_pressed() -> void:
+	# Demander confirmation avant de réinitialiser
+	var confirmation_dialog = ConfirmationDialog.new()
+	confirmation_dialog.dialog_text = "Are you sure you want to start a new game? This will reset all your progress!"
+	confirmation_dialog.get_ok_button().text = "Yes, Start New Game"
+	confirmation_dialog.get_cancel_button().text = "Cancel"
+	
+	# Ajouter le dialogue à la scène
+	get_tree().current_scene.add_child(confirmation_dialog)
+	confirmation_dialog.popup_centered()
+	
+	# Connecter les signaux
+	confirmation_dialog.confirmed.connect(_confirm_new_game)
+	confirmation_dialog.canceled.connect(_cancel_new_game)
+
+func _confirm_new_game() -> void:
+	# Réinitialiser le jeu
+	var success = GameState.save_manager.reset_game()
+	
+	if success:
+		GameState.feedback_manager.show_feedback("New game started!", Color.GREEN)
+		GameState.logger.info("New game started successfully", "AccueilView")
+		
+		# Mettre à jour l'UI
+		_on_click_stats_changed(GameState.clicker_manager.get_click_stats())
+	else:
+		GameState.feedback_manager.show_feedback("Failed to start new game", Color.RED)
+		GameState.logger.error("Failed to start new game", "AccueilView")
+
+func _cancel_new_game() -> void:
+	GameState.logger.info("New game cancelled by user", "AccueilView")
+
 func _on_debug_pressed() -> void:
 	GameState.currency_manager.set_currency("inspiration", DEBUG_CURRENCY_AMOUNT)
 	GameState.currency_manager.set_currency("gold", DEBUG_CURRENCY_AMOUNT)
@@ -88,7 +123,7 @@ func _on_debug_pressed() -> void:
 #==============================================================================
 # Feedback System
 #==============================================================================
-func _show_feedback(amount: int, icon: Texture2D, hframes: int, vframes: int, animation_name: String) -> void:
+func _show_feedback(amount: float, icon: Texture2D, hframes: int, vframes: int, animation_name: String) -> void:
 	var ft = FLOATING_TEXT_SCENE.instantiate()
 	add_child(ft)
-	ft.start("+%d" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))
+	ft.start("+%.0f" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))

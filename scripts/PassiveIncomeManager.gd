@@ -2,6 +2,11 @@ extends Node
 class_name PassiveIncomeManager
 
 ## Gère les revenus passifs du jeu
+
+#==============================================================================
+# Big Number Management
+#==============================================================================
+const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
 ## Système de génération automatique de ressources
 
 #==============================================================================
@@ -109,14 +114,17 @@ func _process_passive_income() -> void:
 			_generate_passive_income(source_name, source["currency_type"], amount_per_second)
 
 func _generate_passive_income(source_name: String, currency_type: String, amount: float) -> void:
-	# Ajouter la devise
-	GameState.currency_manager.add_currency(currency_type, amount)
+	# Appliquer les bonus d'équipement via GameState
+	var bonus_amount = GameState.apply_currency_bonus(currency_type, amount)
 	
-	# Afficher le feedback visuel
-	_show_passive_income_feedback(currency_type, amount)
+	# Ajouter la devise avec bonus
+	GameState.currency_manager.add_currency_raw(currency_type, bonus_amount)
 	
-	# Émettre le signal
-	passive_income_generated.emit(currency_type, amount)
+	# Afficher le feedback avec le montant bonifié
+	_show_passive_income_feedback(currency_type, bonus_amount)
+	
+	# Émettre le signal avec le montant bonifié
+	passive_income_generated.emit(currency_type, bonus_amount)
 	
 	# Log pour debug
 	GameState.logger.debug("Passive income: +%.1f %s from %s" % [amount, currency_type, source_name])

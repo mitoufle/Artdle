@@ -5,6 +5,13 @@ class_name CurrencyManager
 ## Fournit une interface propre pour les opérations sur les devises
 
 #==============================================================================
+# Big Number Management
+#==============================================================================
+const BigNumberManager = preload("res://scripts/BigNumberManager.gd")
+const UIFormatter = preload("res://scripts/UIFormatter.gd")
+const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
+
+#==============================================================================
 # Signals
 #==============================================================================
 signal currency_changed(currency_type: String, new_value: float)
@@ -48,7 +55,7 @@ func set_currency(currency_type: String, value: float) -> bool:
 	currency_changed.emit(currency_type, value)
 	return true
 
-## Ajoute une valeur à une devise existante
+## Ajoute une valeur à une devise existante (avec bonus d'équipement)
 func add_currency(currency_type: String, amount: float) -> bool:
 	if not _validate_currency_type(currency_type):
 		return false
@@ -56,7 +63,18 @@ func add_currency(currency_type: String, amount: float) -> bool:
 	if not _validate_currency_value(amount):
 		return false
 	
-	_currencies[currency_type] += amount
+	# Appliquer les bonus d'équipement
+	var bonus_amount = CurrencyBonusManager.apply_bonuses(currency_type, amount)
+	
+	# Utiliser l'addition sécurisée pour éviter les overflows
+	var current_value = _currencies[currency_type]
+	var new_value = BigNumberManager.safe_add(current_value, bonus_amount)
+	
+	if not BigNumberManager.is_valid_number(new_value):
+		push_error("Currency overflow detected for %s: %s + %s" % [currency_type, current_value, bonus_amount])
+		return false
+	
+	_currencies[currency_type] = new_value
 	currency_changed.emit(currency_type, _currencies[currency_type])
 	return true
 
@@ -68,11 +86,19 @@ func subtract_currency(currency_type: String, amount: float) -> bool:
 	if not _validate_currency_value(amount):
 		return false
 	
-	if _currencies[currency_type] < amount:
-		insufficient_funds.emit(currency_type, amount, _currencies[currency_type])
+	# Utiliser la soustraction sécurisée pour éviter les overflows
+	var current_value = _currencies[currency_type]
+	var new_value = BigNumberManager.safe_add(current_value, -amount)
+	
+	if not BigNumberManager.is_valid_number(new_value):
+		push_error("Currency underflow detected for %s: %s - %s" % [currency_type, current_value, amount])
 		return false
 	
-	_currencies[currency_type] -= amount
+	if new_value < 0:
+		insufficient_funds.emit(currency_type, amount, current_value)
+		return false
+	
+	_currencies[currency_type] = new_value
 	currency_changed.emit(currency_type, _currencies[currency_type])
 	return true
 
@@ -115,6 +141,57 @@ func reset_all_currencies() -> void:
 ## Récupère toutes les devises sous forme de dictionnaire
 func get_all_currencies() -> Dictionary:
 	return _currencies.duplicate()
+
+## Ajoute une valeur à une devise existante SANS appliquer les bonus d'équipement
+func add_currency_raw(currency_type: String, amount: float) -> bool:
+	if not _validate_currency_type(currency_type):
+		return false
+	
+	if not _validate_currency_value(amount):
+		return false
+	
+	# Utiliser l'addition sécurisée pour éviter les overflows
+	var current_value = _currencies[currency_type]
+	var new_value = BigNumberManager.safe_add(current_value, amount)
+	
+	if not BigNumberManager.is_valid_number(new_value):
+		push_error("Currency overflow detected for %s: %s + %s" % [currency_type, current_value, amount])
+		return false
+	
+	_currencies[currency_type] = new_value
+	currency_changed.emit(currency_type, _currencies[currency_type])
+	return true
+
+#==============================================================================
+# Formatting Methods
+#==============================================================================
+
+## Formate une devise pour l'affichage dans l'UI
+func format_currency(currency_type: String) -> String:
+	if not _validate_currency_type(currency_type):
+		return "0"
+	
+	var value = get_currency(currency_type)
+	return UIFormatter.format_currency(value)
+
+## Formate toutes les devises pour l'affichage
+func format_all_currencies() -> Dictionary:
+	var formatted = {}
+	for currency_type in _currencies.keys():
+		formatted[currency_type] = format_currency(currency_type)
+	return formatted
+
+## Formate un coût pour l'affichage
+func format_cost(amount: float, currency_type: String) -> String:
+	return UIFormatter.format_cost(amount, currency_type)
+
+## Formate un gain pour l'affichage
+func format_gain(amount: float, currency_type: String) -> String:
+	return UIFormatter.format_gain(amount, currency_type)
+
+## Formate une perte pour l'affichage
+func format_loss(amount: float, currency_type: String) -> String:
+	return UIFormatter.format_loss(amount, currency_type)
 
 #==============================================================================
 # Private Methods

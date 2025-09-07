@@ -104,8 +104,7 @@ func sell_canvas() -> Dictionary:
 	
 	return {
 		"canvases_sold": total_canvases_sold,
-		"gold_gained": total_gold_gained,
-		"fame_gained": total_canvases_sold
+		"gold_gained": total_gold_gained
 	}
 
 ## Améliorer la résolution du canvas

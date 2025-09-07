@@ -189,16 +189,54 @@ func get_workshop_upgrade_cost() -> int:
 func get_tier_chances() -> Dictionary:
 	var chances = {}
 	
+	# Calculer les chances basées sur le niveau de l'atelier
+	# Plus le niveau est élevé, plus on a de chances d'avoir des tiers élevés
+	
+	# Tier 1: Diminue progressivement
+	var tier1_chance = max(0.1, 1.0 - (workshop_level - 1) * 0.08)
+	
+	# Tier 2: Apparaît à partir du niveau 2, augmente jusqu'au niveau 10
+	var tier2_chance = 0.0
+	if workshop_level >= 2:
+		tier2_chance = min(0.6, (workshop_level - 1) * 0.06)
+	
+	# Tier 3: Apparaît à partir du niveau 5, augmente lentement
+	var tier3_chance = 0.0
+	if workshop_level >= 5:
+		tier3_chance = min(0.3, (workshop_level - 4) * 0.03)
+	
+	# Tier 4: Apparaît à partir du niveau 10, très rare
+	var tier4_chance = 0.0
 	if workshop_level >= 10:
-		chances[InventoryManager.ItemTier.TIER_1] = 0.95
-		chances[InventoryManager.ItemTier.TIER_2] = 0.05
-	elif workshop_level >= 5:
-		chances[InventoryManager.ItemTier.TIER_1] = 0.50
-		chances[InventoryManager.ItemTier.TIER_2] = 0.49
-		chances[InventoryManager.ItemTier.TIER_3] = 0.01
-	else:
-		# Niveaux 1-4: seulement T1
-		chances[InventoryManager.ItemTier.TIER_1] = 1.0
+		tier4_chance = min(0.1, (workshop_level - 9) * 0.01)
+	
+	# Tier 5: Apparaît à partir du niveau 20, extrêmement rare
+	var tier5_chance = 0.0
+	if workshop_level >= 20:
+		tier5_chance = min(0.05, (workshop_level - 19) * 0.005)
+	
+	# Normaliser les chances pour qu'elles totalisent 1.0
+	var total_chance = tier1_chance + tier2_chance + tier3_chance + tier4_chance + tier5_chance
+	if total_chance > 0:
+		tier1_chance /= total_chance
+		tier2_chance /= total_chance
+		tier3_chance /= total_chance
+		tier4_chance /= total_chance
+		tier5_chance /= total_chance
+	
+	# Assigner les chances
+	chances[InventoryManager.ItemTier.TIER_1] = tier1_chance
+	if tier2_chance > 0:
+		chances[InventoryManager.ItemTier.TIER_2] = tier2_chance
+	if tier3_chance > 0:
+		chances[InventoryManager.ItemTier.TIER_3] = tier3_chance
+	if tier4_chance > 0:
+		chances[InventoryManager.ItemTier.TIER_4] = tier4_chance
+	if tier5_chance > 0:
+		chances[InventoryManager.ItemTier.TIER_5] = tier5_chance
+	
+	# Log pour debug
+	GameState.logger.debug("Tier chances at level %d: %s" % [workshop_level, chances])
 	
 	return chances
 
@@ -286,4 +324,3 @@ func _create_item(item_type: InventoryManager.ItemType, tier: InventoryManager.I
 	var item_id = "%s_%d_%d" % [item_type, tier, Time.get_ticks_msec()]
 	
 	return InventoryManager.Item.new(item_id, item_name, item_type, tier)
-

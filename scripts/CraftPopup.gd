@@ -4,6 +4,12 @@ class_name CraftPopup
 ## Modale d'atelier de craft
 
 #==============================================================================
+# Big Number Management
+#==============================================================================
+const BigNumberManager = preload("res://scripts/BigNumberManager.gd")
+const UIFormatter = preload("res://scripts/UIFormatter.gd")
+
+#==============================================================================
 # UI References
 #==============================================================================
 @onready var level_label: Label = $VBoxContainer/WorkshopInfoPanel/WorkshopHBox3/LevelLabel
@@ -16,11 +22,18 @@ class_name CraftPopup
 @onready var cancel_button: Button = $VBoxContainer/CurrentCraftPanel/CraftVBox/CancelButton
 @onready var craft_button: Button = $VBoxContainer/CraftButton
 @onready var craft_info_label: Label = $VBoxContainer/CraftInfoLabel
+
+# Crafted item display
+@onready var crafted_item_name: Label = $VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemName
+@onready var crafted_item_tier: Label = $VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats/CraftedItemTier
+@onready var crafted_item_type: Label = $VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats/CraftedItemType
+@onready var crafted_item_bonuses_list: VBoxContainer = $VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats/CraftedItemBonuses/CraftedItemBonusesList
 @onready var close_button: Button = $VBoxContainer/CloseButton
 
 #==============================================================================
 # State
 #==============================================================================
+var last_crafted_item: InventoryManager.Item = null
 var craft_item_buttons: Dictionary = {}
 
 #==============================================================================
@@ -31,6 +44,7 @@ func _ready() -> void:
 	_update_workshop_info()
 	_update_current_craft()
 	_update_craft_button()
+	_update_crafted_item_display()
 
 func _connect_signals() -> void:
 	close_button.pressed.connect(_on_close_pressed)
@@ -76,13 +90,90 @@ func _update_craft_button() -> void:
 		craft_button.modulate = Color.WHITE
 		craft_info_label.text = "Click to craft a random item"
 
+func _update_crafted_item_display() -> void:
+	if not last_crafted_item:
+		crafted_item_name.text = "No item crafted yet"
+		crafted_item_tier.text = "Tier: -"
+		crafted_item_type.text = "Type: -"
+		_clear_bonuses_display()
+		return
+	
+	# Afficher les informations de base
+	crafted_item_name.text = last_crafted_item.name
+	crafted_item_tier.text = "Tier: %s" % _get_tier_name(last_crafted_item.tier)
+	crafted_item_type.text = "Type: %s" % _get_type_name(last_crafted_item.type)
+	
+	# Afficher les bonus
+	_update_bonuses_display()
+
+func _update_bonuses_display() -> void:
+	_clear_bonuses_display()
+	
+	if not last_crafted_item or last_crafted_item.stats.is_empty():
+		var no_bonus_label = Label.new()
+		no_bonus_label.text = "No bonuses"
+		no_bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		crafted_item_bonuses_list.add_child(no_bonus_label)
+		return
+	
+	for stat_name in last_crafted_item.stats:
+		var bonus_value = last_crafted_item.stats[stat_name]
+		var bonus_label = Label.new()
+		bonus_label.text = UIFormatter.format_bonus(bonus_value, _format_stat_name(stat_name))
+		bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		crafted_item_bonuses_list.add_child(bonus_label)
+
+func _clear_bonuses_display() -> void:
+	for child in crafted_item_bonuses_list.get_children():
+		child.queue_free()
+
+func _get_type_name(item_type: InventoryManager.ItemType) -> String:
+	match item_type:
+		InventoryManager.ItemType.HAT:
+			return "Hat"
+		InventoryManager.ItemType.SHIRT:
+			return "Shirt"
+		InventoryManager.ItemType.BOOTS:
+			return "Boots"
+		InventoryManager.ItemType.GLOVES:
+			return "Gloves"
+		InventoryManager.ItemType.BRUSH:
+			return "Brush"
+		InventoryManager.ItemType.PALETTE:
+			return "Palette"
+		InventoryManager.ItemType.RING:
+			return "Ring"
+		InventoryManager.ItemType.AMULET:
+			return "Amulet"
+		InventoryManager.ItemType.BADGE:
+			return "Badge"
+		_:
+			return "Unknown"
+
+func _format_stat_name(stat_name: String) -> String:
+	match stat_name:
+		"fame_generation":
+			return "Fame Generation"
+		"coin_generation":
+			return "Coin Generation"
+		"inspiration_generation":
+			return "Inspiration Generation"
+		"craft_speed":
+			return "Craft Speed"
+		"paint_speed":
+			return "Paint Speed"
+		"quality_chance":
+			return "Quality Chance"
+		_:
+			return stat_name.capitalize()
+
 func _update_workshop_info() -> void:
 	var level = GameState.craft_manager.get_workshop_level()
 	var upgrade_cost = GameState.craft_manager.get_workshop_upgrade_cost()
 	var tier_chances = GameState.craft_manager.get_tier_chances()
 	
 	level_label.text = "Workshop Level: %d" % level
-	upgrade_cost_label.text = "Cost: %d gold" % upgrade_cost
+	upgrade_cost_label.text = UIFormatter.format_cost(upgrade_cost, "gold")
 	
 	# Mettre à jour l'état du bouton d'amélioration
 	upgrade_button.disabled = not GameState.currency_manager.has_enough("gold", upgrade_cost)
@@ -164,6 +255,10 @@ func _on_craft_completed(item: InventoryManager.Item) -> void:
 	# Donner de l'expérience pour le craft
 	var xp_gained = 10 + (item.tier * 5)
 	GameState.experience_manager.add_experience(xp_gained)
+	
+	# Stocker l'item crafté pour l'affichage
+	last_crafted_item = item
+	_update_crafted_item_display()
 	
 	GameState.feedback_manager.show_feedback("Item created: %s (%s) (+%d XP)" % [item.name, _get_tier_name(item.tier), xp_gained], Color.GREEN)
 

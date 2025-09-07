@@ -292,3 +292,7 @@ func reset_skills() -> void:
 	
 	# Redébloquer le skill racine
 	skills["Devotion"].unlocked = true
+
+## Alias pour la compatibilité avec SaveManager
+func reset_skill_tree() -> void:
+	reset_skills()

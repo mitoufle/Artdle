@@ -6,6 +6,11 @@ extends HBoxContainer
 @onready var icon_node: TextureRect = $Icon
 @onready var amount_label: Label = $Amount
 
+#==============================================================================
+# Big Number Management
+#==============================================================================
+const UIFormatter = preload("res://scripts/UIFormatter.gd")
+
 func _ready():
 	icon_node.texture = icon_texture
 	print("CurrencyDisplay: _ready() called for currency_type: ", currency_type) # DEBUG
@@ -26,4 +31,4 @@ func _ready():
 
 func _on_currency_changed(value: float):
 	#print("CurrencyDisplay: Received signal for ", currency_type, " with value ", value) # DEBUG
-	amount_label.text = str(round(value * 1000) / 1000.0)
+	amount_label.text = UIFormatter.format_currency(value)
