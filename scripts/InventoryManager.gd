@@ -239,6 +239,10 @@ func get_total_bonuses() -> Dictionary:
 				total_bonuses[stat_name] = 1.0
 			total_bonuses[stat_name] *= item.stats[stat_name]
 	
+	# Log pour debug
+	if total_bonuses.size() > 0:
+		GameState.logger.debug("Total bonuses calculated: %s" % total_bonuses)
+	
 	return total_bonuses
 
 ## Réinitialise l'inventaire
@@ -270,4 +274,3 @@ func _get_tier_name(tier: ItemTier) -> String:
 		ItemTier.TIER_4: return "Epic"
 		ItemTier.TIER_5: return "Legendary"
 		_: return "Unknown"
-
