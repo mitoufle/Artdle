@@ -28,12 +28,15 @@ const DEBUG_LEVEL_AMOUNT = 10
 @onready var upgrade_autoclick_speed_button: Button = $Layout/UpgradeAutoclickSpeedButton
 @onready var btn_debug: Button = $debug
 
+# UI Components (utilise les boutons existants de la scène)
+#==============================================================================
+
 #==============================================================================
 # BaseView Overrides
 #==============================================================================
 func _initialize_view() -> void:
 	# Initialization specific to AccueilView
-	pass
+	_setup_unified_ui()
 
 func _connect_view_signals() -> void:
 	# Connect to GameState signals
@@ -55,6 +58,87 @@ func _initialize_ui() -> void:
 	# Initial UI state
 	var initial_stats = GameState.clicker_manager.get_click_stats()
 	_on_click_stats_changed(initial_stats)
+	_update_unified_ui()
+
+#==============================================================================
+# Unified UI System
+#==============================================================================
+
+func _setup_unified_ui():
+	# Utiliser les boutons existants et les modifier pour le système unifié
+	_setup_existing_buttons()
+
+func _setup_existing_buttons():
+	# Modifier les boutons existants pour afficher les prix et niveaux
+	_update_button_text(upgrade_click_power_button, "click_power")
+	_update_button_text(upgrade_autoclick_speed_button, "autoclick_speed")
+
+func _update_button_text(button: Button, upgrade_type: String):
+	if not button:
+		return
+	
+	var level = 0
+	var prices = {}
+	
+	match upgrade_type:
+		"click_power":
+			level = GameState.clicker_manager.click_power
+			prices = _get_click_power_prices(level)
+		"autoclick_speed":
+			level = GameState.clicker_manager.autoclick_speed
+			prices = _get_autoclick_prices(level)
+	
+	# Déterminer la devise principale (celle avec le plus gros montant)
+	var main_currency = ""
+	var main_amount = 0
+	for currency_type in prices.keys():
+		if prices[currency_type] > main_amount:
+			main_currency = currency_type
+			main_amount = prices[currency_type]
+	
+	# Charger l'icône de la devise principale
+	if main_currency != "":
+		var icon_texture = UIDisplayFormatter.get_currency_icon(main_currency)
+		if icon_texture:
+			button.icon = icon_texture
+	
+	# Formater le texte du bouton
+	var formatted_amount = BigNumberManager.format_number(main_amount)
+	var button_text = "Upgrade %s (Level %d)\n%s" % [upgrade_type.replace("_", " ").capitalize(), level, formatted_amount]
+	button.text = button_text
+	
+	# Appliquer le style d'achat possible/impossible
+	UIDisplayFormatter.apply_affordability_style(button, prices)
+
+func _update_unified_ui():
+	_update_click_power_display()
+	_update_autoclick_display()
+
+func _update_click_power_display():
+	if not GameState or not GameState.clicker_manager:
+		return
+	
+	# Mettre à jour le texte du bouton existant
+	_update_button_text(upgrade_click_power_button, "click_power")
+
+func _update_autoclick_display():
+	if not GameState or not GameState.clicker_manager:
+		return
+	
+	# Mettre à jour le texte du bouton existant
+	_update_button_text(upgrade_autoclick_speed_button, "autoclick_speed")
+
+func _get_click_power_prices(level: int) -> Dictionary:
+	# Utiliser la même logique que ClickerManager
+	var base_cost = GameConfig.CLICK_POWER_UPGRADE_COST
+	var cost = int(base_cost * pow(1.5, level))  # Multiplicateur standard
+	return {"gold": cost}
+
+func _get_autoclick_prices(level: int) -> Dictionary:
+	# Utiliser la même logique que ClickerManager
+	var base_cost = GameConfig.AUTOCLICK_SPEED_UPGRADE_COST
+	var cost = int(base_cost * pow(1.5, level))  # Multiplicateur standard
+	return {"gold": cost}
 
 func get_class_name() -> String:
 	return "AccueilView"
@@ -63,8 +147,12 @@ func get_class_name() -> String:
 # Signal Handlers
 #==============================================================================
 func _on_click_stats_changed(new_stats: Dictionary) -> void:
+	# Mettre à jour les labels existants (pour compatibilité)
 	click_power_label.text = "Click Power: %d" % new_stats["click_power"]
 	autoclick_speed_label.text = "Autoclick Speed: %.1f" % new_stats["autoclick_speed"]
+	
+	# Mettre à jour l'UI unifiée
+	_update_unified_ui()
 
 func _on_click_button_pressed() -> void:
 	var result = GameState.clicker_manager.manual_click()
@@ -80,6 +168,7 @@ func _on_upgrade_autoclick_speed_pressed() -> void:
 	var success = GameState.clicker_manager.upgrade_autoclick_speed()
 	if not success:
 		GameState.logger.warning("Failed to upgrade autoclick speed - insufficient funds", "AccueilView")
+
 
 func _on_new_game_pressed() -> void:
 	# Demander confirmation avant de réinitialiser

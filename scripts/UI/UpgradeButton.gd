@@ -1,132 +1,148 @@
 extends Button
 class_name UpgradeButton
 
-## Bouton d'upgrade standardisé
-## Gère l'affichage du coût et la validation des fonds
+## Bouton d'upgrade avec affichage unifié des prix et niveaux
+## S'adapte automatiquement aux différents types d'upgrades
 
 #==============================================================================
-# Exports
+# Signals
 #==============================================================================
-@export var upgrade_type: String  # Type d'upgrade (click_power, fill_speed, etc.)
-@export var currency_type: String = "gold"  # Type de devise requise
-@export var cost_label: Label  # Label pour afficher le coût
-@export var show_cost: bool = true
+signal upgrade_purchased(upgrade_type: String, level: int)
 
 #==============================================================================
-# State
+# Properties
 #==============================================================================
-var current_cost: float = 0.0
-var is_upgrade_available: bool = false
+@export var upgrade_type: String = ""
+@export var level_prefix: String = "Level"
+@export var show_level: bool = true
+@export var show_progress: bool = false
 
 #==============================================================================
-# Godot Lifecycle
+# UI References
 #==============================================================================
-func _ready() -> void:
-	_connect_signals()
-	_update_button_state()
+var price_container: VBoxContainer
+var level_container: VBoxContainer
+var progress_bar: ProgressBar
 
 #==============================================================================
-# Initialization
+# Upgrade Data
 #==============================================================================
-func _connect_signals() -> void:
-	# Connect to currency changes
-	match currency_type:
-		"inspiration":
-			GameState.inspiration_changed.connect(_on_currency_changed)
-		"gold":
-			GameState.gold_changed.connect(_on_currency_changed)
-		"fame":
-			GameState.fame_changed.connect(_on_currency_changed)
-		_:
-			GameState.logger.error("Unknown currency type for upgrade button: %s" % currency_type, "UpgradeButton")
+var current_level: int = 0
+var current_prices: Dictionary = {}
+var current_progress: Dictionary = {}
+
+#==============================================================================
+# Lifecycle
+#==============================================================================
+
+func _ready():
+	_setup_ui()
+	_update_display()
+
+func _setup_ui():
+	# Configuration du bouton
+	custom_minimum_size = Vector2(200, 60)
+	text = "Upgrade"
 	
-	# Connect button press
-	pressed.connect(_on_button_pressed)
-
-#==============================================================================
-# Signal Handlers
-#==============================================================================
-func _on_currency_changed(_value: float) -> void:
-	_update_button_state()
-
-func _on_button_pressed() -> void:
-	_attempt_upgrade()
-
-#==============================================================================
-# Upgrade Logic
-#==============================================================================
-func _attempt_upgrade() -> void:
-	var success = false
+	# Container principal
+	var main_container = VBoxContainer.new()
+	add_child(main_container)
 	
-	match upgrade_type:
-		"click_power":
-			success = GameState.clicker_manager.upgrade_click_power()
-		"autoclick_speed":
-			success = GameState.clicker_manager.upgrade_autoclick_speed()
-		"canvas_resolution":
-			success = GameState.canvas_manager.upgrade_resolution()
-		"canvas_fill_speed":
-			success = GameState.canvas_manager.upgrade_fill_speed()
-		"canvas_storage":
-			success = GameState.canvas_manager.upgrade_canvas_storage()
-		_:
-			GameState.logger.error("Unknown upgrade type: %s" % upgrade_type, "UpgradeButton")
-			return
+	# Container pour le niveau
+	if show_level:
+		level_container = VBoxContainer.new()
+		main_container.add_child(level_container)
 	
-	if success:
-		GameState.logger.info("Upgrade successful: %s" % upgrade_type, "UpgradeButton")
-		_update_button_state()
-	else:
-		GameState.logger.warning("Upgrade failed - insufficient funds: %s" % upgrade_type, "UpgradeButton")
-
-#==============================================================================
-# UI Updates
-#==============================================================================
-func _update_button_state() -> void:
-	# Check if upgrade is available
-	var currency_amount = GameState.currency_manager.get_currency(currency_type)
-	is_upgrade_available = currency_amount >= current_cost
+	# Container pour le prix
+	price_container = VBoxContainer.new()
+	main_container.add_child(price_container)
 	
-	# Update button state
-	disabled = not is_upgrade_available
-	
-	# Update cost label
-	if cost_label and show_cost:
-		cost_label.text = "Cost: %s" % _format_cost(current_cost)
-	
-	# Update button text color based on availability
-	if is_upgrade_available:
-		modulate = Color.WHITE
-	else:
-		modulate = Color(0.5, 0.5, 0.5, 1.0)
+	# Barre de progression (optionnelle)
+	if show_progress:
+		progress_bar = ProgressBar.new()
+		progress_bar.custom_minimum_size = Vector2(180, 8)
+		main_container.add_child(progress_bar)
 
 #==============================================================================
 # Public API
 #==============================================================================
-## Définit le coût de l'upgrade
-func set_upgrade_cost(cost: float) -> void:
-	current_cost = cost
-	_update_button_state()
 
-## Met à jour l'état du bouton
-func refresh_button_state() -> void:
-	_update_button_state()
+## Met à jour les données d'upgrade
+func update_upgrade_data(level: int, prices: Dictionary, progress: Dictionary = {}):
+	current_level = level
+	current_prices = prices
+	current_progress = progress
+	_update_display()
 
-## Récupère le coût actuel
-func get_upgrade_cost() -> float:
-	return current_cost
+## Met à jour l'affichage
+func _update_display():
+	_update_level_display()
+	_update_price_display()
+	_update_progress_display()
+	_update_affordability()
 
-## Vérifie si l'upgrade est disponible
-func is_available() -> bool:
-	return is_upgrade_available
+## Met à jour l'affichage du niveau
+func _update_level_display():
+	if not level_container or not show_level:
+		return
+	
+	# Nettoyer l'affichage précédent
+	for child in level_container.get_children():
+		child.queue_free()
+	
+	# Créer le nouvel affichage
+	var level_display = UIDisplayFormatter.create_level_display(current_level, level_prefix)
+	level_container.add_child(level_display)
 
-#==============================================================================
-# Private Methods
-#==============================================================================
-func _format_cost(cost: float) -> String:
-	if cost >= 1000000:
-		return "%.1fM" % (cost / 1000000.0)
-	elif cost >= 1000:
-		return "%.1fK" % (cost / 1000.0)
+## Met à jour l'affichage du prix
+func _update_price_display():
+	if not price_container:
+		return
+	
+	# Nettoyer l'affichage précédent
+	for child in price_container.get_children():
+		child.queue_free()
+	
+	# Créer le nouvel affichage
+	if current_prices.size() == 1:
+		# Prix simple
+		var currency_type = current_prices.keys()[0]
+		var amount = current_prices[currency_type]
+		var price_display = UIDisplayFormatter.create_price_display(currency_type, amount)
+		price_container.add_child(price_display)
 	else:
-		return "%.0f" % cost
+		# Prix multiple
+		var price_display = UIDisplayFormatter.create_multi_price_display(current_prices)
+		price_container.add_child(price_display)
+
+## Met à jour l'affichage de la progression
+func _update_progress_display():
+	if not progress_bar or not show_progress:
+		return
+	
+	if current_progress.has("current") and current_progress.has("max"):
+		progress_bar.min_value = 0
+		progress_bar.max_value = current_progress["max"]
+		progress_bar.value = current_progress["current"]
+
+## Met à jour l'état d'achat possible
+func _update_affordability():
+	UIDisplayFormatter.apply_affordability_style(self, current_prices)
+
+#==============================================================================
+# Event Handlers
+#==============================================================================
+
+func _on_pressed():
+	if UIDisplayFormatter.can_afford_price(current_prices):
+		upgrade_purchased.emit(upgrade_type, current_level)
+		# L'upgrade sera géré par le parent
+	else:
+		# Feedback visuel pour prix insuffisant
+		_show_insufficient_funds_feedback()
+
+func _show_insufficient_funds_feedback():
+	# Animation de secousse ou changement de couleur
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color.RED, 0.1)
+	tween.tween_property(self, "modulate", Color.WHITE, 0.1)

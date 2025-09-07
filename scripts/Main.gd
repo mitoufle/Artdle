@@ -115,6 +115,14 @@ func _input(event):
 		_test_bonus_system()
 	elif event.is_action_pressed("ui_select"):  # Espace
 		_test_bonus_debug()
+	elif event.is_action_pressed("ui_home"):  # Home
+		_test_ui_formatter()
+	elif event.is_action_pressed("ui_end"):  # End
+		_test_accueil_integration()
+	elif event.is_action_pressed("ui_page_up"):  # Page Up
+		_test_currency_icons()
+	elif event.is_action_pressed("ui_page_down"):  # Page Down
+		_test_button_icons()
 
 func _run_integration_test():
 	print("🧪 Lancement du test complet...")
@@ -129,6 +137,26 @@ func _test_bonus_system():
 func _test_bonus_debug():
 	print("🔍 Lancement du diagnostic des bonus...")
 	var test = preload("res://scripts/TestBonusDebug.gd").new()
+	add_child(test)
+
+func _test_ui_formatter():
+	print("🎨 Lancement du test du système d'affichage...")
+	var test = preload("res://scripts/TestUIFormatter.gd").new()
+	add_child(test)
+
+func _test_accueil_integration():
+	print("🏠 Lancement du test d'intégration AccueilView...")
+	var test = preload("res://scripts/TestAccueilIntegration.gd").new()
+	add_child(test)
+
+func _test_currency_icons():
+	print("💰 Lancement du test des icônes de devises...")
+	var test = preload("res://scripts/TestCurrencyIcons.gd").new()
+	add_child(test)
+
+func _test_button_icons():
+	print("🔘 Lancement du test des icônes de boutons...")
+	var test = preload("res://scripts/TestButtonIcons.gd").new()
 	add_child(test)
 
 
