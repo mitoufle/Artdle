@@ -38,11 +38,9 @@ func _ready():
 func manual_click() -> Dictionary:
 	# Appliquer les bonus d'équipement via GameState
 	var bonus_inspiration = GameState.apply_currency_bonus("inspiration", click_power)
-	print("inspiration bonus")
-	print(bonus_inspiration)
 	
-	# L'expérience gagnée = inspiration gagnée
-	var bonus_experience = bonus_inspiration
+	# L'expérience gagnée = click_power de base, avec ses propres bonus
+	var bonus_experience = GameState.apply_experience_bonus(click_power)
 	
 	# Ajouter les devises avec bonus
 	GameState.currency_manager.add_currency_raw("inspiration", bonus_inspiration)
@@ -118,8 +116,8 @@ func _on_autoclick_timer_timeout() -> void:
 	# Appliquer les bonus d'équipement via GameState
 	var bonus_inspiration = GameState.apply_currency_bonus("inspiration", click_power)
 	
-	# L'expérience gagnée = inspiration gagnée
-	var bonus_experience = bonus_inspiration
+	# L'expérience gagnée = click_power de base, avec ses propres bonus
+	var bonus_experience = GameState.apply_experience_bonus(click_power)
 	
 	# Ajouter les devises avec bonus
 	GameState.currency_manager.add_currency_raw("inspiration", bonus_inspiration)

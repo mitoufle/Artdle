@@ -41,7 +41,12 @@ func _ready():
 	# Test de l'application des bonus
 	var bonus_inspiration = GameState.apply_currency_bonus("inspiration", click_power)
 	print("  Inspiration avec bonus: %.2f" % bonus_inspiration)
-	print("  Multiplicateur appliqué: %.2fx" % (bonus_inspiration / click_power))
+	print("  Multiplicateur inspiration: %.2fx" % (bonus_inspiration / click_power))
+	
+	# Test des bonus d'expérience
+	var bonus_experience = GameState.apply_experience_bonus(click_power)
+	print("  Expérience avec bonus: %.2f" % bonus_experience)
+	print("  Multiplicateur expérience: %.2fx" % (bonus_experience / click_power))
 	
 	# Test d'un click réel
 	print("\n🎮 Test d'un click réel:")

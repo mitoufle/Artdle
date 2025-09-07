@@ -13,6 +13,18 @@ const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
 # Bonus System
 #==============================================================================
 
+## Applique les bonus d'équipement à un gain d'expérience
+func apply_experience_bonus(base_amount: float) -> float:
+	if not inventory_manager:
+		return base_amount
+	
+	var bonuses = inventory_manager.get_total_bonuses()
+	var bonus_multiplier = _get_experience_bonus(bonuses)
+	
+	var final_amount = base_amount * bonus_multiplier
+	logger.debug("Experience bonus: %.2f -> %.2f (%.2fx)" % [base_amount, final_amount, bonus_multiplier])
+	return final_amount
+
 ## Applique les bonus d'équipement à un gain de devise
 func apply_currency_bonus(currency_type: String, base_amount: float) -> float:
 	if not inventory_manager:
@@ -32,7 +44,7 @@ func apply_currency_bonus(currency_type: String, base_amount: float) -> float:
 		"ascendancy_points":
 			bonus_multiplier = _get_ascendancy_bonus(bonuses)
 		"paint_mastery":
-			bonus_multiplier = _get_paint_mastery_bonus(bonuses)
+			bonus_multiplier = _get_generic_bonus(bonuses)
 		_:
 			bonus_multiplier = _get_generic_bonus(bonuses)
 	
@@ -68,8 +80,9 @@ func _get_ascendancy_bonus(bonuses: Dictionary) -> float:
 		multiplier *= bonuses["ascendancy_gain"]
 	return multiplier
 
+
 ## Récupère le multiplicateur de bonus pour l'expérience
-func _get_paint_mastery_bonus(bonuses: Dictionary) -> float:
+func _get_experience_bonus(bonuses: Dictionary) -> float:
 	var multiplier = 1.0
 	if bonuses.has("experience_gain"):
 		multiplier *= bonuses["experience_gain"]
