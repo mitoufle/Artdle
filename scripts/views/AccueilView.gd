@@ -24,8 +24,8 @@ const DEBUG_LEVEL_AMOUNT = 10
 @onready var autoclick_speed_label: Label = $Layout/AutoclickSpeedLabel
 @onready var click_button: TextureButton = $ClickButton
 @onready var new_game_button: Button = $Layout/NewGameButton
-@onready var upgrade_click_power_button: Button = $Layout/UpgradeClickPowerButton
-@onready var upgrade_autoclick_speed_button: Button = $Layout/UpgradeAutoclickSpeedButton
+@onready var upgrade_click_power_button: UpgradeButton = $Layout/UpgradeClickPowerButton
+@onready var upgrade_autoclick_speed_button: UpgradeButton = $Layout/UpgradeAutoclickSpeedButton
 @onready var btn_debug: Button = $debug
 
 # UI Components (utilise les boutons existants de la scène)
@@ -47,10 +47,10 @@ func _connect_view_signals() -> void:
 		click_button.pressed.connect(_on_click_button_pressed)
 	if not new_game_button.pressed.is_connected(_on_new_game_pressed):
 		new_game_button.pressed.connect(_on_new_game_pressed)
-	if not upgrade_click_power_button.pressed.is_connected(_on_upgrade_click_power_pressed):
-		upgrade_click_power_button.pressed.connect(_on_upgrade_click_power_pressed)
-	if not upgrade_autoclick_speed_button.pressed.is_connected(_on_upgrade_autoclick_speed_pressed):
-		upgrade_autoclick_speed_button.pressed.connect(_on_upgrade_autoclick_speed_pressed)
+	if not upgrade_click_power_button.upgrade_purchased.is_connected(_on_upgrade_click_power_purchased):
+		upgrade_click_power_button.upgrade_purchased.connect(_on_upgrade_click_power_purchased)
+	if not upgrade_autoclick_speed_button.upgrade_purchased.is_connected(_on_upgrade_autoclick_speed_purchased):
+		upgrade_autoclick_speed_button.upgrade_purchased.connect(_on_upgrade_autoclick_speed_purchased)
 	if not btn_debug.pressed.is_connected(_on_debug_pressed):
 		btn_debug.pressed.connect(_on_debug_pressed)
 
@@ -65,50 +65,20 @@ func _initialize_ui() -> void:
 #==============================================================================
 
 func _setup_unified_ui():
-	# Utiliser les boutons existants et les modifier pour le système unifié
-	_setup_existing_buttons()
+	# Configurer les boutons d'upgrade
+	_setup_upgrade_buttons()
 
-func _setup_existing_buttons():
-	# Modifier les boutons existants pour afficher les prix et niveaux
-	_update_button_text(upgrade_click_power_button, "click_power")
-	_update_button_text(upgrade_autoclick_speed_button, "autoclick_speed")
+func _setup_upgrade_buttons():
+	# Configurer le bouton de click power
+	var click_level = GameState.clicker_manager.click_power
+	var click_prices = _get_click_power_prices(click_level)
+	upgrade_click_power_button.update_upgrade_data(click_level, click_prices)
+	
+	# Configurer le bouton d'autoclick
+	var autoclick_level = GameState.clicker_manager.autoclick_speed
+	var autoclick_prices = _get_autoclick_prices(autoclick_level)
+	upgrade_autoclick_speed_button.update_upgrade_data(autoclick_level, autoclick_prices)
 
-func _update_button_text(button: Button, upgrade_type: String):
-	if not button:
-		return
-	
-	var level = 0
-	var prices = {}
-	
-	match upgrade_type:
-		"click_power":
-			level = GameState.clicker_manager.click_power
-			prices = _get_click_power_prices(level)
-		"autoclick_speed":
-			level = GameState.clicker_manager.autoclick_speed
-			prices = _get_autoclick_prices(level)
-	
-	# Déterminer la devise principale (celle avec le plus gros montant)
-	var main_currency = ""
-	var main_amount = 0
-	for currency_type in prices.keys():
-		if prices[currency_type] > main_amount:
-			main_currency = currency_type
-			main_amount = prices[currency_type]
-	
-	# Charger l'icône de la devise principale
-	if main_currency != "":
-		var icon_texture = UIDisplayFormatter.get_currency_icon(main_currency)
-		if icon_texture:
-			button.icon = icon_texture
-	
-	# Formater le texte du bouton
-	var formatted_amount = BigNumberManager.format_number(main_amount)
-	var button_text = "Upgrade %s (Level %d)\n%s" % [upgrade_type.replace("_", " ").capitalize(), level, formatted_amount]
-	button.text = button_text
-	
-	# Appliquer le style d'achat possible/impossible
-	UIDisplayFormatter.apply_affordability_style(button, prices)
 
 func _update_unified_ui():
 	_update_click_power_display()
@@ -118,15 +88,19 @@ func _update_click_power_display():
 	if not GameState or not GameState.clicker_manager:
 		return
 	
-	# Mettre à jour le texte du bouton existant
-	_update_button_text(upgrade_click_power_button, "click_power")
+	# Mettre à jour le bouton d'upgrade
+	var level = GameState.clicker_manager.click_power
+	var prices = _get_click_power_prices(level)
+	upgrade_click_power_button.update_upgrade_data(level, prices)
 
 func _update_autoclick_display():
 	if not GameState or not GameState.clicker_manager:
 		return
 	
-	# Mettre à jour le texte du bouton existant
-	_update_button_text(upgrade_autoclick_speed_button, "autoclick_speed")
+	# Mettre à jour le bouton d'upgrade
+	var level = GameState.clicker_manager.autoclick_speed
+	var prices = _get_autoclick_prices(level)
+	upgrade_autoclick_speed_button.update_upgrade_data(level, prices)
 
 func _get_click_power_prices(level: int) -> Dictionary:
 	# Utiliser la même logique que ClickerManager
@@ -159,15 +133,29 @@ func _on_click_button_pressed() -> void:
 	click_sound.play(0.3)
 	_show_feedback(result.inspiration_gained, inspiration_spritesheet, 12, 1, "inspiration_rotate")
 
-func _on_upgrade_click_power_pressed() -> void:
-	var success = GameState.clicker_manager.upgrade_click_power()
+func _on_upgrade_click_power_purchased(upgrade_type: String, level: int) -> void:
+	var current_prices = _get_click_power_prices(level)
+	var cost = current_prices.get("gold", 0)
+	var success = GameState.clicker_manager.upgrade_click_power(cost)
 	if not success:
 		GameState.logger.warning("Failed to upgrade click power - insufficient funds", "AccueilView")
+	else:
+		# Mettre à jour l'affichage du bouton
+		var new_level = GameState.clicker_manager.click_power
+		var new_prices = _get_click_power_prices(new_level)
+		upgrade_click_power_button.update_upgrade_data(new_level, new_prices)
 
-func _on_upgrade_autoclick_speed_pressed() -> void:
-	var success = GameState.clicker_manager.upgrade_autoclick_speed()
+func _on_upgrade_autoclick_speed_purchased(upgrade_type: String, level: int) -> void:
+	var current_prices = _get_autoclick_prices(level)
+	var cost = current_prices.get("gold", 0)
+	var success = GameState.clicker_manager.upgrade_autoclick_speed(cost)
 	if not success:
 		GameState.logger.warning("Failed to upgrade autoclick speed - insufficient funds", "AccueilView")
+	else:
+		# Mettre à jour l'affichage du bouton
+		var new_level = GameState.clicker_manager.autoclick_speed
+		var new_prices = _get_autoclick_prices(new_level)
+		upgrade_autoclick_speed_button.update_upgrade_data(new_level, new_prices)
 
 
 func _on_new_game_pressed() -> void:

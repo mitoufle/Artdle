@@ -52,21 +52,23 @@ func manual_click() -> Dictionary:
 	}
 
 ## Améliore la puissance de clic
-func upgrade_click_power() -> bool:
-	if not GameState.currency_manager.has_enough("gold", GameConfig.CLICK_POWER_UPGRADE_COST):
+func upgrade_click_power(cost: int = -1) -> bool:
+	var upgrade_cost = cost if cost > 0 else GameConfig.CLICK_POWER_UPGRADE_COST
+	if not GameState.currency_manager.has_enough("gold", upgrade_cost):
 		return false
 	
-	GameState.currency_manager.subtract_currency("gold", GameConfig.CLICK_POWER_UPGRADE_COST)
+	GameState.currency_manager.subtract_currency("gold", upgrade_cost)
 	click_power += 1
 	_emit_click_stats()
 	return true
 
 ## Améliore la vitesse d'autoclick
-func upgrade_autoclick_speed() -> bool:
-	if not GameState.currency_manager.has_enough("gold", GameConfig.AUTOCLICK_SPEED_UPGRADE_COST):
+func upgrade_autoclick_speed(cost: int = -1) -> bool:
+	var upgrade_cost = cost if cost > 0 else GameConfig.AUTOCLICK_SPEED_UPGRADE_COST
+	if not GameState.currency_manager.has_enough("gold", upgrade_cost):
 		return false
 	
-	GameState.currency_manager.subtract_currency("gold", GameConfig.AUTOCLICK_SPEED_UPGRADE_COST)
+	GameState.currency_manager.subtract_currency("gold", upgrade_cost)
 	autoclick_speed += 1
 	_update_autoclick_timer()
 	_emit_click_stats()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=4 uid="uid://humenayfn7bx"]
+[gd_scene load_steps=10 format=4 uid="uid://humenayfn7bx"]
 
 [ext_resource type="Script" uid="uid://ntrvcxp73t7u" path="res://scripts/views/AccueilView.gd" id="1_p65rg"]
 [ext_resource type="Texture2D" uid="uid://duau5nvw76sb4" path="res://artdleAsset/animated/animated_inspiration_12.png" id="2_gxb5b"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://d35vi3s221qtp" path="res://accueil_2d_view.tscn" id="4_g1ugx"]
 [ext_resource type="Texture2D" uid="uid://bawukqqh2d810" path="res://artdleAsset/Buttons/accueil_tree_hover.png" id="4_t0b4w"]
 [ext_resource type="Script" uid="uid://6mw433bd10tf" path="res://scripts/tooling/CreateClickMask.gd" id="5_t0b4w"]
+[ext_resource type="PackedScene" uid="uid://bkgb4hj8jgffa" path="res://Scenes/UpgradeButton.tscn" id="6_upgrade_btn"]
 
 [sub_resource type="BitMap" id="BitMap_t0b4w"]
 data = {
@@ -77,13 +78,16 @@ custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 text = "New Game"
 
-[node name="UpgradeClickPowerButton" type="Button" parent="Layout"]
+[node name="UpgradeClickPowerButton" parent="Layout" instance=ExtResource("6_upgrade_btn")]
 z_index = 1
 layout_mode = 2
+level_prefix = "Power"
 
-[node name="UpgradeAutoclickSpeedButton" type="Button" parent="Layout"]
+[node name="UpgradeAutoclickSpeedButton" parent="Layout" instance=ExtResource("6_upgrade_btn")]
 z_index = 1
 layout_mode = 2
+upgrade_type = "autoclick_speed"
+level_prefix = "Speed"
 
 [node name="ClickSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_f85xh")

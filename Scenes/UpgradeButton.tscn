@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkgb4hj8jgffa"]
+
+[ext_resource type="Script" uid="uid://orkn5xjtheoy" path="res://scripts/UI/UpgradeButton.gd" id="1_0x1y2"]
+[ext_resource type="Texture2D" uid="uid://cv2ue1b1apq7e" path="res://artdleAsset/Currency/coin.png" id="2_5eb03"]
+
+[node name="UpgradeButton" type="Button"]
+custom_minimum_size = Vector2(200, 60)
+script = ExtResource("1_0x1y2")
+upgrade_type = "click_power"
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LevelContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="LevelLabel" type="Label" parent="MainContainer/LevelContainer"]
+layout_mode = 2
+text = "Level 5"
+horizontal_alignment = 1
+
+[node name="PriceContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="MainContainer/PriceContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="TextureRect" type="TextureRect" parent="MainContainer/PriceContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_5eb03")
+
+[node name="PriceLabel" type="Label" parent="MainContainer/PriceContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = " 1,250"
+horizontal_alignment = 1
+
+[node name="VSeparator2" type="VSeparator" parent="MainContainer/PriceContainer"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
