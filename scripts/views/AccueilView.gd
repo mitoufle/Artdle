@@ -28,6 +28,13 @@ const DEBUG_LEVEL_AMOUNT = 10
 @onready var upgrade_autoclick_speed_button: UpgradeButton = $Layout/UpgradeAutoclickSpeedButton
 @onready var btn_debug: Button = $debug
 
+#==============================================================================
+# Click and Hold Variables
+#==============================================================================
+var is_holding: bool = false
+var hold_timer: Timer
+var base_click_interval: float = 0.1  # Base click interval (slowest speed)
+
 # UI Components (utilise les boutons existants de la scène)
 #==============================================================================
 
@@ -37,6 +44,7 @@ const DEBUG_LEVEL_AMOUNT = 10
 func _initialize_view() -> void:
 	# Initialization specific to AccueilView
 	_setup_unified_ui()
+	_setup_hold_timer()
 
 func _connect_view_signals() -> void:
 	# Connect to GameState signals
@@ -45,6 +53,10 @@ func _connect_view_signals() -> void:
 	# Connect UI signals
 	if not click_button.pressed.is_connected(_on_click_button_pressed):
 		click_button.pressed.connect(_on_click_button_pressed)
+	if not click_button.button_down.is_connected(_on_click_button_down):
+		click_button.button_down.connect(_on_click_button_down)
+	if not click_button.button_up.is_connected(_on_click_button_up):
+		click_button.button_up.connect(_on_click_button_up)
 	if not new_game_button.pressed.is_connected(_on_new_game_pressed):
 		new_game_button.pressed.connect(_on_new_game_pressed)
 	if not upgrade_click_power_button.upgrade_purchased.is_connected(_on_upgrade_click_power_purchased):
@@ -67,6 +79,14 @@ func _initialize_ui() -> void:
 func _setup_unified_ui():
 	# Configurer les boutons d'upgrade
 	_setup_upgrade_buttons()
+
+func _setup_hold_timer():
+	# Create timer for rapid clicking when holding
+	hold_timer = Timer.new()
+	hold_timer.wait_time = _get_current_click_interval()
+	hold_timer.one_shot = false
+	hold_timer.timeout.connect(_on_hold_timer_timeout)
+	add_child(hold_timer)
 
 func _setup_upgrade_buttons():
 	# Configurer le bouton de click power
@@ -114,6 +134,26 @@ func _get_autoclick_prices(level: int) -> Dictionary:
 	var cost = int(base_cost * pow(1.5, level))  # Multiplicateur standard
 	return {"gold": cost}
 
+func _get_current_click_interval() -> float:
+	# Calculate click interval based on autoclick speed level using logarithmic progression
+	var speed_level = GameState.clicker_manager.autoclick_speed
+	
+	# Logarithmic progression: each level adds less speed benefit
+	# Level 20 should reach ~100 clicks per second (0.01s interval)
+	var max_speed_level = 20.0  # Level where we reach max engine speed
+	var max_clicks_per_second = 100.0  # Maximum clicks per second (engine limit)
+	var min_interval = 1.0 / max_clicks_per_second  # 0.01 seconds
+	
+	if speed_level <= max_speed_level:
+		# Logarithmic progression from base speed to max speed
+		var progress = speed_level / max_speed_level
+		var log_progress = log(1.0 + progress * 9.0) / log(10.0)  # log(1 + 9*progress) / log(10)
+		var current_interval = base_click_interval - (base_click_interval - min_interval) * log_progress
+		return max(current_interval, min_interval)
+	else:
+		# Beyond level 20, we're at max speed
+		return min_interval
+
 func get_class_name() -> String:
 	return "AccueilView"
 
@@ -129,9 +169,48 @@ func _on_click_stats_changed(new_stats: Dictionary) -> void:
 	_update_unified_ui()
 
 func _on_click_button_pressed() -> void:
+	# This handles single clicks
+	_perform_click()
+
+func _on_click_button_down() -> void:
+	# Start holding - begin rapid clicking
+	is_holding = true
+	_update_timer_speed()
+	hold_timer.start()
+
+func _on_click_button_up() -> void:
+	# Stop holding - stop rapid clicking
+	is_holding = false
+	hold_timer.stop()
+
+func _on_hold_timer_timeout() -> void:
+	# This fires every click_interval when holding
+	if is_holding:
+		_perform_click()
+
+func _perform_click() -> void:
+	# The actual click logic (shared between single click and hold)
 	var result = GameState.clicker_manager.manual_click()
+	
+	# Apply speed bonus if we're beyond max speed level
+	var speed_level = GameState.clicker_manager.autoclick_speed
+	var max_speed_level = 20.0
+	
+	if speed_level > max_speed_level:
+		# Calculate bonus multiplier using logarithmic progression
+		var bonus_levels = speed_level - max_speed_level
+		var bonus_multiplier = 1.0 + log(bonus_levels + 1.0)  # log(x+1) as requested
+		
+		# Apply bonus to inspiration gained
+		result.inspiration_gained = int(result.inspiration_gained * bonus_multiplier)
+	
 	click_sound.play(0.3)
 	_show_feedback(result.inspiration_gained, inspiration_spritesheet, 12, 1, "inspiration_rotate")
+
+func _update_timer_speed() -> void:
+	# Update the timer interval based on current speed level
+	var new_interval = _get_current_click_interval()
+	hold_timer.wait_time = new_interval
 
 func _on_upgrade_click_power_purchased(upgrade_type: String, level: int) -> void:
 	var current_prices = _get_click_power_prices(level)
@@ -156,6 +235,9 @@ func _on_upgrade_autoclick_speed_purchased(upgrade_type: String, level: int) -> 
 		var new_level = GameState.clicker_manager.autoclick_speed
 		var new_prices = _get_autoclick_prices(new_level)
 		upgrade_autoclick_speed_button.update_upgrade_data(new_level, new_prices)
+		
+		# Update the hold click speed
+		_update_timer_speed()
 
 
 func _on_new_game_pressed() -> void:
