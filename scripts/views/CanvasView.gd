@@ -145,15 +145,15 @@ func _setup_upgrade_buttons():
 
 func _get_resolution_prices(level: int) -> Dictionary:
 	var cost = GameState.canvas_manager.upgrade_resolution_cost
-	return {"gold": cost}
+	return {"inspiration": cost}
 
 func _get_fill_speed_prices(level: int) -> Dictionary:
 	var cost = GameState.canvas_manager.upgrade_fill_speed_cost
-	return {"gold": cost}
+	return {"inspiration": cost}
 
 func _get_canvas_storage_prices(level: int) -> Dictionary:
 	var cost = GameState.canvas_manager.get_storage_upgrade_cost()
-	return {"gold": cost}
+	return {"inspiration": cost}
 
 #==============================================================================
 # Upgrade Event Handlers
