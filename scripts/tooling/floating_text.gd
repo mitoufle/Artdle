@@ -10,15 +10,23 @@ extends Node2D
 @onready var label: Label                      = $Label
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
-func start(text: String, icon_texture: Texture2D, hframes: int, vframes: int, animation_name: String, _color: Color = Color(1,1,1,1)):
+func start(text: String, icon_texture: Texture2D, hframes: int, vframes: int, animation_name: String, _color: Color = Color(1,1,1,1), amount: float = 1.0):
 	set_as_top_level(true)
 	label.text     = text
 	sprite.texture = icon_texture
 	sprite.hframes = hframes
 	sprite.vframes = vframes
 	
-	# Scale the floating text by the multiplier
-	scale = Vector2(scale_multiplier, scale_multiplier)
+	# Calculate dynamic scale based on amount
+	# Base scale is 1.0, scales up with amount
+	# Formula: base_scale + (log(amount) * 0.1) for logarithmic scaling
+	var base_scale = 1.0
+	var amount_scale = 1.0 + (log(amount + 1.0) * 0.1)  # +1 to avoid log(0)
+	var final_scale = base_scale * amount_scale
+	
+	# Clamp scale between 0.8 and 3.0 to prevent too small or too large text
+	final_scale = clamp(final_scale, 0.8, 3.0)
+	scale = Vector2(final_scale, final_scale)
 	
 	animation_player.play(animation_name)
 	

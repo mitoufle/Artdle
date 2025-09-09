@@ -285,4 +285,4 @@ func _on_debug_pressed() -> void:
 func _show_feedback(amount: float, icon: Texture2D, hframes: int, vframes: int, animation_name: String) -> void:
 	var ft = FLOATING_TEXT_SCENE.instantiate()
 	add_child(ft)
-	ft.start("+%.0f" % amount, icon, hframes, vframes, animation_name, Color(1,1,0))
+	ft.start("+%.0f" % amount, icon, hframes, vframes, animation_name, Color(1,1,0), amount)
