@@ -33,7 +33,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 
-[node name="TextureRect" type="TextureRect" parent="MainContainer/PriceContainer"]
+[node name="CurrencyIcon" type="TextureRect" parent="MainContainer/PriceContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

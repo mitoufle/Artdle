@@ -27,6 +27,8 @@ signal upgrade_purchased(upgrade_type: String, level: int)
 @onready var level_label: Label = $MainContainer/LevelContainer/LevelLabel
 @onready var price_container: HBoxContainer = $MainContainer/PriceContainer
 @onready var price_label: Label = $MainContainer/PriceContainer/PriceLabel
+@onready var currency_icon: TextureRect = $MainContainer/PriceContainer/CurrencyIcon
+
 
 #==============================================================================
 # Upgrade Data
@@ -34,6 +36,7 @@ signal upgrade_purchased(upgrade_type: String, level: int)
 var current_level: int = 0
 var current_prices: Dictionary = {}
 var current_progress: Dictionary = {}
+var currency_icon_texture: Texture2D = preload("res://artdleAsset/Currency/coin.png")
 
 #==============================================================================
 # Lifecycle
@@ -63,12 +66,19 @@ func update_upgrade_data(level: int, prices: Dictionary, progress: Dictionary = 
 	current_progress = progress
 	_update_display()
 
+## Définit l'icône de devise à afficher
+func set_currency_icon(icon_texture: Texture2D):
+	currency_icon_texture = icon_texture
+	if currency_icon:
+		currency_icon.texture = icon_texture
+
 ## Met à jour l'affichage
 func _update_display():
 	_update_level_display()
 	_update_price_display()
 	_update_progress_display()
 	_update_affordability()
+	_update_currency_icon()
 
 ## Met à jour l'affichage du niveau
 func _update_level_display():
@@ -155,3 +165,8 @@ func _show_insufficient_funds_feedback():
 	var tween = create_tween()
 	tween.tween_property(self, "modulate", Color.RED, 0.1)
 	tween.tween_property(self, "modulate", Color.WHITE, 0.1)
+	
+func _update_currency_icon():
+	if currency_icon:
+		currency_icon.texture = currency_icon_texture
+	

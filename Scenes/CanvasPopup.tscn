@@ -1,12 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://bde7a8f8d7q7j"]
+[gd_scene load_steps=4 format=3 uid="uid://bde7a8f8d7q7j"]
 
 [ext_resource type="PackedScene" uid="uid://bgj4i508yh306" path="res://Scenes/views/CanvasView.tscn" id="1_abcde"]
 [ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
+[ext_resource type="PackedScene" uid="uid://bkgb4hj8jgffa" path="res://Scenes/UpgradeButton.tscn" id="3_upgrade_btn"]
 
 [node name="CanvasPopup" type="PopupPanel"]
 title = "Canvas"
 initial_position = 2
-size = Vector2i(488, 527)
+size = Vector2i(488, 558)
 visible = true
 theme = ExtResource("2_abcde")
 
@@ -16,8 +17,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 5.0
 offset_top = 5.0
-offset_right = 483.0
-offset_bottom = 522.0
+offset_right = -5.0
+offset_bottom = -5.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -28,30 +29,23 @@ size_flags_vertical = 3
 [node name="UpgradeHBox" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="UpgradeResolutionButton" type="Button" parent="VBoxContainer/UpgradeHBox"]
+[node name="UpgradeResolutionButton" parent="VBoxContainer/UpgradeHBox" instance=ExtResource("3_upgrade_btn")]
 layout_mode = 2
-text = "Upgrade Resolution"
+size_flags_horizontal = 3
+upgrade_type = "resolution"
+level_prefix = "Resolution"
 
-[node name="UpgradeResolutionCostLabel" type="Label" parent="VBoxContainer/UpgradeHBox"]
+[node name="UpgradeFillSpeedButton" parent="VBoxContainer/UpgradeHBox" instance=ExtResource("3_upgrade_btn")]
 layout_mode = 2
-text = "(Cost: 100)"
+size_flags_horizontal = 3
+upgrade_type = "fill_speed"
+level_prefix = "Speed"
 
-[node name="UpgradeFillSpeedButton" type="Button" parent="VBoxContainer/UpgradeHBox"]
+[node name="UpgradeCanvasStorageButton" parent="VBoxContainer" instance=ExtResource("3_upgrade_btn")]
 layout_mode = 2
-text = "Upgrade Fill Speed"
-
-[node name="UpgradeFillSpeedCostLabel" type="Label" parent="VBoxContainer/UpgradeHBox"]
-layout_mode = 2
-text = "(Cost: 50)"
+upgrade_type = "canvas_storage"
+level_prefix = "Storage"
 
 [node name="CanvasStorageLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Stored Canvases: 0/0"
-
-[node name="UpgradeCanvasStorageButton" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "Upgrade Canvas Storage"
-
-[node name="UpgradeCanvasStorageCostLabel" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-text = "(Cost: 200)"
