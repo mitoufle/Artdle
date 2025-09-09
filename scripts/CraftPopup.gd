@@ -8,13 +8,13 @@ class_name CraftPopup
 #==============================================================================
 const BigNumberManager = preload("res://scripts/BigNumberManager.gd")
 const UIFormatter = preload("res://scripts/UIFormatter.gd")
+const UpgradeButton = preload("res://scripts/UI/UpgradeButton.gd")
 
 #==============================================================================
 # UI References
 #==============================================================================
 @onready var level_label: Label = $VBoxContainer/WorkshopInfoPanel/WorkshopHBox3/LevelLabel
-@onready var upgrade_button: Button = $VBoxContainer/WorkshopInfoPanel/WorkshopHBox/UpgradeButton
-@onready var upgrade_cost_label: Label = $VBoxContainer/WorkshopInfoPanel/WorkshopHBox/UpgradeCostLabel
+@onready var upgrade_button: UpgradeButton = $VBoxContainer/WorkshopInfoPanel/WorkshopHBox/UpgradeButton
 @onready var tier_chances_label: Label = $VBoxContainer/WorkshopInfoPanel/WorkshopHBox2/TierChancesLabel
 @onready var current_craft_panel: Panel = $VBoxContainer/CurrentCraftPanel
 @onready var current_craft_info_label: Label = $VBoxContainer/CurrentCraftPanel/CraftVBox/InfoLabel
@@ -48,7 +48,7 @@ func _ready() -> void:
 
 func _connect_signals() -> void:
 	close_button.pressed.connect(_on_close_pressed)
-	upgrade_button.pressed.connect(_on_upgrade_workshop_pressed)
+	upgrade_button.upgrade_purchased.connect(_on_upgrade_workshop_purchased)
 	cancel_button.pressed.connect(_on_cancel_craft_pressed)
 	craft_button.pressed.connect(_on_craft_button_pressed)
 	
@@ -173,10 +173,14 @@ func _update_workshop_info() -> void:
 	var tier_chances = GameState.craft_manager.get_tier_chances()
 	
 	level_label.text = "Workshop Level: %d" % level
-	upgrade_cost_label.text = UIFormatter.format_cost(upgrade_cost, "gold")
 	
-	# Mettre à jour l'état du bouton d'amélioration
-	upgrade_button.disabled = not GameState.currency_manager.has_enough("gold", upgrade_cost)
+	# Update the UpgradeButton with level and cost
+	var prices = {"gold": upgrade_cost}
+	upgrade_button.update_upgrade_data(level, prices)
+	
+	# Set the gold icon for the upgrade button
+	var gold_icon = preload("res://artdleAsset/Currency/coin.png")
+	upgrade_button.set_currency_icon(gold_icon)
 	
 	# Afficher les chances de tiers
 	var chances_text = "Tier Chances: "
@@ -213,7 +217,7 @@ func _update_current_craft() -> void:
 func _on_close_pressed() -> void:
 	hide()
 
-func _on_upgrade_workshop_pressed() -> void:
+func _on_upgrade_workshop_purchased(upgrade_type: String, level: int) -> void:
 	var success = GameState.craft_manager.upgrade_workshop()
 	if success:
 		GameState.feedback_manager.show_feedback("Workshop upgraded!", Color.BLUE)

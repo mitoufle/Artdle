@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bde7a8f8d7raj"]
+[gd_scene load_steps=4 format=3 uid="uid://bde7a8f8d7raj"]
 
 [ext_resource type="Script" uid="uid://bk8as12h6mnvj" path="res://scripts/CraftPopup.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" uid="uid://bkgb4hj8jgffa" path="res://Scenes/UpgradeButton.tscn" id="3_upgrade_btn"]
 
 [node name="CraftPopup" type="PopupPanel"]
 title = "Craft Workshop"
@@ -64,15 +65,10 @@ offset_bottom = 68.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="UpgradeButton" type="Button" parent="VBoxContainer/WorkshopInfoPanel/WorkshopHBox"]
+[node name="UpgradeButton" parent="VBoxContainer/WorkshopInfoPanel/WorkshopHBox" instance=ExtResource("3_upgrade_btn")]
 layout_mode = 2
-text = "Upgrade
-Workshop"
-
-[node name="UpgradeCostLabel" type="Label" parent="VBoxContainer/WorkshopInfoPanel/WorkshopHBox"]
-layout_mode = 2
-text = "Cost:
- 100 g"
+upgrade_type = "workshop"
+level_prefix = "Workshop"
 
 [node name="WorkshopHBox3" type="HBoxContainer" parent="VBoxContainer/WorkshopInfoPanel"]
 layout_mode = 1
