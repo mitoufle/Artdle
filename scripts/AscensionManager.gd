@@ -36,8 +36,8 @@ func ascend() -> bool:
 	# Réinitialiser les systèmes
 	_reset_game_systems()
 	
-	# Augmenter le coût pour la prochaine ascension
-	ascendancy_cost = int(ascendancy_cost * GameConfig.ASCENDANCY_COST_MULTIPLIER)
+	# Ascension cost remains fixed - no scaling
+	# ascendancy_cost stays the same for all ascensions
 	
 	ascended.emit()
 	return true
@@ -80,12 +80,26 @@ func _reset_game_systems() -> void:
 	# Réinitialiser les devises principales
 	GameState.currency_manager.set_currency("inspiration", inspiration_to_keep)
 	GameState.currency_manager.set_currency("gold", 0)
+	GameState.currency_manager.set_currency("fame", 0)
+	GameState.currency_manager.set_currency("paint_mastery", 0)
 	
-	# Réinitialiser le canvas
+	# Réinitialiser le canvas (including all upgrades)
 	GameState.canvas_manager.reset_canvas()
 	
 	# Réinitialiser le système de clic
 	GameState.clicker_manager.reset_clicker()
+	
+	# Réinitialiser l'inventaire et l'atelier
+	GameState.inventory_manager.reset_inventory()
+	GameState.craft_manager.reset_workshop()
+	
+	# Réinitialiser l'expérience
+	GameState.experience_manager.reset_experience()
+	
+	# Réinitialiser les revenus passifs
+	GameState.passive_income_manager.reset_passive_income()
+	
+	GameState.logger.info("Complete game reset performed during ascension")
 
 #==============================================================================
 # Public API Methods

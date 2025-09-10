@@ -406,6 +406,6 @@ tile_map_data = PackedByteArray("AAAEAAIAAAABAAkAAAA=")
 tile_set = SubResource("TileSet_rdb0t")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(597, 366)
+position = Vector2(600, 368)
 scale = Vector2(1.2, 1.2)
 editor_draw_limits = true

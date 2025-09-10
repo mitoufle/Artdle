@@ -88,11 +88,21 @@ func _create_inventory_items() -> void:
 		child.queue_free()
 	inventory_buttons.clear()
 	
-	# Create buttons for each inventory item
+	# Create buttons for each inventory item (only unequipped items)
 	var inventory_items = GameState.inventory_manager.get_inventory_items()
+	var equipped_items = GameState.inventory_manager.get_all_equipped_items()
 	
 	for item in inventory_items:
-		_create_inventory_item_button(item)
+		# Check if item is equipped
+		var is_equipped = false
+		for slot in equipped_items.keys():
+			if equipped_items[slot].id == item.id:
+				is_equipped = true
+				break
+		
+		# Only show unequipped items
+		if not is_equipped:
+			_create_inventory_item_button(item)
 
 func _create_inventory_item_button(item: InventoryManager.Item) -> void:
 	# Create container for item with buttons
@@ -186,10 +196,14 @@ func _on_close_pressed() -> void:
 func _on_item_equipped(slot: String, item: InventoryManager.Item) -> void:
 	_update_equipment_slot(slot)
 	_update_stats_display()
+	# Update inventory display to hide the equipped item
+	_create_inventory_items()
 
 func _on_item_unequipped(slot: String, item: InventoryManager.Item) -> void:
 	_update_equipment_slot(slot)
 	_update_stats_display()
+	# Update inventory display to show the unequipped item
+	_create_inventory_items()
 
 func _on_inventory_changed() -> void:
 	_create_inventory_items()

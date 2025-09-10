@@ -29,6 +29,10 @@ static func get_bonus_multiplier(currency_type: String) -> float:
 			return _get_paint_mastery_bonus(bonuses)
 		"canvas_speed":
 			return _get_canvas_speed_bonus(bonuses)
+		"painting_speed":
+			return _get_painting_speed_bonus(bonuses)
+		"pixel_gain":
+			return _get_pixel_gain_bonus(bonuses)
 		_:
 			return _get_generic_bonus(bonuses)
 
@@ -100,6 +104,10 @@ static func _get_fame_bonus(bonuses: Dictionary) -> float:
 	if bonuses.has("fame_generation"):
 		multiplier *= bonuses["fame_generation"]
 	
+	# Bonus de gain de renommée (anciennement ascendancy_gain)
+	if bonuses.has("fame_gain"):
+		multiplier *= bonuses["fame_gain"]
+	
 	# Bonus générique de génération
 	if bonuses.has("generation_bonus"):
 		multiplier *= bonuses["generation_bonus"]
@@ -113,6 +121,20 @@ static func _get_ascendancy_bonus(bonuses: Dictionary) -> float:
 	# Bonus direct d'ascension
 	if bonuses.has("ascendancy_generation"):
 		multiplier *= bonuses["ascendancy_generation"]
+	
+	# Bonus générique de génération
+	if bonuses.has("generation_bonus"):
+		multiplier *= bonuses["generation_bonus"]
+	
+	return multiplier
+
+## Récupère le multiplicateur de bonus pour la renommée (remplace ascendancy_gain)
+static func _get_fame_gain_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	
+	# Bonus direct de renommée (anciennement ascendancy_gain)
+	if bonuses.has("fame_gain"):
+		multiplier *= bonuses["fame_gain"]
 	
 	# Bonus générique de génération
 	if bonuses.has("generation_bonus"):
@@ -141,6 +163,34 @@ static func _get_canvas_speed_bonus(bonuses: Dictionary) -> float:
 	# Bonus direct de vitesse de canvas
 	if bonuses.has("canvas_speed"):
 		multiplier *= bonuses["canvas_speed"]
+	
+	# Bonus générique de génération
+	if bonuses.has("generation_bonus"):
+		multiplier *= bonuses["generation_bonus"]
+	
+	return multiplier
+
+## Récupère le multiplicateur de bonus pour la vitesse de peinture
+static func _get_painting_speed_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	
+	# Bonus direct de vitesse de peinture
+	if bonuses.has("painting_speed"):
+		multiplier *= bonuses["painting_speed"]
+	
+	# Bonus générique de génération
+	if bonuses.has("generation_bonus"):
+		multiplier *= bonuses["generation_bonus"]
+	
+	return multiplier
+
+## Récupère le multiplicateur de bonus pour le gain de pixels
+static func _get_pixel_gain_bonus(bonuses: Dictionary) -> float:
+	var multiplier = 1.0
+	
+	# Bonus direct de gain de pixels
+	if bonuses.has("pixel_gain"):
+		multiplier *= bonuses["pixel_gain"]
 	
 	# Bonus générique de génération
 	if bonuses.has("generation_bonus"):

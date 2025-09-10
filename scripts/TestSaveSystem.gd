@@ -30,7 +30,7 @@ var test_data = {
 		"sell_price": 15,
 		"stored_canvases": 2,
 		"canvas_storage_level": 1,
-		"upgrade_resolution_cost": 50,
+		"upgrade_resolution_cost": 10000,
 		"upgrade_fill_speed_cost": 75,
 		"canvas_storage_cost": 100
 	},

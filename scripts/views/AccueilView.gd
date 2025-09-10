@@ -286,3 +286,15 @@ func _show_feedback(amount: float, icon: Texture2D, hframes: int, vframes: int, 
 	var ft = FLOATING_TEXT_SCENE.instantiate()
 	add_child(ft)
 	ft.start("+%.0f" % amount, icon, hframes, vframes, animation_name, Color(1,1,0), amount)
+
+func _show_devotion_feedback(amount: float) -> void:
+	# Show floating text for devotion procs centered on click button
+	var ft = FLOATING_TEXT_SCENE.instantiate()
+	add_child(ft)
+	
+	# Position the floating text at the center of the click button
+	var button_center = click_button.get_global_rect().position + click_button.get_global_rect().size / 2
+	ft.global_position = button_center
+	
+	# Use inspiration icon and animation
+	ft.start("+%.0f" % amount, inspiration_spritesheet, 12, 1, "inspiration_rotate", Color(1,1,0), amount)

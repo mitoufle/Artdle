@@ -22,18 +22,19 @@ const DEFAULT_EXPERIENCE_TO_NEXT_LEVEL: float = 100.0
 #==============================================================================
 const BASE_CANVAS_SIZE: int = 32
 const BASE_SELL_PRICE: int = 1000
-const BASE_FAME_PER_CANVAS: int = 10
+const BASE_FAME_PER_CANVAS: int = 5
+const BASE_FAME_PER_LEVEL: int = 1
 const BASE_RESOLUTION_LEVEL: int = 1
 const BASE_FILL_SPEED_LEVEL: int = 1
 const BASE_CANVAS_STORAGE_LEVEL: int = 0
 
 # Canvas Upgrade Costs
-const BASE_RESOLUTION_UPGRADE_COST: int = 100
+const BASE_RESOLUTION_UPGRADE_COST: int = 10000
 const BASE_FILL_SPEED_UPGRADE_COST: int = 50
 const BASE_CANVAS_STORAGE_UPGRADE_COST: int = 200
 
 # Canvas Upgrade Multipliers
-const RESOLUTION_COST_MULTIPLIER: float = 1.5
+const RESOLUTION_COST_MULTIPLIER: float = 10.0
 const FILL_SPEED_COST_MULTIPLIER: float = 1.2
 const CANVAS_STORAGE_COST_MULTIPLIER: float = 1.5
 const SELL_PRICE_MULTIPLIER: float = 1.8

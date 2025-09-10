@@ -10,6 +10,7 @@ class_name PaintingView
 const CANVAS_POPUP_SCENE = preload("res://Scenes/CanvasPopup.tscn")
 const INVENTORY_POPUP_SCENE = preload("res://Scenes/InventoryPopup.tscn")
 const CRAFT_POPUP_SCENE = preload("res://Scenes/CraftPopup.tscn")
+const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
 const DEBUG_CURRENCY_AMOUNT = 100000000
 
 # Atelier Configuration
@@ -103,8 +104,10 @@ func get_class_name() -> String:
 #==============================================================================
 func _process_workshop_production(delta: float) -> void:
 	if atelier_count > 0:
-		var production = atelier_count * ATELIER_PRODUCTION_RATE * delta
-		GameState.currency_manager.add_currency("inspiration", production)
+		var base_production = atelier_count * ATELIER_PRODUCTION_RATE * delta
+		# Appliquer les bonus d'items pour l'inspiration
+		var bonus_production = CurrencyBonusManager.apply_bonuses("inspiration", base_production)
+		GameState.currency_manager.add_currency("inspiration", bonus_production)
 
 #==============================================================================
 # Signal Handlers

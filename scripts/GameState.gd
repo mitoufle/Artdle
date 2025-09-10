@@ -262,16 +262,8 @@ func set_level(amount: int) -> void:
 	experience_manager.set_level(amount)
 
 func add_experience(amount: float) -> void:
-	var old_level = experience_manager.get_level()
+	# ExperienceManager now handles fame granting internally
 	experience_manager.add_experience(amount)
-	var new_level = experience_manager.get_level()
-	
-	# Donner 1 renommée par niveau gagné
-	var levels_gained = new_level - old_level
-	if levels_gained > 0:
-		var fame_gained = levels_gained * 1.0
-		currency_manager.add_currency_raw("fame", fame_gained)
-		logger.info("Level up! Gained %d levels and %d fame" % [levels_gained, fame_gained])
 
 # Canvas Methods (Legacy)
 func sell_canvas() -> Dictionary:
@@ -279,7 +271,8 @@ func sell_canvas() -> Dictionary:
 	if result.canvases_sold > 0:
 		# Appliquer les bonus d'équipement
 		var bonus_gold = apply_currency_bonus("gold", result.gold_gained)
-		var bonus_fame = apply_currency_bonus("fame", result.canvases_sold * GameConfig.BASE_FAME_PER_CANVAS)
+		var base_fame = result.canvases_sold * GameConfig.BASE_FAME_PER_CANVAS
+		var bonus_fame = apply_currency_bonus("fame", base_fame)
 		
 		# Ajouter les devises avec bonus
 		currency_manager.add_currency_raw("gold", bonus_gold)

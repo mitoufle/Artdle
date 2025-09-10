@@ -258,7 +258,7 @@ func update_devotion_passive_income() -> void:
 	if devotion_skill.level >= 1:
 		# Recalculer les effets basés sur le niveau actuel
 		var base_amount = 1.0
-		var base_interval = 5.0
+		var base_interval = 0.5  # Changé de 5.0 à 0.5 (2 fois par seconde)
 		var player_level = GameState.experience_manager.get_level()
 		
 		# Niveau 2: Multiplier le taux par le niveau du joueur (évolue dynamiquement)
@@ -267,7 +267,7 @@ func update_devotion_passive_income() -> void:
 		
 		# Niveau 3: Augmenter le rythme en fonction du niveau (évolue dynamiquement)
 		if devotion_skill.level >= 3:
-			base_interval = max(0.1, 5.0 - (player_level * 0.2))  # Min 0.1 seconde (10 fois par seconde max)
+			base_interval = max(0.05, 0.5 - (player_level * 0.02))  # Min 0.05 seconde (20 fois par seconde max)
 		
 		# Niveau 4: Doubler le gain passif
 		if devotion_skill.level >= 4:

@@ -181,6 +181,14 @@ func _collect_save_data() -> Dictionary:
 		},
 		"passive_income": {
 			"sources": GameState.passive_income_manager.get_passive_sources()
+		},
+		"workshop": {
+			"workshop_level": GameState.craft_manager.workshop_level,
+			"workshop_upgrade_cost": GameState.craft_manager.workshop_upgrade_cost
+		},
+		"inventory": {
+			"equipped_items": _collect_equipped_items(),
+			"inventory_items": _collect_inventory_items()
 		}
 	}
 
@@ -189,6 +197,37 @@ func _collect_skill_levels() -> Dictionary:
 	for skill_name in GameState.skill_tree_manager.skills.keys():
 		skill_levels[skill_name] = GameState.skill_tree_manager.get_skill_level(skill_name)
 	return skill_levels
+
+func _collect_equipped_items() -> Dictionary:
+	var equipped_data = {}
+	var equipped_items = GameState.inventory_manager.get_all_equipped_items()
+	
+	for slot in equipped_items.keys():
+		var item = equipped_items[slot]
+		equipped_data[slot] = {
+			"id": item.id,
+			"name": item.name,
+			"type": item.type,
+			"tier": item.tier,
+			"stats": item.stats
+		}
+	
+	return equipped_data
+
+func _collect_inventory_items() -> Array:
+	var inventory_data = []
+	var inventory_items = GameState.inventory_manager.get_inventory_items()
+	
+	for item in inventory_items:
+		inventory_data.append({
+			"id": item.id,
+			"name": item.name,
+			"type": item.type,
+			"tier": item.tier,
+			"stats": item.stats
+		})
+	
+	return inventory_data
 
 func _validate_save_data(save_data: Dictionary) -> bool:
 	var required_keys: Array[String] = ["version", "timestamp", "currencies", "experience", "canvas", "clicker", "ascension", "skill_tree", "passive_income"]
@@ -243,6 +282,15 @@ func _apply_save_data(save_data: Dictionary) -> void:
 	var passive_income_data = save_data.get("passive_income", {})
 	_restore_passive_income(passive_income_data)
 	
+	# Restaurer l'atelier
+	var workshop_data = save_data.get("workshop", {})
+	GameState.craft_manager.workshop_level = workshop_data.get("workshop_level", 1)
+	GameState.craft_manager.workshop_upgrade_cost = workshop_data.get("workshop_upgrade_cost", 100)
+	
+	# Restaurer l'inventaire
+	var inventory_data = save_data.get("inventory", {})
+	_restore_inventory(inventory_data)
+	
 	# Réinitialiser le canvas
 	GameState.canvas_manager._initialize_new_canvas()
 	GameState.canvas_manager._update_fill_speed()
@@ -283,6 +331,39 @@ func _restore_passive_income(passive_income_data: Dictionary) -> void:
 			source_name,
 			source_data.get("enabled", true)
 		)
+
+func _restore_inventory(inventory_data: Dictionary) -> void:
+	# Clear existing inventory
+	GameState.inventory_manager.inventory_items.clear()
+	GameState.inventory_manager.equipped_items.clear()
+	
+	# Restore inventory items
+	var inventory_items = inventory_data.get("inventory_items", [])
+	for item_data in inventory_items:
+		var item = InventoryManager.Item.new(
+			item_data.id,
+			item_data.name,
+			item_data.type,
+			item_data.tier
+		)
+		item.stats = item_data.stats
+		GameState.inventory_manager.inventory_items.append(item)
+	
+	# Restore equipped items
+	var equipped_items = inventory_data.get("equipped_items", {})
+	for slot in equipped_items.keys():
+		var item_data = equipped_items[slot]
+		var item = InventoryManager.Item.new(
+			item_data.id,
+			item_data.name,
+			item_data.type,
+			item_data.tier
+		)
+		item.stats = item_data.stats
+		GameState.inventory_manager.equipped_items[slot] = item
+		
+		# Apply item stats
+		GameState.inventory_manager._apply_item_stats(item)
 
 #==============================================================================
 # New Game Methods

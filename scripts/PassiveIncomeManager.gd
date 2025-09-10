@@ -130,6 +130,34 @@ func _generate_passive_income(source_name: String, currency_type: String, amount
 	GameState.logger.debug("Passive income: +%.1f %s from %s" % [amount, currency_type, source_name])
 
 func _show_passive_income_feedback(currency_type: String, amount: float) -> void:
-	# Pas de feedback visuel pour les revenus passifs
-	# Les revenus passifs sont silencieux pour éviter le spam visuel
-	pass
+	# Show floating text for devotion procs centered on click button
+	if currency_type == "inspiration" and amount > 0:
+		_show_devotion_feedback(amount)
+
+func _show_devotion_feedback(amount: float) -> void:
+	# Get the AccueilView to show floating text centered on click button
+	var accueil_view = GameState.scene_manager.get_current_view()
+	if accueil_view and accueil_view.get_class_name() == "AccueilView":
+		# Use the AccueilView's feedback system
+		accueil_view._show_devotion_feedback(amount)
+	else:
+		# Fallback: try to find AccueilView in the scene tree
+		var accueil_node = _find_accueil_view()
+		if accueil_node:
+			accueil_node._show_devotion_feedback(amount)
+
+func _find_accueil_view() -> Node:
+	# Search for AccueilView in the scene tree
+	var root = get_tree().current_scene
+	return _search_for_accueil_view(root)
+
+func _search_for_accueil_view(node: Node) -> Node:
+	if node.get_class_name() == "AccueilView":
+		return node
+	
+	for child in node.get_children():
+		var result = _search_for_accueil_view(child)
+		if result:
+			return result
+	
+	return null

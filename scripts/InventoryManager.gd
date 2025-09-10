@@ -75,7 +75,7 @@ class Item:
 				base_stats["painting_speed"] = randf_range(1.1, 1.3)
 				base_stats["pixel_gain"] = randf_range(1.0, 2.0)
 			ItemType.RING, ItemType.AMULET:
-				base_stats["ascendancy_gain"] = randf_range(1.0, 2.0)
+				base_stats["fame_gain"] = randf_range(1.0, 2.0)
 				base_stats["experience_gain"] = randf_range(1.1, 1.2)
 			ItemType.BADGE:
 				base_stats["special_effect"] = randf_range(1.0, 1.5)
@@ -126,7 +126,7 @@ class Item:
 			"gold_gain": return "Gain d'or"
 			"painting_speed": return "Vitesse de peinture"
 			"pixel_gain": return "Gain de pixels"
-			"ascendancy_gain": return "Gain d'ascension"
+			"fame_gain": return "Gain de renommée"
 			"experience_gain": return "Gain d'expérience"
 			"special_effect": return "Effet spécial"
 			_: return stat

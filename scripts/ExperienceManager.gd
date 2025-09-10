@@ -26,6 +26,7 @@ func add_experience(amount: float) -> void:
 	if amount <= 0:
 		return
 	
+	var old_level = level
 	experience += amount
 	
 	# Vérifier les montées de niveau
@@ -34,6 +35,11 @@ func add_experience(amount: float) -> void:
 		experience -= experience_to_next_level
 		experience_to_next_level = int(experience_to_next_level * GameConfig.EXPERIENCE_MULTIPLIER)
 		level_changed.emit(level)
+	
+	# Grant fame for level ups
+	var levels_gained = level - old_level
+	if levels_gained > 0:
+		_grant_fame_for_level_up(levels_gained)
 	
 	experience_changed.emit(experience, experience_to_next_level)
 
@@ -106,3 +112,19 @@ func emit_experience_changed() -> void:
 ## Émet le signal de niveau changé
 func emit_level_changed() -> void:
 	level_changed.emit(level)
+
+## Grant fame for level ups
+func _grant_fame_for_level_up(levels_gained: int) -> void:
+	if levels_gained <= 0:
+		return
+	
+	# Get GameState reference to access currency manager and bonus system
+	var game_state = get_node("/root/GameState")
+	if not game_state:
+		return
+	
+	var base_fame = levels_gained * GameConfig.BASE_FAME_PER_LEVEL
+	var bonus_fame = game_state.apply_currency_bonus("fame", base_fame)
+	game_state.currency_manager.add_currency_raw("fame", bonus_fame)
+	
+	game_state.logger.info("Level up! Gained %d levels and %d fame (base: %d, bonus: %.2fx)" % [levels_gained, bonus_fame, base_fame, bonus_fame / base_fame])

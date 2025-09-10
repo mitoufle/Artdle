@@ -5,6 +5,11 @@ class_name CanvasManager
 ## Sépare la logique de canvas du GameState principal
 
 #==============================================================================
+# Imports
+#==============================================================================
+const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
+
+#==============================================================================
 # Signals
 #==============================================================================
 signal canvas_updated(new_texture: ImageTexture)
@@ -44,6 +49,11 @@ func _ready():
 	_initialize_new_canvas()
 	_update_fill_speed()
 	canvas_fill_timer.start()
+	
+	# Connecter aux signaux de changement d'équipement pour recalculer les bonus
+	if GameState.inventory_manager:
+		GameState.inventory_manager.item_equipped.connect(_on_equipment_changed)
+		GameState.inventory_manager.item_unequipped.connect(_on_equipment_changed)
 
 #==============================================================================
 # Public API
@@ -79,10 +89,15 @@ func sell_canvas() -> Dictionary:
 	var current_sell_price = sell_price
 	var current_canvas_was_sold = false
 	
+	# Appliquer les bonus d'items pour l'or
+	var gold_bonus = CurrencyBonusManager.get_bonus_multiplier("gold")
+	
 	# Vendre les canvas stockés
 	while stored_canvases > 0:
 		total_canvases_sold += 1
-		total_gold_gained += current_sell_price
+		var base_gold = current_sell_price
+		var bonus_gold = CurrencyBonusManager.apply_bonuses("gold", base_gold)
+		total_gold_gained += int(bonus_gold)
 		current_sell_price = int(current_sell_price * GameConfig.BULK_SELL_PRICE_MULTIPLIER)
 		stored_canvases -= 1
 		canvas_storage_changed.emit(stored_canvases, canvas_storage_level)
@@ -90,7 +105,9 @@ func sell_canvas() -> Dictionary:
 	# Vendre le canvas actuel s'il est terminé
 	if current_pixel_count >= max_pixels:
 		total_canvases_sold += 1
-		total_gold_gained += current_sell_price
+		var base_gold = current_sell_price
+		var bonus_gold = CurrencyBonusManager.apply_bonuses("gold", base_gold)
+		total_gold_gained += int(bonus_gold)
 		current_canvas_was_sold = true
 	
 	if total_canvases_sold > 0:
@@ -194,17 +211,25 @@ func _setup_timers() -> void:
 	canvas_fill_timer.timeout.connect(_on_canvas_fill_timer_timeout)
 
 func _try_store_completed_canvas() -> bool:
+	GameState.logger.debug("Trying to store canvas: current_pixels=%d, max_pixels=%d, stored=%d, storage_level=%d" % [current_pixel_count, max_pixels, stored_canvases, canvas_storage_level])
 	if current_pixel_count >= max_pixels and stored_canvases < canvas_storage_level:
 		stored_canvases += 1
 		_initialize_new_canvas()
 		canvas_fill_timer.start()
 		canvas_storage_changed.emit(stored_canvases, canvas_storage_level)
+		GameState.logger.debug("Canvas stored successfully! New count: %d" % stored_canvases)
 		return true
+	else:
+		GameState.logger.debug("Canvas storage failed: canvas complete=%s, storage available=%s" % [current_pixel_count >= max_pixels, stored_canvases < canvas_storage_level])
 	return false
 
 func _prefill_canvas(pixels_to_fill: int) -> void:
+	# Appliquer le bonus de gain de pixels
+	var pixel_gain_bonus = CurrencyBonusManager.get_bonus_multiplier("pixel_gain")
+	var adjusted_pixels_to_fill = int(pixels_to_fill * pixel_gain_bonus)
+	
 	var filled_count = 0
-	while filled_count < pixels_to_fill and unfilled_pixels.size() > 0:
+	while filled_count < adjusted_pixels_to_fill and unfilled_pixels.size() > 0:
 		var random_index = randi() % unfilled_pixels.size()
 		var pixel_pos = unfilled_pixels.pop_at(random_index)
 		
@@ -224,24 +249,44 @@ func _on_canvas_fill_timer_timeout() -> void:
 			return
 
 		canvas_fill_timer.stop()
+		GameState.logger.debug("Canvas completed! Attempting to store...")
 		
 		if not _try_store_completed_canvas():
+			GameState.logger.debug("Canvas could not be stored, emitting completion signal")
 			canvas_completed.emit()
 		return
 
-	var random_index = randi() % unfilled_pixels.size()
-	var pixel_pos = unfilled_pixels.pop_at(random_index)
+	# Appliquer le bonus de gain de pixels
+	var pixel_gain_bonus = CurrencyBonusManager.get_bonus_multiplier("pixel_gain")
+	var pixels_to_fill = int(pixel_gain_bonus)
 	
-	var alpha = snapped(randf_range(GameConfig.PIXEL_ALPHA_MIN, GameConfig.PIXEL_ALPHA_MAX), GameConfig.PIXEL_ALPHA_SNAP)
-	canvas_image.set_pixelv(pixel_pos, Color(randf(), randf(), randf(), alpha))
+	# S'assurer qu'on ne dépasse pas le maximum
+	var max_possible = min(pixels_to_fill, unfilled_pixels.size(), max_pixels - current_pixel_count)
+	
+	for i in range(max_possible):
+		var random_index = randi() % unfilled_pixels.size()
+		var pixel_pos = unfilled_pixels.pop_at(random_index)
+		
+		var alpha = snapped(randf_range(GameConfig.PIXEL_ALPHA_MIN, GameConfig.PIXEL_ALPHA_MAX), GameConfig.PIXEL_ALPHA_SNAP)
+		canvas_image.set_pixelv(pixel_pos, Color(randf(), randf(), randf(), alpha))
+	
 	canvas_texture.update(canvas_image)
-	
-	current_pixel_count += 1
+	current_pixel_count += max_possible
 	canvas_progress_updated.emit(current_pixel_count, max_pixels)
 
 func _update_fill_speed() -> void:
-	var speed = 1.0 / float(fill_speed_level)
-	canvas_fill_timer.wait_time = speed
+	var base_speed = 1.0 / float(fill_speed_level)
+	
+	# Appliquer les bonus d'items pour la vitesse de canvas
+	var canvas_speed_bonus = CurrencyBonusManager.get_bonus_multiplier("canvas_speed")
+	var painting_speed_bonus = CurrencyBonusManager.get_bonus_multiplier("painting_speed")
+	
+	# Combiner les bonus (diviser car plus de bonus = plus rapide)
+	var total_speed_bonus = canvas_speed_bonus * painting_speed_bonus
+	var final_speed = base_speed / total_speed_bonus
+	
+	canvas_fill_timer.wait_time = final_speed
+	GameState.logger.debug("Canvas speed updated: base=%.3f, canvas_bonus=%.2f, painting_bonus=%.2f, final=%.3f" % [base_speed, canvas_speed_bonus, painting_speed_bonus, final_speed])
 
 func _emit_upgrade_costs() -> void:
 	var costs = {
@@ -249,6 +294,12 @@ func _emit_upgrade_costs() -> void:
 		"fill_speed_cost": upgrade_fill_speed_cost
 	}
 	canvas_upgrade_costs_changed.emit(costs)
+
+## Callback quand l'équipement change - recalculer les bonus
+func _on_equipment_changed(slot: String, item: InventoryManager.Item = null) -> void:
+	# Recalculer la vitesse de remplissage avec les nouveaux bonus
+	_update_fill_speed()
+	GameState.logger.debug("Canvas speed updated due to equipment change in slot: %s" % slot)
 
 #==============================================================================
 # Public API Methods
@@ -307,6 +358,7 @@ func set_stored_canvases(value: int) -> void:
 func set_canvas_storage_level(value: int) -> void:
 	canvas_storage_level = value
 	canvas_storage_changed.emit(stored_canvases, canvas_storage_level)
+	GameState.logger.debug("Canvas storage level set to: %d" % canvas_storage_level)
 
 ## Définit le coût d'amélioration de résolution (pour le système de sauvegarde)
 func set_upgrade_resolution_cost(value: int) -> void:

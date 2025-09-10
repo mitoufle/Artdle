@@ -238,27 +238,27 @@ func activate_devotion():
 		# Afficher les effets selon le niveau (avec évolution dynamique)
 		var player_level = GameState.experience_manager.get_level()
 		var base_amount = 1.0
-		var base_interval = 5.0
+		var base_interval = 0.5  # Changé de 5.0 à 0.5 (2 fois par seconde)
 		
 		# Calculer les effets actuels
 		if level >= 2:
 			base_amount *= player_level
 		if level >= 3:
-			base_interval = max(0.1, 5.0 - (player_level * 0.2))  # Scaling plus rapide
+			base_interval = max(0.05, 0.5 - (player_level * 0.02))  # Scaling plus rapide
 		if level >= 4:
 			base_amount *= 2.0
 		
 		match level:
 			1:
-				print("Effet: 1 inspiration toutes les 5 secondes")
+				print("Effet: 1 inspiration toutes les 0.5 secondes (2/s)")
 			2:
-				print("Effet: %d inspiration toutes les 5 secondes (ÉVOLUE avec votre niveau!)" % int(base_amount))
+				print("Effet: %d inspiration toutes les 0.5 secondes (ÉVOLUE avec votre niveau!)" % int(base_amount))
 			3:
-				print("Effet: %d inspiration toutes les %.1f secondes (rythme ÉVOLUTIF!)" % [int(base_amount), base_interval])
+				print("Effet: %d inspiration toutes les %.2f secondes (rythme ÉVOLUTIF!)" % [int(base_amount), base_interval])
 			4:
-				print("Effet: %d inspiration toutes les %.1f secondes (gain doublé + ÉVOLUTIF!)" % [int(base_amount), base_interval])
+				print("Effet: %d inspiration toutes les %.2f secondes (gain doublé + ÉVOLUTIF!)" % [int(base_amount), base_interval])
 			5:
-				print("Effet: %d inspiration toutes les %.1f secondes + 0.1%% conservée à l'ascension (ÉVOLUTIF!)" % [int(base_amount), base_interval])
+				print("Effet: %d inspiration toutes les %.2f secondes + 0.1%% conservée à l'ascension (ÉVOLUTIF!)" % [int(base_amount), base_interval])
 		
 		print("💡 Le revenu passif s'améliore automatiquement quand vous montez de niveau!")
 		print("💡 Regardez les tooltips dans l'écran skill tree pour voir les effets détaillés!")

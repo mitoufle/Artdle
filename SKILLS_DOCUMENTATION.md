@@ -31,31 +31,31 @@ Devotion (root) - Revenu passif d'inspiration
 
 | Niveau | Effet | Description |
 |--------|-------|-------------|
-| **1** | Revenu de base | 1 inspiration toutes les 5 secondes |
+| **1** | Revenu de base | 1 inspiration toutes les 0.5 secondes (2 fois/seconde) |
 | **2** | Scaling de niveau | Multiplie le gain par votre niveau actuel |
-| **3** | Rythme amélioré | Intervalle réduit selon le niveau (0.2 par niveau) |
+| **3** | Rythme amélioré | Intervalle réduit selon le niveau (0.02 par niveau) |
 | **4** | Gain doublé | Double le gain passif total |
 | **5** | Conservation | Garde 0.1% d'inspiration lors de l'ascension |
 
 #### **Formules de Calcul**
-- **Niveau 1:** `1 inspiration / 5 secondes`
-- **Niveau 2:** `niveau × 1 inspiration / 5 secondes`
-- **Niveau 3:** `niveau × 1 inspiration / max(0.1, 5.0 - niveau × 0.2) secondes`
-- **Niveau 4:** `niveau × 2 inspiration / max(0.1, 5.0 - niveau × 0.2) secondes`
-- **Niveau 5:** `niveau × 2 inspiration / max(0.1, 5.0 - niveau × 0.2) secondes + 0.1% conservé`
+- **Niveau 1:** `1 inspiration / 0.5 secondes` (2 fois/seconde)
+- **Niveau 2:** `niveau × 1 inspiration / 0.5 secondes`
+- **Niveau 3:** `niveau × 1 inspiration / max(0.05, 0.5 - niveau × 0.02) secondes`
+- **Niveau 4:** `niveau × 2 inspiration / max(0.05, 0.5 - niveau × 0.02) secondes`
+- **Niveau 5:** `niveau × 2 inspiration / max(0.05, 0.5 - niveau × 0.02) secondes + 0.1% conservé`
 
 #### **Exemples de Progression**
 ```
 Niveau 10:
-- Niveau 1: 1 inspiration/5s
-- Niveau 2: 10 inspiration/5s
-- Niveau 3: 10 inspiration/3s
-- Niveau 4: 20 inspiration/3s
-- Niveau 5: 20 inspiration/3s + conservation
+- Niveau 1: 1 inspiration/0.5s (2/s)
+- Niveau 2: 10 inspiration/0.5s (20/s)
+- Niveau 3: 10 inspiration/0.3s (33/s)
+- Niveau 4: 20 inspiration/0.3s (67/s)
+- Niveau 5: 20 inspiration/0.3s + conservation
 
 Niveau 50:
-- Niveau 1: 1 inspiration/5s
-- Niveau 2: 50 inspiration/5s
+- Niveau 1: 1 inspiration/0.5s (2/s)
+- Niveau 2: 50 inspiration/0.5s (100/s)
 - Niveau 3: 50 inspiration/0.1s (500 inspiration/s!)
 - Niveau 4: 100 inspiration/0.1s (1000 inspiration/s!)
 - Niveau 5: 100 inspiration/0.1s + conservation
