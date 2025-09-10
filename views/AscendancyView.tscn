@@ -53,20 +53,19 @@ tooltype_style = "pulse"
 
 [node name="SkillTreeButton" parent="." instance=ExtResource("4")]
 layout_mode = 1
-offset_left = -168.0
-offset_top = -192.0
-offset_right = 122.0
-offset_bottom = -147.0
+offset_left = -184.0
+offset_top = -167.0
+offset_right = -88.0
+offset_bottom = -151.0
+scale = Vector2(3.72948, 3.72948)
 texture_normal = ExtResource("5_55mb7")
 texture_pressed = ExtResource("5_55mb7")
 texture_hover = ExtResource("9_jbkff")
 texture_click_mask = SubResource("BitMap_bi60q")
 custom_texture = ExtResource("5_55mb7")
-button_text = "ascendancy skills"
+button_text = ""
 font_size = 9
 font_color = Color(0, 0, 0, 1)
-v_align = 0
-autowrap_mode = 3
 
 [node name="AscendancyPointsLabel" type="Label" parent="."]
 layout_mode = 2
@@ -83,3 +82,14 @@ offset_right = 1200.0
 offset_bottom = 599.0
 text = "Ascend Cost: 100 Fame"
 horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 441.0
+offset_top = 177.0
+offset_right = 747.0
+offset_bottom = 219.0
+theme_override_font_sizes/font_size = 25
+text = "Ascendency Perks"
+horizontal_alignment = 1
+vertical_alignment = 1
