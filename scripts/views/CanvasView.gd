@@ -25,6 +25,7 @@ const FLOATING_TEXT_SCENE = preload("res://Scenes/floating_text.tscn")
 @onready var upgrade_fill_speed_button: UpgradeButton = get_parent().get_node("UpgradeHBox/UpgradeFillSpeedButton")
 @onready var canvas_storage_label: Label = get_parent().get_node("CanvasStorageLabel")
 @onready var upgrade_canvas_storage_button: UpgradeButton = get_parent().get_node("UpgradeCanvasStorageButton")
+@onready var canvas_speed_label: Label = get_parent().get_node("CanvasSpeedLabel")
 
 #==============================================================================
 # Godot Lifecycle
@@ -37,6 +38,7 @@ func _ready():
 	GameState.canvas_upgrade_costs_changed.connect(_on_canvas_upgrade_costs_changed)
 	GameState.canvas_storage_changed.connect(_on_canvas_storage_changed)
 	GameState.canvas_storage_upgrade_cost_changed.connect(_on_canvas_storage_upgrade_cost_changed)
+	GameState.canvas_manager.canvas_fill_speed_changed.connect(_on_canvas_fill_speed_changed)
 	
 	# Connect UI signals
 	sell_button.pressed.connect(_on_sell_button_pressed)
@@ -63,6 +65,10 @@ func _ready():
 	
 	# Setup canvas storage upgrade button
 	_setup_canvas_storage_upgrade_button()
+	
+	# Initialize speed display
+	var speed_info = GameState.canvas_manager.get_fill_speed_info()
+	_on_canvas_fill_speed_changed(speed_info)
 	
 	_update_sell_button_state() # Call here for initial state
 	_setup_upgrade_buttons()
@@ -102,6 +108,13 @@ func _on_canvas_storage_changed(stored_canvases: int, max_storage: int):
 func _on_canvas_storage_upgrade_cost_changed(cost: int):
 	# Update the upgrade button with new cost
 	_setup_canvas_storage_upgrade_button()
+
+func _on_canvas_fill_speed_changed(speed_info: Dictionary):
+	# Update the speed display
+	if canvas_speed_label:
+		var pixels_per_second = speed_info.get("pixels_per_second", 0)
+		var level = speed_info.get("level", 1)
+		canvas_speed_label.text = "Fill Speed: Level %d (%.1f pixels/sec)" % [level, pixels_per_second]
 
 #==============================================================================
 # UI Event Handlers

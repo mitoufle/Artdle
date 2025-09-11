@@ -78,7 +78,22 @@ class Item:
 				base_stats["fame_gain"] = randf_range(1.0, 2.0)
 				base_stats["experience_gain"] = randf_range(1.1, 1.2)
 			ItemType.BADGE:
-				base_stats["special_effect"] = randf_range(1.0, 1.5)
+				# Badges get one unique stat with higher values than other items
+				var badge_stats = ["inspiration_gain", "gold_gain", "ascendancy_gain", "canvas_speed", "pixel_gain"]
+				var selected_stat = badge_stats[randi() % badge_stats.size()]
+				
+				# Higher base values for badges since they only have one stat
+				match selected_stat:
+					"inspiration_gain":
+						base_stats["inspiration_gain"] = randf_range(2.0, 4.0)  # 2x higher than other items
+					"gold_gain":
+						base_stats["gold_gain"] = randf_range(1.5, 3.0)  # 2x higher than other items
+					"ascendancy_gain":
+						base_stats["ascendancy_gain"] = randf_range(1.2, 2.0)  # Unique to badges
+					"canvas_speed":
+						base_stats["canvas_speed"] = randf_range(1.3, 2.0)  # Unique to badges
+					"pixel_gain":
+						base_stats["pixel_gain"] = randf_range(2.0, 4.0)  # 2x higher than other items
 		return base_stats
 	
 	func _generate_tier_2_stats() -> Dictionary:
@@ -126,7 +141,9 @@ class Item:
 			"gold_gain": return "Gain d'or"
 			"painting_speed": return "Vitesse de peinture"
 			"pixel_gain": return "Gain de pixels"
+			"canvas_speed": return "Vitesse de canvas"
 			"fame_gain": return "Gain de renommée"
+			"ascendancy_gain": return "Gain d'ascension"
 			"experience_gain": return "Gain d'expérience"
 			"special_effect": return "Effet spécial"
 			_: return stat
@@ -149,7 +166,8 @@ var equipment_slots = {
 	"ring_2": ItemType.RING,
 	"amulet": ItemType.AMULET,
 	"badge_1": ItemType.BADGE,
-	"badge_2": ItemType.BADGE
+	"badge_2": ItemType.BADGE,
+	"badge_3": ItemType.BADGE
 }
 
 #==============================================================================

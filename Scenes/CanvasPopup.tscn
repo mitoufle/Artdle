@@ -7,7 +7,7 @@
 [node name="CanvasPopup" type="PopupPanel"]
 title = "Canvas"
 initial_position = 2
-size = Vector2i(488, 558)
+size = Vector2i(488, 585)
 visible = true
 theme = ExtResource("2_abcde")
 
@@ -18,7 +18,7 @@ anchor_bottom = 1.0
 offset_left = 5.0
 offset_top = 5.0
 offset_right = 483.0
-offset_bottom = 553.0
+offset_bottom = 580.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -49,3 +49,7 @@ level_prefix = "Storage"
 [node name="CanvasStorageLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Stored Canvases: 0/0"
+
+[node name="CanvasSpeedLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Fill Speed: Level 1 (1.0 pixels/sec)"

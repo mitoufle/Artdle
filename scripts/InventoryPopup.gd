@@ -48,8 +48,8 @@ func _create_equipment_slots() -> void:
 	equipment_buttons.clear()
 	
 	# Create equipment slots
-	var slot_names = ["hat", "shirt", "boots", "gloves", "brush", "palette", "ring_1", "ring_2", "amulet", "badge_1", "badge_2"]
-	var slot_labels = ["Hat", "Shirt", "Boots", "Gloves", "Brush", "Palette", "Ring 1", "Ring 2", "Amulet", "Badge 1", "Badge 2"]
+	var slot_names = ["hat", "shirt", "boots", "gloves", "brush", "palette", "ring_1", "ring_2", "amulet", "badge_1", "badge_2", "badge_3"]
+	var slot_labels = ["Hat", "Shirt", "Boots", "Gloves", "Brush", "Palette", "Ring 1", "Ring 2", "Amulet", "Badge 1", "Badge 2", "Badge 3"]
 	
 	for i in range(slot_names.size()):
 		var slot_name = slot_names[i]
@@ -153,6 +153,12 @@ func _update_equipment_slot(slot_name: String) -> void:
 	var slot_container = button.get_parent()
 	var item_label = slot_container.get_node("ItemLabel")
 	
+	# Disconnect existing signals to avoid duplicates
+	if button.mouse_entered.is_connected(_on_equipment_slot_mouse_entered):
+		button.mouse_entered.disconnect(_on_equipment_slot_mouse_entered)
+	if button.mouse_exited.is_connected(_on_equipment_slot_mouse_exited):
+		button.mouse_exited.disconnect(_on_equipment_slot_mouse_exited)
+	
 	if item:
 		button.text = item.name
 		item_label.text = _get_tier_name(item.tier)
@@ -166,6 +172,10 @@ func _update_equipment_slot(slot_name: String) -> void:
 			InventoryManager.ItemTier.TIER_5: Color.ORANGE
 		}
 		button.modulate = tier_colors.get(item.tier, Color.WHITE)
+		
+		# Connect tooltip signals for equipped items
+		button.mouse_entered.connect(_on_equipment_slot_mouse_entered.bind(item))
+		button.mouse_exited.connect(_on_equipment_slot_mouse_exited)
 	else:
 		button.text = _get_slot_label(slot_name)
 		item_label.text = "Empty"
@@ -186,6 +196,167 @@ func _update_stats_display() -> void:
 			stats_text += "%s: +%.1f%%\n" % [stat_display, bonus_percent]
 	
 	stats_label.text = stats_text
+
+#==============================================================================
+# Tooltip Methods
+#==============================================================================
+func _on_equipment_slot_mouse_entered(item: InventoryManager.Item) -> void:
+	_show_equipment_tooltip(item)
+
+func _on_equipment_slot_mouse_exited() -> void:
+	_hide_equipment_tooltip()
+
+var current_tooltip: Control = null
+
+func _show_equipment_tooltip(item: InventoryManager.Item) -> void:
+	# Hide existing tooltip if any
+	_hide_equipment_tooltip()
+	
+	# Create tooltip text
+	var tooltip_text = _generate_equipment_tooltip_text(item)
+	
+	# Load and instantiate the custom tooltip scene
+	var tooltip_scene = preload("res://Scenes/CustomTooltip.tscn")
+	current_tooltip = tooltip_scene.instantiate()
+	
+	# Add to scene
+	get_tree().get_root().add_child(current_tooltip)
+	
+	# Set tooltip content
+	if current_tooltip.has_method("set_text"):
+		current_tooltip.set_text(tooltip_text)
+	
+	# Position tooltip
+	var mouse_pos = get_viewport().get_mouse_position()
+	current_tooltip.global_position = mouse_pos + Vector2(20, -20)
+
+func _hide_equipment_tooltip() -> void:
+	if current_tooltip:
+		current_tooltip.queue_free()
+		current_tooltip = null
+
+func _generate_equipment_tooltip_text(item: InventoryManager.Item) -> String:
+	var tooltip = ""
+	
+	# Item name and tier
+	tooltip += "[b]%s[/b]\n" % item.name
+	tooltip += "[color=gray]%s[/color]\n\n" % _get_tier_name(item.tier)
+	
+	# Item type
+	tooltip += "[b]Type:[/b] %s\n" % _get_type_name(item.type)
+	
+	# Stats
+	if item.stats.size() > 0:
+		tooltip += "\n[b]Stats:[/b]\n"
+		for stat_name in item.stats.keys():
+			var stat_value = item.stats[stat_name]
+			var stat_display = _format_stat_name(stat_name)
+			var bonus_percent = (stat_value - 1.0) * 100
+			tooltip += "• %s: +%.1f%%\n" % [stat_display, bonus_percent]
+	
+	# Description if available
+	if item.description != "":
+		tooltip += "\n[b]Description:[/b]\n%s" % item.description
+	
+	return tooltip
+
+func _get_tier_name(tier: InventoryManager.ItemTier) -> String:
+	match tier:
+		InventoryManager.ItemTier.TIER_1:
+			return "Common"
+		InventoryManager.ItemTier.TIER_2:
+			return "Uncommon"
+		InventoryManager.ItemTier.TIER_3:
+			return "Rare"
+		InventoryManager.ItemTier.TIER_4:
+			return "Epic"
+		InventoryManager.ItemTier.TIER_5:
+			return "Legendary"
+		_:
+			return "Unknown"
+
+func _get_type_name(item_type: InventoryManager.ItemType) -> String:
+	match item_type:
+		InventoryManager.ItemType.HAT:
+			return "Hat"
+		InventoryManager.ItemType.SHIRT:
+			return "Shirt"
+		InventoryManager.ItemType.BOOTS:
+			return "Boots"
+		InventoryManager.ItemType.GLOVES:
+			return "Gloves"
+		InventoryManager.ItemType.BRUSH:
+			return "Brush"
+		InventoryManager.ItemType.PALETTE:
+			return "Palette"
+		InventoryManager.ItemType.RING:
+			return "Ring"
+		InventoryManager.ItemType.AMULET:
+			return "Amulet"
+		InventoryManager.ItemType.BADGE:
+			return "Badge"
+		_:
+			return "Unknown"
+
+func _format_stat_name(stat_name: String) -> String:
+	match stat_name:
+		"fame_generation":
+			return "Fame Generation"
+		"coin_generation":
+			return "Coin Generation"
+		"inspiration_generation":
+			return "Inspiration Generation"
+		"craft_speed":
+			return "Craft Speed"
+		"painting_speed":
+			return "Painting Speed"
+		"pixel_gain":
+			return "Pixel Gain"
+		"canvas_speed":
+			return "Canvas Speed"
+		"fame_gain":
+			return "Fame Gain"
+		"gold_gain":
+			return "Gold Gain"
+		"inspiration_gain":
+			return "Inspiration Gain"
+		"ascendancy_gain":
+			return "Ascendancy Gain"
+		"experience_gain":
+			return "Experience Gain"
+		"special_effect":
+			return "Special Effect"
+		_:
+			return stat_name.capitalize()
+
+func _get_slot_label(slot_name: String) -> String:
+	match slot_name:
+		"hat":
+			return "Hat"
+		"shirt":
+			return "Shirt"
+		"boots":
+			return "Boots"
+		"gloves":
+			return "Gloves"
+		"brush":
+			return "Brush"
+		"palette":
+			return "Palette"
+		"ring_1":
+			return "Ring 1"
+		"ring_2":
+			return "Ring 2"
+		"amulet":
+			return "Amulet"
+		"badge_1":
+			return "Badge 1"
+		"badge_2":
+			return "Badge 2"
+		"badge_3":
+			return "Badge 3"
+		_:
+			return slot_name.capitalize()
 
 #==============================================================================
 # Signal Handlers
@@ -285,40 +456,6 @@ func _find_available_slot(item_type: InventoryManager.ItemType) -> String:
 	
 	return ""
 
-func _get_slot_label(slot_name: String) -> String:
-	match slot_name:
-		"hat": return "Hat"
-		"shirt": return "Shirt"
-		"boots": return "Boots"
-		"gloves": return "Gloves"
-		"brush": return "Brush"
-		"palette": return "Palette"
-		"ring_1": return "Ring 1"
-		"ring_2": return "Ring 2"
-		"amulet": return "Amulet"
-		"badge_1": return "Badge 1"
-		"badge_2": return "Badge 2"
-		_: return slot_name
-
-func _get_tier_name(tier: InventoryManager.ItemTier) -> String:
-	match tier:
-		InventoryManager.ItemTier.TIER_1: return "Normal"
-		InventoryManager.ItemTier.TIER_2: return "Magic"
-		InventoryManager.ItemTier.TIER_3: return "Rare"
-		InventoryManager.ItemTier.TIER_4: return "Epic"
-		InventoryManager.ItemTier.TIER_5: return "Legendary"
-		_: return "Unknown"
-
-func _format_stat_name(stat: String) -> String:
-	match stat:
-		"inspiration_gain": return "Inspiration Gain"
-		"gold_gain": return "Gold Gain"
-		"painting_speed": return "Painting Speed"
-		"pixel_gain": return "Pixel Gain"
-		"ascendancy_gain": return "Ascendancy Gain"
-		"experience_gain": return "Experience Gain"
-		"special_effect": return "Special Effect"
-		_: return stat
 
 func _calculate_sell_price(item: InventoryManager.Item) -> Dictionary:
 	# Base price based on tier

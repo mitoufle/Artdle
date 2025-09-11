@@ -135,11 +135,11 @@ func _show_passive_income_feedback(currency_type: String, amount: float) -> void
 		_show_devotion_feedback(amount)
 
 func _show_devotion_feedback(amount: float) -> void:
-	# Get the AccueilView to show floating text centered on click button
-	var accueil_view = GameState.scene_manager.get_current_view()
-	if accueil_view and accueil_view.get_class_name() == "AccueilView":
+	# Get the current view from SceneManager
+	var current_view = SceneManager.current_scene
+	if current_view and current_view.has_method("_show_devotion_feedback"):
 		# Use the AccueilView's feedback system
-		accueil_view._show_devotion_feedback(amount)
+		current_view._show_devotion_feedback(amount)
 	else:
 		# Fallback: try to find AccueilView in the scene tree
 		var accueil_node = _find_accueil_view()
@@ -152,7 +152,7 @@ func _find_accueil_view() -> Node:
 	return _search_for_accueil_view(root)
 
 func _search_for_accueil_view(node: Node) -> Node:
-	if node.get_class_name() == "AccueilView":
+	if node.has_method("_show_devotion_feedback"):
 		return node
 	
 	for child in node.get_children():

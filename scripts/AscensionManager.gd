@@ -23,28 +23,30 @@ var ascend_level: int = GameConfig.DEFAULT_ASCEND_LEVEL
 
 ## Tente d'effectuer une ascension
 func ascend() -> bool:
-	if not GameState.currency_manager.has_enough("fame", ascendancy_cost):
+	var current_fame = GameState.currency_manager.get_currency("fame")
+	if current_fame < 1000:  # Minimum 1000 fame required
 		return false
 	
-	# Retirer le coût d'ascension
-	GameState.currency_manager.subtract_currency("fame", ascendancy_cost)
+	# Calculate ascendancy points from all available fame
+	var ascendancy_points_gained = int(current_fame / 1000)  # 1000 fame per point
+	var fame_remaining = int(current_fame) % 1000  # Keep remainder
 	
-	# Ajouter les points d'ascendance
-	GameState.currency_manager.add_currency("ascendancy_points", GameConfig.ASCENDANCY_POINTS_PER_ASCENSION)
-	GameState.currency_manager.add_currency("ascend_level", GameConfig.ASCEND_LEVELS_PER_ASCENSION)
+	# Consume all fame and add ascendancy points
+	GameState.currency_manager.set_currency("fame", fame_remaining)
+	GameState.currency_manager.add_currency("ascendancy_points", ascendancy_points_gained)
+	GameState.currency_manager.add_currency("ascend_level", 1)  # Always increment ascend level
 	
-	# Réinitialiser les systèmes
+	# Reset everything except fame
 	_reset_game_systems()
 	
-	# Ascension cost remains fixed - no scaling
-	# ascendancy_cost stays the same for all ascensions
-	
+	GameState.logger.info("Ascension: Gained %d ascendancy points, %d fame remaining" % [ascendancy_points_gained, fame_remaining])
 	ascended.emit()
 	return true
 
 ## Vérifie si l'ascension est possible
 func can_ascend() -> bool:
-	return GameState.currency_manager.has_enough("fame", ascendancy_cost)
+	var current_fame = GameState.currency_manager.get_currency("fame")
+	return current_fame >= 1000  # Minimum 1000 fame required
 
 ## Récupère le coût d'ascension actuel
 func get_ascendancy_cost() -> float:
@@ -77,10 +79,10 @@ func _reset_game_systems() -> void:
 		inspiration_to_keep = current_inspiration * 0.001  # 0.1%
 		GameState.logger.info("Devotion level 5: Keeping %.1f inspiration (0.1% of %.1f)" % [inspiration_to_keep, current_inspiration])
 	
-	# Réinitialiser les devises principales
+	# Réinitialiser les devises principales (fame is handled in ascend() function)
 	GameState.currency_manager.set_currency("inspiration", inspiration_to_keep)
 	GameState.currency_manager.set_currency("gold", 0)
-	GameState.currency_manager.set_currency("fame", 0)
+	# Fame is NOT reset - it's consumed and remainder is kept
 	GameState.currency_manager.set_currency("paint_mastery", 0)
 	
 	# Réinitialiser le canvas (including all upgrades)

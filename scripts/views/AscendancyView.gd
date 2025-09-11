@@ -72,11 +72,11 @@ func _on_skill_tree_button_pressed() -> void:
 #==============================================================================
 func _update_ui() -> void:
 	var ascendancy_points = GameState.ascension_manager.get_ascendancy_points()
-	var ascendancy_cost = GameState.ascension_manager.get_ascendancy_cost()
+	var current_fame = GameState.currency_manager.get_currency("fame")
 	var can_ascend = GameState.ascension_manager.can_ascend()
 	
 	ascendancy_points_label.text = "Ascendancy Points: %d" % ascendancy_points
-	ascend_cost_label.text = "Ascend Cost: %d Fame" % ascendancy_cost
+	ascend_cost_label.text = "Ascend Cost: 1000+ Fame (Current: %d)" % current_fame
 	ascend_button.disabled = not can_ascend
 
 #==============================================================================

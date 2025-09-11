@@ -171,10 +171,21 @@ func upgrade_workshop() -> bool:
 	
 	GameState.currency_manager.subtract_currency("gold", workshop_upgrade_cost)
 	workshop_level += 1
-	workshop_upgrade_cost = int(workshop_upgrade_cost * 1.5)
+	
+	# Improved scaling: exponential growth that becomes very expensive at high levels
+	# Level 1-10: 1.5x multiplier (reasonable early game)
+	# Level 11-50: 1.3x multiplier (mid game)
+	# Level 51+: 1.2x multiplier (late game)
+	var multiplier = 1.5
+	if workshop_level > 50:
+		multiplier = 1.2
+	elif workshop_level > 10:
+		multiplier = 1.3
+	
+	workshop_upgrade_cost = int(workshop_upgrade_cost * multiplier)
 	
 	workshop_upgraded.emit(workshop_level)
-	GameState.logger.info("Workshop upgraded to level %d" % workshop_level)
+	GameState.logger.info("Workshop upgraded to level %d (cost: %d gold)" % [workshop_level, workshop_upgrade_cost])
 	return true
 
 ## Récupère le niveau de l'atelier
@@ -189,31 +200,43 @@ func get_workshop_upgrade_cost() -> int:
 func get_tier_chances() -> Dictionary:
 	var chances = {}
 	
-	# Calculer les chances basées sur le niveau de l'atelier
-	# Plus le niveau est élevé, plus on a de chances d'avoir des tiers élevés
+	# Improved tier scaling system for levels 1-1000
+	# Legendary (Tier 5) appears much later with increasing chances
+	# Other tiers decrease as legendary becomes more common
 	
-	# Tier 1: Diminue progressivement
-	var tier1_chance = max(0.1, 1.0 - (workshop_level - 1) * 0.08)
+	# Tier 1 (Common): Starts at 100%, decreases to 5% at level 1000
+	var tier1_chance = max(0.05, 1.0 - (workshop_level - 1) * 0.00095)
 	
-	# Tier 2: Apparaît à partir du niveau 2, augmente jusqu'au niveau 10
+	# Tier 2 (Uncommon): Appears at level 5, peaks at level 50, then decreases
 	var tier2_chance = 0.0
-	if workshop_level >= 2:
-		tier2_chance = min(0.6, (workshop_level - 1) * 0.06)
-	
-	# Tier 3: Apparaît à partir du niveau 5, augmente lentement
-	var tier3_chance = 0.0
 	if workshop_level >= 5:
-		tier3_chance = min(0.3, (workshop_level - 4) * 0.03)
+		if workshop_level <= 50:
+			tier2_chance = min(0.4, (workshop_level - 4) * 0.008)
+		else:
+			tier2_chance = max(0.1, 0.4 - (workshop_level - 50) * 0.003)
 	
-	# Tier 4: Apparaît à partir du niveau 10, très rare
-	var tier4_chance = 0.0
-	if workshop_level >= 10:
-		tier4_chance = min(0.1, (workshop_level - 9) * 0.01)
-	
-	# Tier 5: Apparaît à partir du niveau 20, extrêmement rare
-	var tier5_chance = 0.0
+	# Tier 3 (Rare): Appears at level 20, peaks at level 200, then decreases
+	var tier3_chance = 0.0
 	if workshop_level >= 20:
-		tier5_chance = min(0.05, (workshop_level - 19) * 0.005)
+		if workshop_level <= 200:
+			tier3_chance = min(0.3, (workshop_level - 19) * 0.0015)
+		else:
+			tier3_chance = max(0.05, 0.3 - (workshop_level - 200) * 0.0003)
+	
+	# Tier 4 (Epic): Appears at level 100, peaks at level 500, then decreases
+	var tier4_chance = 0.0
+	if workshop_level >= 100:
+		if workshop_level <= 500:
+			tier4_chance = min(0.2, (workshop_level - 99) * 0.0004)
+		else:
+			tier4_chance = max(0.02, 0.2 - (workshop_level - 500) * 0.00036)
+	
+	# Tier 5 (Legendary): Appears at level 300, increases significantly at high levels
+	var tier5_chance = 0.0
+	if workshop_level >= 300:
+		# Logarithmic scaling: starts very low, becomes significant at high levels
+		var progress = (workshop_level - 299) / 700.0  # Progress from level 300 to 1000
+		tier5_chance = min(0.5, pow(progress, 0.5) * 0.5)  # Square root scaling
 	
 	# Normaliser les chances pour qu'elles totalisent 1.0
 	var total_chance = tier1_chance + tier2_chance + tier3_chance + tier4_chance + tier5_chance
