@@ -12,7 +12,22 @@ extends Node2D
 
 func start(text: String, icon_texture: Texture2D, hframes: int, vframes: int, animation_name: String, _color: Color = Color(1,1,1,1), amount: float = 1.0):
 	set_as_top_level(true)
-	label.text     = text
+	
+	# Format the text using BigNumberManager for proper M, B, T formatting
+	var formatted_text = text
+	if text.begins_with("+"):
+		# Extract the number part and format it
+		var number_part = text.substr(1)  # Remove the "+"
+		var number_value = number_part.to_float()
+		var formatted_number = BigNumberManager.format_number(number_value)
+		formatted_text = "+" + formatted_number
+	else:
+		# Try to format as number if it's a valid number
+		var number_value = text.to_float()
+		if number_value > 0:
+			formatted_text = BigNumberManager.format_number(number_value)
+	
+	label.text     = formatted_text
 	sprite.texture = icon_texture
 	sprite.hframes = hframes
 	sprite.vframes = vframes

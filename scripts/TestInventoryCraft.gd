@@ -188,8 +188,6 @@ func _find_slot_for_item(item: InventoryManager.Item) -> String:
 			return "badge_1"
 		elif not GameState.inventory_manager.get_equipped_item("badge_2"):
 			return "badge_2"
-		elif not GameState.inventory_manager.get_equipped_item("badge_3"):
-			return "badge_3"
 		else:
 			return ""
 	
@@ -215,7 +213,6 @@ func _format_stat_name(stat: String) -> String:
 		"gold_gain": return "Gain d'or"
 		"painting_speed": return "Vitesse de peinture"
 		"pixel_gain": return "Gain de pixels"
-		"canvas_speed": return "Vitesse de canvas"
 		"ascendancy_gain": return "Gain d'ascension"
 		"experience_gain": return "Gain d'expérience"
 		"special_effect": return "Effet spécial"
