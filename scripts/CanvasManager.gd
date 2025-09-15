@@ -26,9 +26,23 @@ signal canvas_fill_speed_changed(speed_info: Dictionary)
 var canvas_image: Image
 var canvas_texture: ImageTexture
 var canvas_fill_timer: Timer
+var display_update_timer: Timer
 var current_pixel_count: int = 0
 var max_pixels: int
 var unfilled_pixels: Array[Vector2i] = []
+var filled_pixels_count: int = 0  # Track filled pixels instead of maintaining large array
+
+# Creative optimization: Chunk-based filling
+var fill_chunk_size: int = 16  # Fill 16x16 chunks at a time
+var current_chunk_x: int = 0
+var current_chunk_y: int = 0
+var chunk_fill_progress: float = 0.0  # 0.0 to 1.0 within current chunk
+
+# Display throttling variables
+var last_displayed_pixel_count: int = 0
+var display_update_threshold: int = 10  # Only update display every 10 pixels
+var last_display_update_time: float = 0.0
+var min_display_interval: float = 0.5  # Minimum 0.5 seconds between updates
 
 # Canvas Properties
 var resolution_level: int = GameConfig.BASE_RESOLUTION_LEVEL
@@ -53,6 +67,7 @@ func _ready():
 	_initialize_new_canvas()
 	_update_fill_speed()
 	canvas_fill_timer.start()
+	display_update_timer.start()
 	
 	# Connecter aux signaux de changement d'équipement pour recalculer les bonus
 	if GameState.inventory_manager:
@@ -72,10 +87,24 @@ func _initialize_new_canvas() -> void:
 	max_pixels = width * height
 	current_pixel_count = 0
 	
+	# Reset throttling variables for new canvas
+	last_displayed_pixel_count = 0
+	last_display_update_time = Time.get_ticks_msec() / 1000.0
+	filled_pixels_count = 0
+	
+	# Reset chunk-based filling
+	current_chunk_x = 0
+	current_chunk_y = 0
+	chunk_fill_progress = 0.0
+	
+	# Adjust throttling parameters based on canvas size for better performance
+	_update_throttling_parameters()
+	
+	# Adjust chunk size based on canvas size for optimal performance
+	_update_chunk_size()
+	
+	# Don't pre-populate unfilled_pixels array - use random generation instead
 	unfilled_pixels.clear()
-	for y in range(height):
-		for x in range(width):
-			unfilled_pixels.append(Vector2i(x, y))
 	
 	canvas_image = Image.create(width, height, false, Image.FORMAT_RGBA8)
 	canvas_image.fill(Color.TRANSPARENT)
@@ -124,6 +153,7 @@ func sell_canvas() -> Dictionary:
 		if current_canvas_was_sold:
 			_initialize_new_canvas()
 			canvas_fill_timer.start()
+			display_update_timer.start()
 	
 	return {
 		"canvases_sold": total_canvases_sold,
@@ -144,6 +174,9 @@ func upgrade_resolution() -> bool:
 	resolution_level += 1
 	sell_price = int(sell_price * GameConfig.SELL_PRICE_MULTIPLIER)
 	upgrade_resolution_cost = int(upgrade_resolution_cost * GameConfig.RESOLUTION_COST_MULTIPLIER)
+	# Prevent negative prices due to integer overflow
+	sell_price = max(sell_price, 1)
+	upgrade_resolution_cost = max(upgrade_resolution_cost, 1)
 	
 	# Initialize new canvas with new resolution
 	_initialize_new_canvas()
@@ -164,6 +197,8 @@ func upgrade_fill_speed() -> bool:
 	GameState.currency_manager.subtract_currency("inspiration", upgrade_fill_speed_cost)
 	fill_speed_level += 1
 	upgrade_fill_speed_cost = int(upgrade_fill_speed_cost * GameConfig.FILL_SPEED_COST_MULTIPLIER)
+	# Prevent negative prices due to integer overflow
+	upgrade_fill_speed_cost = max(upgrade_fill_speed_cost, 1)
 	_update_fill_speed()
 	_emit_upgrade_costs()
 	return true
@@ -176,6 +211,8 @@ func upgrade_canvas_storage() -> bool:
 	GameState.currency_manager.subtract_currency("inspiration", canvas_storage_cost)
 	canvas_storage_level += 1
 	canvas_storage_cost = int(canvas_storage_cost * GameConfig.CANVAS_STORAGE_COST_MULTIPLIER)
+	# Prevent negative prices due to integer overflow
+	canvas_storage_cost = max(canvas_storage_cost, 1)
 	
 	# Emit storage change signal to update UI
 	canvas_storage_changed.emit(stored_canvases, canvas_storage_level)
@@ -201,6 +238,8 @@ func reset_canvas() -> void:
 ## Ajoute un multiplicateur de prix de vente (pour les skills)
 func add_sell_price_multiplier(multiplier: float) -> void:
 	sell_price = int(sell_price * (1.0 + multiplier))
+	# Prevent negative prices due to integer overflow
+	sell_price = max(sell_price, 1)
 	GameState.logger.info("Canvas sell price increased by %.1f%%" % (multiplier * 100))
 
 ## Ajoute un multiplicateur de gains de peinture (pour les skills)
@@ -226,6 +265,13 @@ func _setup_timers() -> void:
 	canvas_fill_timer = Timer.new()
 	add_child(canvas_fill_timer)
 	canvas_fill_timer.timeout.connect(_on_canvas_fill_timer_timeout)
+	
+	# Display update timer - much more aggressive throttling for memory efficiency
+	display_update_timer = Timer.new()
+	add_child(display_update_timer)
+	display_update_timer.wait_time = 0.1  # Check every 100ms, but only update if needed
+	display_update_timer.timeout.connect(_on_display_update_timeout)
+	display_update_timer.start()
 
 func _try_store_completed_canvas() -> bool:
 	GameState.logger.debug("Trying to store canvas: current_pixels=%d, max_pixels=%d, stored=%d, storage_level=%d" % [current_pixel_count, max_pixels, stored_canvases, canvas_storage_level])
@@ -238,6 +284,7 @@ func _try_store_completed_canvas() -> bool:
 		stored_canvases += 1
 		_initialize_new_canvas()
 		canvas_fill_timer.start()
+		display_update_timer.start()
 		canvas_storage_changed.emit(stored_canvases, canvas_storage_level)
 		GameState.logger.info("Canvas stored successfully! New count: %d/%d" % [stored_canvases, canvas_storage_level])
 		return true
@@ -253,23 +300,160 @@ func _prefill_canvas(pixels_to_fill: int) -> void:
 	var pixel_gain_bonus = CurrencyBonusManager.get_bonus_multiplier("pixel_gain")
 	var adjusted_pixels_to_fill = int(pixels_to_fill * pixel_gain_bonus)
 	
-	var filled_count = 0
-	while filled_count < adjusted_pixels_to_fill and unfilled_pixels.size() > 0:
-		var random_index = randi() % unfilled_pixels.size()
-		var pixel_pos = unfilled_pixels.pop_at(random_index)
-		
-		var alpha = snapped(randf_range(GameConfig.PIXEL_ALPHA_MIN, GameConfig.PIXEL_ALPHA_MAX), GameConfig.PIXEL_ALPHA_SNAP)
-		canvas_image.set_pixelv(pixel_pos, Color(randf(), randf(), randf(), alpha))
-		
-		filled_count += 1
+	# Use the same efficient batch filling method
+	_fill_pixels_batch(adjusted_pixels_to_fill)
+	current_pixel_count += adjusted_pixels_to_fill
 	
 	canvas_texture.set_image(canvas_image)
-	current_pixel_count = filled_count
 	canvas_updated.emit(canvas_texture)
 	canvas_progress_updated.emit(current_pixel_count, max_pixels)
 
 func _on_canvas_fill_timer_timeout() -> void:
 	_process_canvas_fill()
+
+func _on_display_update_timeout() -> void:
+	# Smart throttling - only update display when there's a meaningful change
+	var current_time = Time.get_ticks_msec() / 1000.0
+	var pixel_difference = current_pixel_count - last_displayed_pixel_count
+	var time_difference = current_time - last_display_update_time
+	
+	# Update display if:
+	# 1. Significant pixel change (threshold reached), OR
+	# 2. Enough time has passed (minimum interval), OR
+	# 3. Canvas is complete
+	var should_update = (
+		pixel_difference >= display_update_threshold or
+		time_difference >= min_display_interval or
+		current_pixel_count >= max_pixels
+	)
+	
+	if should_update:
+		canvas_progress_updated.emit(current_pixel_count, max_pixels)
+		last_displayed_pixel_count = current_pixel_count
+		last_display_update_time = current_time
+
+func _force_display_update() -> void:
+	# Force immediate display update (bypasses throttling)
+	canvas_progress_updated.emit(current_pixel_count, max_pixels)
+	last_displayed_pixel_count = current_pixel_count
+	last_display_update_time = Time.get_ticks_msec() / 1000.0
+
+func _update_throttling_parameters() -> void:
+	# Adjust throttling based on canvas size for optimal performance
+	if max_pixels <= 1024:  # Small canvas (32x32)
+		display_update_threshold = 5
+		min_display_interval = 0.3
+	elif max_pixels <= 4096:  # Medium canvas (64x64)
+		display_update_threshold = 10
+		min_display_interval = 0.5
+	elif max_pixels <= 16384:  # Large canvas (128x128)
+		display_update_threshold = 25
+		min_display_interval = 0.8
+	else:  # Very large canvas (256x256+)
+		display_update_threshold = 50
+		min_display_interval = 1.0
+	
+	GameState.logger.debug("Throttling parameters updated: threshold=%d, interval=%.1fs for %d pixels" % [display_update_threshold, min_display_interval, max_pixels])
+
+func _update_chunk_size() -> void:
+	# Ultra-large chunk sizing for high-resolution canvases
+	# Creates smooth, sweeping painting effects on large canvases
+	
+	# Special case for level 10 - exactly 512x512 chunks as requested
+	if resolution_level == 10:
+		fill_chunk_size = 512
+	elif resolution_level <= 2:  # Small canvases (32x32, 64x64)
+		fill_chunk_size = 8 * resolution_level  # 8x8, 16x16
+	elif resolution_level <= 5:  # Medium canvases (96x96 to 160x160)
+		fill_chunk_size = 16 * resolution_level  # 48x48, 64x64, 80x80
+	elif resolution_level <= 8:  # Large canvases (192x192 to 256x256)
+		fill_chunk_size = 32 * resolution_level  # 192x192, 224x224, 256x256
+	elif resolution_level <= 12:  # Very large canvases (288x288 to 384x384)
+		fill_chunk_size = 48 * resolution_level  # 480x480, 528x528, 576x576
+	else:  # Ultra large canvases (400x400+)
+		fill_chunk_size = 64 * resolution_level  # 640x640, 704x704, 768x768+
+	
+	# Cap at reasonable maximum to prevent memory issues
+	fill_chunk_size = min(fill_chunk_size, 1024)  # Max 1024x1024 chunks
+	
+	# Ensure minimum chunk size
+	fill_chunk_size = max(fill_chunk_size, 8)
+	
+	GameState.logger.debug("Ultra chunk size updated: %dx%d for %d pixels (resolution level %d)" % [fill_chunk_size, fill_chunk_size, max_pixels, resolution_level])
+
+func _fill_pixels_batch(pixel_count: int) -> void:
+	# Creative chunk-based filling - much more efficient!
+	if pixel_count <= 0:
+		return
+	
+	var width = GameConfig.BASE_CANVAS_SIZE * resolution_level
+	var height = GameConfig.BASE_CANVAS_SIZE * resolution_level
+	var chunks_x = (width + fill_chunk_size - 1) / fill_chunk_size
+	var chunks_y = (height + fill_chunk_size - 1) / fill_chunk_size
+	
+	var pixels_filled = 0
+	var pixels_to_fill = pixel_count
+	
+	# Fill chunks progressively instead of random pixels
+	while pixels_filled < pixels_to_fill and current_pixel_count < max_pixels:
+		# Calculate how many pixels to fill in current chunk
+		var chunk_pixels_remaining = fill_chunk_size * fill_chunk_size - int(chunk_fill_progress * fill_chunk_size * fill_chunk_size)
+		var pixels_in_this_chunk = min(pixels_to_fill - pixels_filled, chunk_pixels_remaining)
+		
+		if pixels_in_this_chunk > 0:
+			# Fill the current chunk
+			var filled_in_chunk = _fill_current_chunk(pixels_in_this_chunk, width, height)
+			pixels_filled += filled_in_chunk
+			chunk_fill_progress += float(filled_in_chunk) / (fill_chunk_size * fill_chunk_size)
+		
+		# Move to next chunk if current one is complete
+		if chunk_fill_progress >= 1.0:
+			chunk_fill_progress = 0.0
+			current_chunk_x += 1
+			if current_chunk_x >= chunks_x:
+				current_chunk_x = 0
+				current_chunk_y += 1
+				if current_chunk_y >= chunks_y:
+					# All chunks filled, start over (shouldn't happen normally)
+					current_chunk_x = 0
+					current_chunk_y = 0
+	
+	# Update texture only once per batch
+	canvas_texture.update(canvas_image)
+
+func _fill_current_chunk(pixel_count: int, width: int, height: int) -> int:
+	# Fill pixels in the current chunk using a pattern-based approach
+	var start_x = current_chunk_x * fill_chunk_size
+	var start_y = current_chunk_y * fill_chunk_size
+	var end_x = min(start_x + fill_chunk_size, width)
+	var end_y = min(start_y + fill_chunk_size, height)
+	
+	var pixels_filled = 0
+	var pattern_seed = current_chunk_x * 1000 + current_chunk_y  # Deterministic but varied
+	
+	# Use a simple pattern to fill pixels (much faster than random)
+	for y in range(start_y, end_y):
+		for x in range(start_x, end_x):
+			if pixels_filled >= pixel_count:
+				break
+				
+			# Check if pixel is already filled
+			var current_color = canvas_image.get_pixelv(Vector2i(x, y))
+			if current_color.a < 0.1:  # Nearly transparent = unfilled
+				# Generate pseudo-random color based on position and seed
+				var pseudo_rand = sin(x * 0.1 + y * 0.1 + pattern_seed) * 1000
+				var r = fmod(abs(pseudo_rand), 1.0)
+				var g = fmod(abs(pseudo_rand * 1.618), 1.0)  # Golden ratio for variety
+				var b = fmod(abs(pseudo_rand * 2.718), 1.0)  # Euler's number for variety
+				var alpha = snapped(randf_range(GameConfig.PIXEL_ALPHA_MIN, GameConfig.PIXEL_ALPHA_MAX), GameConfig.PIXEL_ALPHA_SNAP)
+				
+				canvas_image.set_pixelv(Vector2i(x, y), Color(r, g, b, alpha))
+				pixels_filled += 1
+		
+		if pixels_filled >= pixel_count:
+			break
+	
+	return pixels_filled
 
 func _process_canvas_fill() -> void:
 	if current_pixel_count >= max_pixels:
@@ -277,6 +461,11 @@ func _process_canvas_fill() -> void:
 			return
 
 		canvas_fill_timer.stop()
+		display_update_timer.stop()
+		
+		# Force immediate display update for completion
+		_force_display_update()
+		
 		GameState.logger.debug("Canvas completed! Attempting to store...")
 		
 		if not _try_store_completed_canvas():
@@ -290,22 +479,17 @@ func _process_canvas_fill() -> void:
 	var pixels_to_fill = int(base_pixels_to_fill * pixel_gain_bonus)  # Apply pixel gain bonus
 	
 	# S'assurer qu'on ne dépasse pas le maximum
-	var max_possible = min(pixels_to_fill, unfilled_pixels.size(), max_pixels - current_pixel_count)
+	var unfilled_count = max_pixels - current_pixel_count
+	var max_possible = min(pixels_to_fill, unfilled_count)
 	
 	# Debug logging for pixel filling
 	if current_pixel_count % 100 == 0:  # Log every 100 pixels to avoid spam
 		GameState.logger.debug("Canvas filling: pixels_per_tick=%d, pixel_gain_bonus=%.2f, pixels_to_fill=%d, max_possible=%d, current=%d/%d" % [pixels_per_tick, pixel_gain_bonus, pixels_to_fill, max_possible, current_pixel_count, max_pixels])
 	
-	for i in range(max_possible):
-		var random_index = randi() % unfilled_pixels.size()
-		var pixel_pos = unfilled_pixels.pop_at(random_index)
-		
-		var alpha = snapped(randf_range(GameConfig.PIXEL_ALPHA_MIN, GameConfig.PIXEL_ALPHA_MAX), GameConfig.PIXEL_ALPHA_SNAP)
-		canvas_image.set_pixelv(pixel_pos, Color(randf(), randf(), randf(), alpha))
-	
-	canvas_texture.update(canvas_image)
+	# Optimized pixel filling - batch operations for better performance
+	_fill_pixels_batch(max_possible)
 	current_pixel_count += max_possible
-	canvas_progress_updated.emit(current_pixel_count, max_pixels)
+	# Note: Progress updates are now handled by the display_update_timer for better performance
 
 func _update_fill_speed() -> void:
 	# Balanced scaling: logarithmic improvement that feels impactful but not overpowered
@@ -345,6 +529,7 @@ func _update_fill_speed() -> void:
 	# Start timer if it's not running
 	if canvas_fill_timer.is_stopped():
 		canvas_fill_timer.start()
+		display_update_timer.start()
 	
 	# Emit speed change signal
 	var speed_info = get_fill_speed_info()

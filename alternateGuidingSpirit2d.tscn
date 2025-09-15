@@ -53,7 +53,7 @@ _data = {
 [node name="ParallaxLayer2" type="ParallaxLayer" parent="ParallaxBackground"]
 
 [node name="FloatingSky" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer2"]
-position = Vector2(986, 266)
+position = Vector2(986, 280)
 scale = Vector2(0.635212, 0.635212)
 texture = ExtResource("1_w3135")
 
@@ -62,6 +62,7 @@ root_node = NodePath("../../..")
 libraries = {
 &"": SubResource("AnimationLibrary_800wt")
 }
+autoplay = "FloatingSky"
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 

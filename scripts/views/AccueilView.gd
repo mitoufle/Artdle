@@ -126,12 +126,16 @@ func _get_click_power_prices(level: int) -> Dictionary:
 	# Utiliser la même logique que ClickerManager
 	var base_cost = GameConfig.CLICK_POWER_UPGRADE_COST
 	var cost = int(base_cost * pow(1.5, level))  # Multiplicateur standard
+	# Prevent negative prices due to integer overflow
+	cost = max(cost, 1)
 	return {"gold": cost}
 
 func _get_autoclick_prices(level: int) -> Dictionary:
 	# Utiliser la même logique que ClickerManager
 	var base_cost = GameConfig.AUTOCLICK_SPEED_UPGRADE_COST
 	var cost = int(base_cost * pow(1.5, level))  # Multiplicateur standard
+	# Prevent negative prices due to integer overflow
+	cost = max(cost, 1)
 	return {"gold": cost}
 
 func _get_current_click_interval() -> float:

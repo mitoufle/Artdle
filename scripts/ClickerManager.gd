@@ -174,8 +174,8 @@ func set_click_power(value: float) -> void:
 ## Définit la vitesse d'autoclick (pour le système de sauvegarde)
 func set_autoclick_speed(value: float) -> void:
 	autoclick_speed = value
-	if autoclick_timer:
-		autoclick_timer.wait_time = 1.0 / autoclick_speed
+	_update_autoclick_timer()
+	_emit_click_stats()
 
 func _emit_click_stats() -> void:
 	click_stats_changed.emit(get_click_stats())
