@@ -10,6 +10,7 @@ class_name PaintingView
 const CANVAS_POPUP_SCENE = preload("res://Scenes/CanvasPopup.tscn")
 const INVENTORY_POPUP_SCENE = preload("res://Scenes/InventoryPopup.tscn")
 const CRAFT_POPUP_SCENE = preload("res://Scenes/CraftPopup.tscn")
+const PAINTER_OFFICE_POPUP_SCENE = preload("res://Scenes/PainterOfficePopup.tscn")
 const CurrencyBonusManager = preload("res://scripts/CurrencyBonusManager.gd")
 const DEBUG_CURRENCY_AMOUNT = 100000000
 
@@ -29,6 +30,7 @@ var atelier_cost: int = ATELIER_BASE_COST
 #==============================================================================
 var inventory_popup_instance: InventoryPopup
 var craft_popup_instance: CraftPopup
+var painter_office_popup_instance: PopupPanel
 
 #==============================================================================
 # UI References
@@ -43,6 +45,7 @@ var canvas_popup_instance: PopupPanel
 # Inventory & Craft UI (boutons pour ouvrir les modales)
 @onready var btn_inventory: Button = $BtnInventory if has_node("BtnInventory") else null
 @onready var btn_craft: Button = $BtnCraft if has_node("BtnCraft") else null
+@onready var btn_painter_office: Button = $BtnPainterOffice if has_node("BtnPainterOffice") else null
 
 #==============================================================================
 # Godot Lifecycle
@@ -72,6 +75,8 @@ func _connect_view_signals() -> void:
 		btn_inventory.pressed.connect(_on_inventory_pressed)
 	if btn_craft and not btn_craft.pressed.is_connected(_on_craft_pressed):
 		btn_craft.pressed.connect(_on_craft_pressed)
+	if btn_painter_office and not btn_painter_office.pressed.is_connected(_on_painter_office_pressed):
+		btn_painter_office.pressed.connect(_on_painter_office_pressed)
 	
 	# Connecter les signaux du craft manager
 	if not GameState.craft_manager.craft_completed.is_connected(_on_craft_completed):
@@ -92,6 +97,11 @@ func _initialize_ui() -> void:
 	craft_popup_instance = CRAFT_POPUP_SCENE.instantiate()
 	craft_popup_instance.hide()
 	add_child(craft_popup_instance)
+	
+	# Initialize painter office popup
+	painter_office_popup_instance = PAINTER_OFFICE_POPUP_SCENE.instantiate()
+	painter_office_popup_instance.hide()
+	add_child(painter_office_popup_instance)
 	
 	# Center camera - wait for next frame to ensure nodes are ready
 	call_deferred("center_camera_in_child", paintingscreen_instance)
@@ -157,6 +167,14 @@ func _on_craft_completed(item: InventoryManager.Item) -> void:
 	
 	# Feedback visuel
 	GameState.feedback_manager.show_feedback("Item créé: %s (+%d XP)" % [item.name, xp_gained], Color.GREEN)
+
+func _on_painter_office_pressed() -> void:
+	if not painter_office_popup_instance:
+		print("⚠️ Painter Office popup non disponible")
+		return
+	
+	painter_office_popup_instance.popup()
+	GameState.logger.info("Painter Office popup opened", "PaintingView")
 
 #==============================================================================
 # Public API

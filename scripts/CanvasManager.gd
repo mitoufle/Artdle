@@ -247,6 +247,18 @@ func add_painting_gain_multiplier(multiplier: float) -> void:
 	# Cette méthode sera utilisée pour augmenter les gains de peinture
 	GameState.logger.info("Painting gain multiplier increased by %.1f%%" % (multiplier * 100))
 
+## Ajoute un bonus permanent de vitesse de remplissage (pour les jobs)
+func add_fill_speed_bonus(bonus: float) -> void:
+	# This will be implemented to add permanent fill speed bonuses
+	if GameState.logger:
+		GameState.logger.info("Permanent canvas fill speed bonus: +%.1f%%" % (bonus * 100))
+
+## Ajoute un bonus permanent de stockage (pour les jobs)
+func add_storage_bonus(bonus: float) -> void:
+	# This will be implemented to add permanent storage bonuses
+	if GameState.logger:
+		GameState.logger.info("Permanent canvas storage bonus: +%.1f%%" % (bonus * 100))
+
 ## Débloque le stockage de canvas (pour les skills)
 func unlock_canvas_storage() -> void:
 	# Cette méthode sera utilisée pour débloquer le stockage

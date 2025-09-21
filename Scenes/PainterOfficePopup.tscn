@@ -1,0 +1,92 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8x7lam2n3p4q"]
+
+[ext_resource type="Script" uid="uid://dmooxqkfwxqy4" path="res://scripts/PainterOfficePopup.gd" id="1_office"]
+[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_theme"]
+
+[node name="PainterOfficePopup" type="PopupPanel"]
+title = "Painter Office"
+initial_position = 2
+size = Vector2i(900, 700)
+visible = true
+theme = ExtResource("2_theme")
+script = ExtResource("1_office")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 895.0
+offset_bottom = 695.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBoxContainer/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Painter Office"
+
+[node name="OfficeCurrency" type="Label" parent="VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Office Currency: 1000"
+horizontal_alignment = 2
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Workers" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
+layout_mode = 2
+metadata/_tab_title = "Workers"
+metadata/_tab_index = 0
+
+[node name="HireSection" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers"]
+layout_mode = 2
+
+[node name="HireLabel" type="Label" parent="VBoxContainer/TabContainer/Workers/HireSection"]
+layout_mode = 2
+text = "Hire Workers"
+
+[node name="WorkerTiersContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers/HireSection"]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer/TabContainer/Workers"]
+layout_mode = 2
+
+[node name="CurrentWorkersSection" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers"]
+layout_mode = 2
+
+[node name="CurrentWorkersLabel" type="Label" parent="VBoxContainer/TabContainer/Workers/CurrentWorkersSection"]
+layout_mode = 2
+text = "Current Workers"
+
+[node name="WorkersList" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers/CurrentWorkersSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Jobs" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_title = "Jobs"
+metadata/_tab_index = 1
+
+[node name="AvailableJobsLabel" type="Label" parent="VBoxContainer/TabContainer/Jobs"]
+layout_mode = 2
+text = "Available Jobs"
+
+[node name="JobsList" type="VBoxContainer" parent="VBoxContainer/TabContainer/Jobs"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CloseButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Close"

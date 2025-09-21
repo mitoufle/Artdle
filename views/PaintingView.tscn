@@ -65,6 +65,17 @@ offset_bottom = 175.0
 size_flags_horizontal = 0
 text = "Workshop"
 
+[node name="BtnPainterOffice" type="Button" parent="."]
+z_index = 2
+layout_mode = 2
+offset_left = 200.0
+offset_top = 50.0
+offset_right = 350.0
+offset_bottom = 80.0
+size_flags_horizontal = 0
+text = "Painter Office"
+
 [connection signal="pressed" from="Debug" to="." method="_on_debug_pressed"]
 [connection signal="pressed" from="BtnInventory" to="." method="_on_inventory_pressed"]
 [connection signal="pressed" from="BtnCraft" to="." method="_on_craft_pressed"]
+[connection signal="pressed" from="BtnPainterOffice" to="." method="_on_painter_office_pressed"]

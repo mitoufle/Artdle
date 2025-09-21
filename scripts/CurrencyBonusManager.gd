@@ -219,3 +219,15 @@ static func format_bonus_info(currency_type: String) -> String:
 		return "%.1fx bonus" % multiplier
 	else:
 		return "%.1fx bonus" % multiplier
+
+## Ajoute un bonus permanent de gain de renommée (pour les jobs)
+func add_fame_gain_bonus(bonus: float) -> void:
+	# This will be implemented to add permanent fame gain bonuses
+	if GameState.logger:
+		GameState.logger.info("Permanent fame gain bonus: +%.1f%%" % (bonus * 100))
+
+## Ajoute un bonus permanent de gain d'ascension (pour les jobs)
+func add_ascendancy_gain_bonus(bonus: float) -> void:
+	# This will be implemented to add permanent ascendancy gain bonuses
+	if GameState.logger:
+		GameState.logger.info("Permanent ascendancy gain bonus: +%.1f%%" % (bonus * 100))

@@ -267,6 +267,12 @@ func get_tier_chances() -> Dictionary:
 func get_craft_cost(item_type: InventoryManager.ItemType, quantity: int = 1) -> int:
 	return _calculate_craft_cost(item_type, quantity)
 
+## Ajoute un bonus permanent de vitesse d'atelier (pour les jobs)
+func add_workshop_speed_bonus(bonus: float) -> void:
+	# This will be implemented to add permanent workshop speed bonuses
+	if GameState.logger:
+		GameState.logger.info("Permanent workshop speed bonus: +%.1f%%" % (bonus * 100))
+
 ## Récupère la durée de craft d'un item
 func get_craft_duration(item_type: InventoryManager.ItemType, quantity: int = 1) -> float:
 	return _calculate_craft_duration(item_type, quantity)

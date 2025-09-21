@@ -129,6 +129,7 @@ var skill_tree_manager: SkillTreeManager
 var passive_income_manager: PassiveIncomeManager
 var inventory_manager: InventoryManager
 var craft_manager: CraftManager
+var worker_manager: WorkerManager
 var data_validator: DataValidator
 var logger: GameLogger
 var save_manager: SaveManager
@@ -359,6 +360,7 @@ func _initialize_managers() -> void:
 	passive_income_manager = PassiveIncomeManager.new()
 	inventory_manager = InventoryManager.new()
 	craft_manager = CraftManager.new()
+	worker_manager = WorkerManager.new()
 	data_validator = DataValidator.new()
 	logger = GameLogger.new()
 	save_manager = SaveManager.new()
@@ -374,6 +376,7 @@ func _initialize_managers() -> void:
 	add_child(passive_income_manager)
 	add_child(inventory_manager)
 	add_child(craft_manager)
+	add_child(worker_manager)
 	add_child(data_validator)
 	add_child(logger)
 	add_child(save_manager)

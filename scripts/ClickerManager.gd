@@ -156,6 +156,18 @@ func upgrade_autoclick_speed_multiplier(amount: float) -> void:
 func get_autoclick_speed_multiplier() -> float:
 	return autoclick_speed_multiplier
 
+## Ajoute un bonus permanent de puissance de clic (pour les jobs)
+func add_click_power_bonus(bonus: float) -> void:
+	# This will be implemented to add permanent click power bonuses
+	if GameState.logger:
+		GameState.logger.info("Permanent click power bonus: +%.1f%%" % (bonus * 100))
+
+## Ajoute un bonus permanent de vitesse d'autoclick (pour les jobs)
+func add_autoclick_speed_bonus(bonus: float) -> void:
+	# This will be implemented to add permanent autoclick speed bonuses
+	if GameState.logger:
+		GameState.logger.info("Permanent autoclick speed bonus: +%.1f%%" % (bonus * 100))
+
 ## Définit le multiplicateur de vitesse d'autoclick (pour la sauvegarde)
 func set_autoclick_speed_multiplier(value: float) -> void:
 	autoclick_speed_multiplier = value
