@@ -183,7 +183,10 @@ func upgrade_resolution() -> bool:
 	
 	# Calculate how many pixels to prefill based on completion percentage
 	var pixels_to_prefill = int(completion_percentage * max_pixels)
-	_prefill_canvas(pixels_to_prefill)
+	
+	# Safety check - only prefill if we have a reasonable amount to prefill
+	if pixels_to_prefill > 0 and pixels_to_prefill <= max_pixels:
+		_prefill_canvas(pixels_to_prefill)
 	
 	GameState.logger.info("Resolution upgraded: %d%% completion preserved (%d/%d -> %d/%d pixels)" % [int(completion_percentage * 100), current_pixel_count, old_max_pixels, pixels_to_prefill, max_pixels])
 	_emit_upgrade_costs()
@@ -308,9 +311,24 @@ func _try_store_completed_canvas() -> bool:
 	return false
 
 func _prefill_canvas(pixels_to_fill: int) -> void:
+	# Safety check - don't prefill if pixels_to_fill is invalid
+	if pixels_to_fill <= 0:
+		return
+	
+	# Safety check - don't prefill more than the canvas can hold
+	var max_possible = max_pixels - current_pixel_count
+	if pixels_to_fill > max_possible:
+		pixels_to_fill = max_possible
+	
 	# Appliquer le bonus de gain de pixels
 	var pixel_gain_bonus = CurrencyBonusManager.get_bonus_multiplier("pixel_gain")
 	var adjusted_pixels_to_fill = int(pixels_to_fill * pixel_gain_bonus)
+	
+	# Additional safety check after bonus calculation
+	adjusted_pixels_to_fill = max(0, min(adjusted_pixels_to_fill, max_possible))
+	
+	if adjusted_pixels_to_fill <= 0:
+		return
 	
 	# Use the same efficient batch filling method
 	_fill_pixels_batch(adjusted_pixels_to_fill)
@@ -395,6 +413,14 @@ func _update_chunk_size() -> void:
 
 func _fill_pixels_batch(pixel_count: int) -> void:
 	# Creative chunk-based filling - much more efficient!
+	if pixel_count <= 0:
+		return
+	
+	# Safety check - don't fill more than possible
+	var max_possible = max_pixels - current_pixel_count
+	if pixel_count > max_possible:
+		pixel_count = max_possible
+	
 	if pixel_count <= 0:
 		return
 	

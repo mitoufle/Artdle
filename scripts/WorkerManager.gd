@@ -321,24 +321,9 @@ func _apply_job_bonuses(job: Job):
 		_apply_permanent_bonus(stat, bonus)
 
 func _apply_permanent_bonus(stat: String, bonus: float):
-	# Apply bonuses to appropriate managers
-	match stat:
-		"canvas_fill_speed":
-			GameState.canvas_manager.add_fill_speed_bonus(bonus)
-		"pixel_gain":
-			GameState.currency_bonus_manager.add_pixel_gain_bonus(bonus)
-		"autoclick_power":
-			GameState.clicker_manager.add_click_power_bonus(bonus)
-		"autoclick_speed":
-			GameState.clicker_manager.add_autoclick_speed_bonus(bonus)
-		"workshop_speed":
-			GameState.craft_manager.add_workshop_speed_bonus(bonus)
-		"canvas_storage":
-			GameState.canvas_manager.add_storage_bonus(bonus)
-		"fame_gain":
-			GameState.currency_bonus_manager.add_fame_gain_bonus(bonus)
-		"ascendancy_gain":
-			GameState.currency_bonus_manager.add_ascendancy_gain_bonus(bonus)
+	# Apply bonuses through the inventory manager's permanent bonus system
+	# This integrates with the existing item bonus system
+	GameState.inventory_manager.add_permanent_bonus(stat, bonus)
 
 #==============================================================================
 # Utility Functions

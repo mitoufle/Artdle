@@ -12,6 +12,11 @@ signal item_unequipped(slot: String, item: Item)
 signal inventory_changed()
 
 #==============================================================================
+# Permanent Bonuses (from jobs, etc.)
+#==============================================================================
+var permanent_bonuses: Dictionary = {}
+
+#==============================================================================
 # Item System
 #==============================================================================
 enum ItemTier {
@@ -251,17 +256,33 @@ func get_items_by_tier(tier: ItemTier) -> Array[Item]:
 func get_total_bonuses() -> Dictionary:
 	var total_bonuses = {}
 	
+	# Add equipped item bonuses
 	for item in equipped_items.values():
 		for stat_name in item.stats.keys():
 			if not total_bonuses.has(stat_name):
 				total_bonuses[stat_name] = 1.0
 			total_bonuses[stat_name] *= item.stats[stat_name]
 	
+	# Add permanent bonuses (from jobs, etc.)
+	for stat_name in permanent_bonuses.keys():
+		if not total_bonuses.has(stat_name):
+			total_bonuses[stat_name] = 1.0
+		total_bonuses[stat_name] *= permanent_bonuses[stat_name]
+	
 	# Log pour debug
 	if total_bonuses.size() > 0:
 		GameState.logger.debug("Total bonuses calculated: %s" % total_bonuses)
 	
 	return total_bonuses
+
+## Ajoute un bonus permanent (pour les jobs, etc.)
+func add_permanent_bonus(stat_name: String, bonus: float) -> void:
+	if not permanent_bonuses.has(stat_name):
+		permanent_bonuses[stat_name] = 1.0
+	permanent_bonuses[stat_name] *= (1.0 + bonus)  # Additive bonus
+	
+	if GameState.logger:
+		GameState.logger.info("Permanent bonus added: %s +%.1f%% (total: %.1fx)" % [stat_name, bonus * 100, permanent_bonuses[stat_name]])
 
 ## Réinitialise l'inventaire
 func reset_inventory() -> void:

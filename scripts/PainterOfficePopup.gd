@@ -6,9 +6,9 @@ extends PopupPanel
 # UI References
 #==============================================================================
 @onready var office_currency_label: Label = $VBoxContainer/Header/OfficeCurrency
-@onready var worker_tiers_container: VBoxContainer = $VBoxContainer/TabContainer/Workers/HireSection/WorkerTiersContainer
-@onready var workers_list: VBoxContainer = $VBoxContainer/TabContainer/Workers/CurrentWorkersSection/WorkersList
-@onready var jobs_list: VBoxContainer = $VBoxContainer/TabContainer/Jobs/JobsList
+@onready var worker_tiers_container: VBoxContainer = $VBoxContainer/ScrollContainer/TabContainer/Workers/HireSection/WorkerTiersContainer
+@onready var workers_list: VBoxContainer = $VBoxContainer/ScrollContainer/TabContainer/Workers/CurrentWorkersSection/WorkersList
+@onready var jobs_list: VBoxContainer = $VBoxContainer/ScrollContainer/TabContainer/Jobs/JobsList
 @onready var close_button: Button = $VBoxContainer/CloseButton
 
 #==============================================================================
@@ -16,6 +16,8 @@ extends PopupPanel
 #==============================================================================
 var worker_ui_elements: Array[Control] = []
 var job_ui_elements: Array[Control] = []
+var current_worker_for_assignment: WorkerManager.Worker = null
+var job_selection_popup: PopupPanel = null
 
 #==============================================================================
 # Godot Lifecycle
@@ -207,21 +209,8 @@ func _on_hire_worker_pressed(tier_index: int):
 			GameState.logger.warning("Failed to hire worker - insufficient currency or max workers reached")
 
 func _on_assign_job_pressed(worker: WorkerManager.Worker):
-	# Simple job assignment - assign to first available job
-	var available_jobs = GameState.worker_manager.get_available_jobs_for_worker(worker)
-	if available_jobs.size() > 0:
-		var job = available_jobs[0]  # Assign to first available job
-		var success = GameState.worker_manager.assign_worker_to_job(worker, job)
-		if success:
-			if GameState.logger:
-				GameState.logger.info("Assigned %s to %s" % [worker.name, job.job_name])
-			_update_workers_display()
-		else:
-			if GameState.logger:
-				GameState.logger.warning("Failed to assign job")
-	else:
-		if GameState.logger:
-			GameState.logger.warning("No available jobs for this worker")
+	# Show job selection dialog
+	_show_job_selection_dialog(worker)
 
 func _on_fire_worker_pressed(worker: WorkerManager.Worker):
 	var success = GameState.worker_manager.fire_worker(worker)
@@ -231,3 +220,76 @@ func _on_fire_worker_pressed(worker: WorkerManager.Worker):
 	else:
 		if GameState.logger:
 			GameState.logger.warning("Failed to fire worker")
+
+#==============================================================================
+# Job Selection Dialog
+#==============================================================================
+func _show_job_selection_dialog(worker: WorkerManager.Worker):
+	current_worker_for_assignment = worker
+	var available_jobs = GameState.worker_manager.get_available_jobs_for_worker(worker)
+	
+	if available_jobs.size() == 0:
+		if GameState.logger:
+			GameState.logger.warning("No available jobs for this worker")
+		return
+	
+	# Create job selection popup
+	job_selection_popup = PopupPanel.new()
+	job_selection_popup.size = Vector2i(400, 300)
+	job_selection_popup.initial_position = 2  # Center on screen
+	add_child(job_selection_popup)
+	
+	var vbox = VBoxContainer.new()
+	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 10)
+	job_selection_popup.add_child(vbox)
+	
+	# Title
+	var title_label = Label.new()
+	title_label.text = "Assign Job to %s" % worker.name
+	title_label.add_theme_font_size_override("font_size", 18)
+	vbox.add_child(title_label)
+	
+	var separator = HSeparator.new()
+	vbox.add_child(separator)
+	
+	# Job options
+	for job in available_jobs:
+		var job_button = Button.new()
+		var duration_hours = job.base_duration / 3600.0  # Convert seconds to hours
+		job_button.text = "%s\nDuration: %.1f hours\nReward: %s office currency" % [
+			job.job_name, 
+			duration_hours,
+			BigNumberManager.format_number(job.base_reward)
+		]
+		job_button.pressed.connect(_on_job_selected.bind(job))
+		vbox.add_child(job_button)
+	
+	# Cancel button
+	var cancel_button = Button.new()
+	cancel_button.text = "Cancel"
+	cancel_button.pressed.connect(_on_job_selection_cancelled)
+	vbox.add_child(cancel_button)
+	
+	job_selection_popup.popup()
+
+func _on_job_selected(job: WorkerManager.Job):
+	if current_worker_for_assignment == null:
+		return
+	
+	var success = GameState.worker_manager.assign_worker_to_job(current_worker_for_assignment, job)
+	if success:
+		if GameState.logger:
+			GameState.logger.info("Assigned %s to %s" % [current_worker_for_assignment.name, job.job_name])
+		_update_workers_display()
+	
+	_close_job_selection_dialog()
+
+func _on_job_selection_cancelled():
+	_close_job_selection_dialog()
+
+func _close_job_selection_dialog():
+	if job_selection_popup:
+		job_selection_popup.queue_free()
+		job_selection_popup = null
+	current_worker_for_assignment = null

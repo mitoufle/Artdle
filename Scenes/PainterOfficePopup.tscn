@@ -39,51 +39,56 @@ horizontal_alignment = 2
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TabContainer" type="TabContainer" parent="VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="Workers" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
+[node name="Workers" type="VBoxContainer" parent="VBoxContainer/ScrollContainer/TabContainer"]
 layout_mode = 2
 metadata/_tab_title = "Workers"
 metadata/_tab_index = 0
 
-[node name="HireSection" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers"]
+[node name="HireSection" type="VBoxContainer" parent="VBoxContainer/ScrollContainer/TabContainer/Workers"]
 layout_mode = 2
 
-[node name="HireLabel" type="Label" parent="VBoxContainer/TabContainer/Workers/HireSection"]
+[node name="HireLabel" type="Label" parent="VBoxContainer/ScrollContainer/TabContainer/Workers/HireSection"]
 layout_mode = 2
 text = "Hire Workers"
 
-[node name="WorkerTiersContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers/HireSection"]
+[node name="WorkerTiersContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer/TabContainer/Workers/HireSection"]
 layout_mode = 2
 
-[node name="HSeparator2" type="HSeparator" parent="VBoxContainer/TabContainer/Workers"]
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer/ScrollContainer/TabContainer/Workers"]
 layout_mode = 2
 
-[node name="CurrentWorkersSection" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers"]
+[node name="CurrentWorkersSection" type="VBoxContainer" parent="VBoxContainer/ScrollContainer/TabContainer/Workers"]
 layout_mode = 2
 
-[node name="CurrentWorkersLabel" type="Label" parent="VBoxContainer/TabContainer/Workers/CurrentWorkersSection"]
+[node name="CurrentWorkersLabel" type="Label" parent="VBoxContainer/ScrollContainer/TabContainer/Workers/CurrentWorkersSection"]
 layout_mode = 2
 text = "Current Workers"
 
-[node name="WorkersList" type="VBoxContainer" parent="VBoxContainer/TabContainer/Workers/CurrentWorkersSection"]
+[node name="WorkersList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer/TabContainer/Workers/CurrentWorkersSection"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Jobs" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
+[node name="Jobs" type="VBoxContainer" parent="VBoxContainer/ScrollContainer/TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_title = "Jobs"
 metadata/_tab_index = 1
 
-[node name="AvailableJobsLabel" type="Label" parent="VBoxContainer/TabContainer/Jobs"]
+[node name="AvailableJobsLabel" type="Label" parent="VBoxContainer/ScrollContainer/TabContainer/Jobs"]
 layout_mode = 2
 text = "Available Jobs"
 
-[node name="JobsList" type="VBoxContainer" parent="VBoxContainer/TabContainer/Jobs"]
+[node name="JobsList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer/TabContainer/Jobs"]
 layout_mode = 2
 size_flags_vertical = 3
 
