@@ -2,7 +2,7 @@ extends GutTest
 
 func test_stage_0_is_seed():
     var s = TreeStages.get_stage(0)
-    assert_ne(s, null)
+    assert_true(not s.is_empty())
     assert_eq(s["name"], "Pousse")
 
 func test_stage_count_at_least_5():

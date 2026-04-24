@@ -2,7 +2,7 @@ extends GutTest
 
 func test_tier_1_exists():
     var t = CanvasTiers.get_tier(1)
-    assert_ne(t, null)
+    assert_true(not t.is_empty())
     assert_eq(t["tier"], 1)
 
 func test_tier_gold_value_increases():

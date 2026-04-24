@@ -5,6 +5,11 @@ var currency: Currency
 func before_each():
 	currency = Currency.new()
 
+func after_each():
+	if currency != null:
+		currency.free()
+		currency = null
+
 func test_initial_zero():
 	assert_eq(currency.get_amount("inspiration").value, 0.0)
 	assert_eq(currency.get_amount("gold").value, 0.0)
@@ -56,3 +61,4 @@ func test_serialize_roundtrip():
 	fresh.deserialize(data)
 	assert_eq(fresh.get_amount("gold").value, 1234.0)
 	assert_eq(fresh.get_amount("fame").value, 5.0)
+	fresh.free()
