@@ -1,181 +1,30 @@
-[gd_scene load_steps=4 format=3 uid="uid://bde7a8f8d7raj"]
+[gd_scene load_steps=2 format=3 uid="uid://bde7a8f8d7raj"]
 
-[ext_resource type="Script" uid="uid://bk8as12h6mnvj" path="res://scripts/CraftPopup.gd" id="1_script"]
-[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_theme"]
-[ext_resource type="PackedScene" uid="uid://bkgb4hj8jgffa" path="res://Scenes/UpgradeButton.tscn" id="3_upgrade_btn"]
+[ext_resource type="Script" path="res://scripts/ui/popups/CraftPopup.gd" id="1_craftpopup"]
 
 [node name="CraftPopup" type="PopupPanel"]
-title = "Craft Workshop"
-initial_position = 2
-size = Vector2i(600, 692)
-visible = true
-theme = ExtResource("2_theme")
-script = ExtResource("1_script")
+title = "Atelier — Craft"
+size = Vector2i(400, 300)
+script = ExtResource("1_craftpopup")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 595.0
-offset_bottom = 687.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MarginContainer" type="MarginContainer" parent="."]
+offset_right = 400.0
+offset_bottom = 300.0
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-text = "Craft Workshop"
-horizontal_alignment = 1
-
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="WorkshopInfoPanel" type="Panel" parent="VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 0
+text = "Atelier — Craft"
 
-[node name="WorkshopHBox2" type="HBoxContainer" parent="VBoxContainer/WorkshopInfoPanel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -107.0
-offset_top = 68.0
-offset_right = 108.0
-offset_bottom = 93.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TierChancesLabel" type="Label" parent="VBoxContainer/WorkshopInfoPanel/WorkshopHBox2"]
+[node name="RecipeList" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 0
-text = "Tier Chances:  Normal 100%"
 
-[node name="WorkshopHBox" type="HBoxContainer" parent="VBoxContainer/WorkshopInfoPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -4.0
-offset_right = -309.0
-offset_bottom = 68.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="UpgradeButton" parent="VBoxContainer/WorkshopInfoPanel/WorkshopHBox" instance=ExtResource("3_upgrade_btn")]
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-upgrade_type = "workshop"
-level_prefix = "Workshop"
-
-[node name="WorkshopHBox3" type="HBoxContainer" parent="VBoxContainer/WorkshopInfoPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -35.0
-offset_right = -375.0
-offset_bottom = -10.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="LevelLabel" type="Label" parent="VBoxContainer/WorkshopInfoPanel/WorkshopHBox3"]
-layout_mode = 2
-text = "Workshop Level: 1"
-
-[node name="CurrentCraftPanel" type="Panel" parent="VBoxContainer"]
-visible = false
-layout_mode = 2
-size_flags_vertical = 0
-
-[node name="CraftVBox" type="VBoxContainer" parent="VBoxContainer/CurrentCraftPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 101.0
-offset_bottom = 217.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="InfoLabel" type="Label" parent="VBoxContainer/CurrentCraftPanel/CraftVBox"]
-layout_mode = 2
-text = "Crafting: Hat x1"
-
-[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer/CurrentCraftPanel/CraftVBox"]
-layout_mode = 2
-value = 50.0
-
-[node name="CancelButton" type="Button" parent="VBoxContainer/CurrentCraftPanel/CraftVBox"]
-layout_mode = 2
-text = "Cancel Craft"
-
-[node name="CraftItemsPanel" type="Panel" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 250)
-layout_mode = 2
-size_flags_vertical = 10
-
-[node name="CraftedItemVBox" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="CraftedItemTitle" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox"]
-layout_mode = 2
-text = "Last Crafted Item"
-horizontal_alignment = 1
-
-[node name="CraftedItemName" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox"]
-layout_mode = 2
-text = "No item crafted yet"
-horizontal_alignment = 1
-
-[node name="CraftedItemStats" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="CraftedItemTier" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats"]
-layout_mode = 2
-text = "Tier: -"
-horizontal_alignment = 1
-
-[node name="CraftedItemType" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats"]
-layout_mode = 2
-text = "Type: -"
-horizontal_alignment = 1
-
-[node name="CraftedItemBonuses" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="CraftedItemBonusesTitle" type="Label" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats/CraftedItemBonuses"]
-layout_mode = 2
-text = "Bonuses:"
-horizontal_alignment = 1
-
-[node name="CraftedItemBonusesList" type="VBoxContainer" parent="VBoxContainer/CraftItemsPanel/CraftedItemVBox/CraftedItemStats/CraftedItemBonuses"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="CraftButton" type="Button" parent="VBoxContainer"]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 2
-text = "Start Random Craft"
-
-[node name="CraftInfoLabel" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-text = "Click to craft a random item"
-horizontal_alignment = 1
-
-[node name="CloseButton" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "Close"
+text = "Fermer"
