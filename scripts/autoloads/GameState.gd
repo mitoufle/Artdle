@@ -23,70 +23,70 @@ var tree: InspirationTreeClass
 var paint_mastery: PaintMasteryClass
 
 func _ready() -> void:
-    currency = CurrencyClass.new()
-    currency.name = "Currency"
-    add_child(currency)
+	currency = CurrencyClass.new()
+	currency.name = "Currency"
+	add_child(currency)
 
-    save_system = SaveClass.new()
-    save_system.name = "Save"
-    add_child(save_system)
+	save_system = SaveClass.new()
+	save_system.name = "Save"
+	add_child(save_system)
 
-    canvas = CanvasClass.new()
-    canvas.name = "Canvas"
-    add_child(canvas)
-    canvas.sold.connect(_on_canvas_sold)
+	canvas = CanvasClass.new()
+	canvas.name = "Canvas"
+	add_child(canvas)
+	canvas.sold.connect(_on_canvas_sold)
 
-    paint_mastery = PaintMasteryClass.new()
-    paint_mastery.name = "PaintMastery"
-    paint_mastery.currency = currency
-    add_child(paint_mastery)
+	paint_mastery = PaintMasteryClass.new()
+	paint_mastery.name = "PaintMastery"
+	paint_mastery.currency = currency
+	add_child(paint_mastery)
 
-    tree = InspirationTreeClass.new()
-    tree.name = "InspirationTree"
-    tree.currency = currency
-    add_child(tree)
-    tree.stage_entered.connect(_on_stage_entered)
-    tree.possibility_unlocked.connect(_on_possibility_unlocked)
+	tree = InspirationTreeClass.new()
+	tree.name = "InspirationTree"
+	tree.currency = currency
+	add_child(tree)
+	tree.stage_entered.connect(_on_stage_entered)
+	tree.possibility_unlocked.connect(_on_possibility_unlocked)
 
-    currency.changed.connect(_on_currency_changed)
+	currency.changed.connect(_on_currency_changed)
 
 # Called explicitly by the main scene (Phase 4). Kept out of _process so tests stay deterministic.
 func tick(delta: float) -> void:
-    tree.tick(delta)
-    canvas.tick(delta)
+	tree.tick(delta)
+	canvas.tick(delta)
 
 func _on_canvas_sold(tier: int, gold_amount: float) -> void:
-    currency.add("gold", BigNumber.from_float(gold_amount))
-    paint_mastery.on_canvas_sold(tier, BigNumber.from_float(gold_amount))
-    canvas_sold.emit(tier, gold_amount)
+	currency.add("gold", BigNumber.from_float(gold_amount))
+	paint_mastery.on_canvas_sold(tier, BigNumber.from_float(gold_amount))
+	canvas_sold.emit(tier, gold_amount)
 
 func _on_stage_entered(stage_index: int) -> void:
-    stage_entered.emit(stage_index)
+	stage_entered.emit(stage_index)
 
 func _on_possibility_unlocked(mechanic_id: String) -> void:
-    possibility_unlocked.emit(mechanic_id)
+	possibility_unlocked.emit(mechanic_id)
 
 func _on_currency_changed(kind: String, _new_value: float) -> void:
-    if kind == "paint_mastery":
-        tree.external_multiplier = paint_mastery.current_multiplier()
+	if kind == "paint_mastery":
+		tree.external_multiplier = paint_mastery.current_multiplier()
 
 func save_game() -> bool:
-    var payload: Dictionary = {
-        "currency":   currency.serialize(),
-        "canvas":     canvas.serialize(),
-        "inspi_tree": tree.serialize(),
-    }
-    return save_system.write(payload)
+	var payload: Dictionary = {
+		"currency":   currency.serialize(),
+		"canvas":     canvas.serialize(),
+		"inspi_tree": tree.serialize(),
+	}
+	return save_system.write(payload)
 
 func load_game() -> bool:
-    var data = save_system.read()
-    if data == null:
-        return false
-    if data.has("currency"):
-        currency.deserialize(data["currency"])
-    if data.has("canvas"):
-        canvas.deserialize(data["canvas"])
-    if data.has("inspi_tree"):
-        tree.deserialize(data["inspi_tree"])
-    tree.external_multiplier = paint_mastery.current_multiplier()
-    return true
+	var data = save_system.read()
+	if data == null:
+		return false
+	if data.has("currency"):
+		currency.deserialize(data["currency"])
+	if data.has("canvas"):
+		canvas.deserialize(data["canvas"])
+	if data.has("inspi_tree"):
+		tree.deserialize(data["inspi_tree"])
+	tree.external_multiplier = paint_mastery.current_multiplier()
+	return true
