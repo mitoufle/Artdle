@@ -52,5 +52,6 @@ func _rebuild_possibilities() -> void:
             var btn: Button = Button.new()
             var cost: BigNumber = TreeStages.unlock_cost(mech_id)
             btn.text = "Débloquer %s (%s inspi)" % [mech_id, Formatter.short(cost)]
-            btn.pressed.connect(func(): GameState.try_activate_mechanic(mech_id))
+            var id_copy: String = mech_id
+            btn.pressed.connect(func(): GameState.try_activate_mechanic(id_copy))
             possibilities_container.add_child(btn)
