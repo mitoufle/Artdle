@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://bcdmain8artdl0"]
+[gd_scene load_steps=7 format=3 uid="uid://bcdmain8artdl0"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://dpskjp8x1i7x" path="res://Scenes/BottomBar.tscn" id="2_bottombar"]
+[ext_resource type="PackedScene" path="res://views/AccueilView.tscn" id="3_accueil"]
+[ext_resource type="PackedScene" path="res://views/PaintingView.tscn" id="4_painting"]
+[ext_resource type="PackedScene" path="res://views/AscendancyView.tscn" id="5_ascendancy"]
+[ext_resource type="PackedScene" path="res://views/SkillTreeView.tscn" id="6_skilltree"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -11,6 +15,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
+accueil_scene = ExtResource("3_accueil")
+painting_scene = ExtResource("4_painting")
+ascendancy_scene = ExtResource("5_ascendancy")
+skill_tree_scene = ExtResource("6_skilltree")
 
 [node name="MainLayout" type="CanvasLayer" parent="."]
 
