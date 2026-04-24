@@ -3,7 +3,7 @@ extends GutTest
 func test_zero():
     var n = BigNumber.new()
     assert_eq(n.value, 0.0)
-    assert_eq(n.to_string(), "0")
+    assert_eq(str(n), "0")
 
 func test_add_positive():
     var a = BigNumber.from_float(5.0)
