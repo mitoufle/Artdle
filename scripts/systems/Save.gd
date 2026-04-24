@@ -27,15 +27,18 @@ func read() -> Variant:
         return null
     var text = f.get_as_text()
     f.close()
-    var parsed = JSON.parse_string(text)
-    if parsed == null or typeof(parsed) != TYPE_DICTIONARY:
+    var json := JSON.new()
+    var err := json.parse(text)
+    if err != OK or typeof(json.data) != TYPE_DICTIONARY:
         return null
+    var parsed: Dictionary = json.data
     var version: int = int(parsed.get("version", 0))
     if version > SAVE_VERSION:
-        push_error("Save from newer version (%d > %d) — refusing to load" % [version, SAVE_VERSION])
+        push_warning("Save from newer version (%d > %d) — refusing to load" % [version, SAVE_VERSION])
         return null
     if version < SAVE_VERSION:
         parsed = _migrate(parsed, version, SAVE_VERSION)
+    parsed["version"] = version
     return parsed
 
 func _migrate(data: Dictionary, from_v: int, to_v: int) -> Dictionary:
