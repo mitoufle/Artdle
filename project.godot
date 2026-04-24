@@ -26,6 +26,10 @@ window/size/viewport_width=1200
 window/size/viewport_height=800
 mouse_cursor/custom_image="uid://p7gnpt45ola2"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
