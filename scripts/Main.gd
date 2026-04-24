@@ -14,25 +14,25 @@ extends Control
 var _current_view: Node = null
 
 func _ready() -> void:
-    btn_accueil.pressed.connect(func(): _switch_view(accueil_scene))
-    btn_peinture.pressed.connect(func(): _switch_view(painting_scene))
-    btn_ascendancy.pressed.connect(func(): _switch_view(ascendancy_scene))
-    btn_skill.pressed.connect(func(): _switch_view(skill_tree_scene))
-    GameState.load_game()
-    _switch_view(accueil_scene)
+	btn_accueil.pressed.connect(func(): _switch_view(accueil_scene))
+	btn_peinture.pressed.connect(func(): _switch_view(painting_scene))
+	btn_ascendancy.pressed.connect(func(): _switch_view(ascendancy_scene))
+	btn_skill.pressed.connect(func(): _switch_view(skill_tree_scene))
+	GameState.load_game()
+	_switch_view(accueil_scene)
 
 func _process(delta: float) -> void:
-    GameState.tick(delta)
+	GameState.tick(delta)
 
 func _switch_view(scene: PackedScene) -> void:
-    if scene == null:
-        return
-    if _current_view != null:
-        _current_view.queue_free()
-    _current_view = scene.instantiate()
-    content.add_child(_current_view)
+	if scene == null:
+		return
+	if _current_view != null:
+		_current_view.queue_free()
+	_current_view = scene.instantiate()
+	content.add_child(_current_view)
 
 func _notification(what: int) -> void:
-    if what == NOTIFICATION_WM_CLOSE_REQUEST:
-        GameState.save_game()
-        get_tree().quit()
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		GameState.save_game()
+		get_tree().quit()
