@@ -16,23 +16,23 @@ var currency: CurrencyClass
 var save_system: SaveClass
 
 func _ready() -> void:
-    currency = CurrencyClass.new()
-    currency.name = "Currency"
-    add_child(currency)
-    save_system = SaveClass.new()
-    save_system.name = "Save"
-    add_child(save_system)
+	currency = CurrencyClass.new()
+	currency.name = "Currency"
+	add_child(currency)
+	save_system = SaveClass.new()
+	save_system.name = "Save"
+	add_child(save_system)
 
 func save_game() -> bool:
-    var payload: Dictionary = {
-        "currency": currency.serialize(),
-    }
-    return save_system.write(payload)
+	var payload: Dictionary = {
+		"currency": currency.serialize(),
+	}
+	return save_system.write(payload)
 
 func load_game() -> bool:
-    var data = save_system.read()
-    if data == null:
-        return false
-    if data.has("currency"):
-        currency.deserialize(data["currency"])
-    return true
+	var data = save_system.read()
+	if data == null:
+		return false
+	if data.has("currency"):
+		currency.deserialize(data["currency"])
+	return true
