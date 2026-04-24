@@ -14,6 +14,11 @@ config/name="artdle"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameState="*res://scripts/autoloads/GameState.gd"
+SceneManager="*res://scripts/autoloads/SceneManager.gd"
+
 [display]
 
 window/size/viewport_width=1200
