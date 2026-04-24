@@ -45,10 +45,12 @@ func is_at_cap() -> bool:
     return value >= MAX_VALUE
 
 func to_string() -> String:
+    if value == floor(value) and value < 1.0e15:
+        return "%d" % int(value)
     return str(value)
 
 func serialize() -> float:
     return value
 
-static func deserialize(data) -> BigNumber:
+static func deserialize(data: Variant) -> BigNumber:
     return BigNumber.from_float(float(data))
