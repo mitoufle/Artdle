@@ -49,6 +49,14 @@ text = "Ascend"
 layout_mode = 2
 text = "Skill Tree"
 
+[node name="Spacer" type="Control" parent="MainLayout/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="btnSpeed" type="Button" parent="MainLayout/VBoxContainer/TopBar"]
+layout_mode = 2
+text = "x1"
+
 [node name="Content" type="PanelContainer" parent="MainLayout/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
