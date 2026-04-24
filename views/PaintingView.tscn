@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://dcm3fck3p2gj7"]
+[gd_scene load_steps=2 format=3 uid="uid://dcm3fck3p2gj7"]
 
-[ext_resource type="Script" uid="uid://daww5r6t5ivr5" path="res://scripts/views/PaintingView.gd" id="1_tvnqg"]
-[ext_resource type="PackedScene" uid="uid://c1id4y8ipgg7q" path="res://Scenes/paintingscreen.tscn" id="2_tvnqg"]
+[ext_resource type="Script" path="res://scripts/ui/views/PaintingView.gd" id="1_painting"]
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3
@@ -10,72 +9,47 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
+script = ExtResource("1_painting")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasArea" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
 size_flags_vertical = 3
-mouse_filter = 1
-script = ExtResource("1_tvnqg")
 
-[node name="paintingscreen" parent="." instance=ExtResource("2_tvnqg")]
-
-[node name="BtnOpenCanvas" type="Button" parent="."]
-z_index = 2
+[node name="TierLabel" type="Label" parent="VBoxContainer/CanvasArea"]
 layout_mode = 2
-offset_left = 50.0
-offset_top = 217.0
-offset_right = 282.0
-offset_bottom = 257.0
-size_flags_horizontal = 4
-text = "Voir le Canvas"
+text = "Tier 1"
 
-[node name="BtnBuildStuff" type="Button" parent="."]
-z_index = 5
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer/CanvasArea"]
 layout_mode = 2
-offset_left = 49.0
-offset_top = 195.0
-offset_right = 71.0
-offset_bottom = 217.0
-size_flags_horizontal = 0
-flat = true
+max_value = 1.0
 
-[node name="Debug" type="Button" parent="."]
-layout_mode = 0
-offset_left = 834.0
-offset_top = 264.0
-offset_right = 842.0
-offset_bottom = 272.0
-text = "debug"
-
-[node name="BtnInventory" type="Button" parent="."]
-z_index = 2
+[node name="SellButton" type="Button" parent="VBoxContainer/CanvasArea"]
 layout_mode = 2
-offset_left = 50.0
-offset_top = 50.0
-offset_right = 150.0
-offset_bottom = 80.0
-size_flags_horizontal = 0
-text = "Inventory"
+text = "Vendre"
 
-[node name="BtnCraft" type="Button" parent="."]
-z_index = 2
+[node name="ButtonsRow" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
-offset_left = 50.0
-offset_top = 135.0
-offset_right = 190.0
-offset_bottom = 175.0
-size_flags_horizontal = 0
+
+[node name="BtnWorkshop" type="Button" parent="VBoxContainer/ButtonsRow"]
+layout_mode = 2
 text = "Workshop"
 
-[node name="BtnPainterOffice" type="Button" parent="."]
-z_index = 2
+[node name="BtnInventory" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
-offset_left = 200.0
-offset_top = 50.0
-offset_right = 350.0
-offset_bottom = 80.0
-size_flags_horizontal = 0
-text = "Painter Office"
+text = "Inventory"
 
-[connection signal="pressed" from="Debug" to="." method="_on_debug_pressed"]
-[connection signal="pressed" from="BtnInventory" to="." method="_on_inventory_pressed"]
-[connection signal="pressed" from="BtnCraft" to="." method="_on_craft_pressed"]
-[connection signal="pressed" from="BtnPainterOffice" to="." method="_on_painter_office_pressed"]
+[node name="BtnCraft" type="Button" parent="VBoxContainer/ButtonsRow"]
+layout_mode = 2
+text = "Craft"
+
+[node name="BtnOffice" type="Button" parent="VBoxContainer/ButtonsRow"]
+layout_mode = 2
+text = "Painter Office"
