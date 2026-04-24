@@ -1,34 +1,31 @@
-[gd_scene load_steps=2 format=4 uid="uid://b8x7y9z2a1b3c"]
+[gd_scene load_steps=2 format=3 uid="uid://b8x7y9z2a1b3c"]
 
-[ext_resource type="Script" path="res://scripts/views/SkillTreeView.gd" id="1_skill_tree"]
+[ext_resource type="Script" path="res://scripts/ui/views/SkillTreeView.gd" id="1_skilltree"]
 
 [node name="SkillTreeView" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_skill_tree")
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_skilltree")
 
-[node name="TopPanel" type="PanelContainer" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 60.0
-
-[node name="AscendancyPointsLabel" type="Label" parent="TopPanel"]
-layout_mode = 2
-text = "Points d'Ascension: 0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 60.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+text = "Skill Tree"
+
+[node name="FameLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Fame : 0"
+
+[node name="NodesList" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
