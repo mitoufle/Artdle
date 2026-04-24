@@ -1,55 +1,35 @@
-[gd_scene load_steps=4 format=3 uid="uid://bde7a8f8d7q7j"]
+[gd_scene load_steps=2 format=3 uid="uid://bde7a8f8d7q7j"]
 
-[ext_resource type="PackedScene" uid="uid://bgj4i508yh306" path="res://Scenes/views/CanvasView.tscn" id="1_abcde"]
-[ext_resource type="Theme" uid="uid://bcy08y4x4a7v" path="res://themes/popup_theme.tres" id="2_abcde"]
-[ext_resource type="PackedScene" uid="uid://bkgb4hj8jgffa" path="res://Scenes/UpgradeButton.tscn" id="3_upgrade_btn"]
+[ext_resource type="Script" path="res://scripts/ui/popups/CanvasPopup.gd" id="1_canvaspopup"]
 
 [node name="CanvasPopup" type="PopupPanel"]
 title = "Canvas"
-initial_position = 2
-size = Vector2i(488, 585)
-visible = true
-theme = ExtResource("2_abcde")
+size = Vector2i(400, 200)
+script = ExtResource("1_canvaspopup")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 483.0
-offset_bottom = 580.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MarginContainer" type="MarginContainer" parent="."]
+offset_right = 400.0
+offset_bottom = 200.0
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="CanvasView" parent="VBoxContainer" instance=ExtResource("1_abcde")]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="UpgradeHBox" type="HBoxContainer" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="UpgradeResolutionButton" parent="VBoxContainer/UpgradeHBox" instance=ExtResource("3_upgrade_btn")]
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
-upgrade_type = "resolution"
-level_prefix = "Resolution"
+text = "Canvas"
 
-[node name="UpgradeFillSpeedButton" parent="VBoxContainer/UpgradeHBox" instance=ExtResource("3_upgrade_btn")]
+[node name="TierLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
-upgrade_type = "fill_speed"
-level_prefix = "Speed"
+text = "Tier actuel : 1"
 
-[node name="UpgradeCanvasStorageButton" parent="VBoxContainer" instance=ExtResource("3_upgrade_btn")]
+[node name="UpgradeButton" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-upgrade_type = "canvas_storage"
-level_prefix = "Storage"
+text = "Upgrade"
 
-[node name="CanvasStorageLabel" type="Label" parent="VBoxContainer"]
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Stored Canvases: 0/0"
-
-[node name="CanvasSpeedLabel" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-text = "Fill Speed: Level 1 (1.0 pixels/sec)"
+text = "Fermer"
