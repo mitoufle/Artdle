@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://bcdmain8artdl0"]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://dpskjp8x1i7x" path="res://Scenes/BottomBar.tscn" id="2_bottombar"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="MainLayout" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainLayout"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopBar" type="HBoxContainer" parent="MainLayout/VBoxContainer"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="btnAccueil" type="Button" parent="MainLayout/VBoxContainer/TopBar"]
+layout_mode = 2
+text = "Accueil"
+
+[node name="btnPeinture" type="Button" parent="MainLayout/VBoxContainer/TopBar"]
+layout_mode = 2
+text = "Peinture"
+
+[node name="btnAscendancy" type="Button" parent="MainLayout/VBoxContainer/TopBar"]
+layout_mode = 2
+text = "Ascend"
+
+[node name="btnSkillTree" type="Button" parent="MainLayout/VBoxContainer/TopBar"]
+layout_mode = 2
+text = "Skill Tree"
+
+[node name="Content" type="PanelContainer" parent="MainLayout/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BottomBar" parent="MainLayout/VBoxContainer" instance=ExtResource("2_bottombar")]
+layout_mode = 2
