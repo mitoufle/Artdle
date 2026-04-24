@@ -1,153 +1,149 @@
 # Artdle Rebuild — Session Handover
 
 **Last session:** 2026-04-24
-**Status:** Phase 3 complete (140/140 tests pass on master). Next: Phase 4 (UI — `Main.tscn`, views, popups, widgets).
+**Status:** **Phase 4 complete — MVP playable.** 140/140 GUT tests pass. Game verified in-editor: Accueil tree + Peinture canvas + Ascend + Skill Tree all wired, save/load round-trip works.
 
 ---
 
 ## Where the project stands
 
-- **Branch:** `master` (Phase 3 branch merged and deleted). Master is **ahead of `Origin/master` by 9 commits** — unpushed Phase 3 work. Push when ready.
-- **Approach:** Full rebuild per spec (`docs/superpowers/specs/2026-04-24-artdle-rescope-design.md`). Phases 1 (foundation), 2 (core loop), and 3 (systems) all merged to `master`. Old GDScript was stripped; existing `.tscn` layouts in `Scenes/` and `views/` stay as references — Phase 4 attaches new scripts to them.
-- **Godot version:** 4.6.2.
-- **Test framework:** GUT 9.x. CLI runner remains broken — verify via editor panel only (Project → Tools → GUT → Run All).
+- **Branch:** `master`. **26 commits ahead of `Origin/master`** (10 Phase 3 + 15 Phase 4 + 1 indent normalize). Push when ready.
+- **All 4 phases done** per the 2026-04-24 rebuild spec (`docs/superpowers/specs/2026-04-24-artdle-rescope-design.md`). MVP satisfies spec §16 definition of done: 4 currencies, 5 tree stages, painting loop with gated sub-mechanics, ascend + skill tree, save/load, 140 tests.
+- **Godot version:** 4.6.2. **Test framework:** GUT 9.x (editor panel; CLI still broken).
 
 ---
 
 ## What's done
 
-### Phase 1 (Foundation) — `scripts/core/`, `scripts/systems/`, Phase 1 autoloads
+### Phase 1 — Foundation (scripts/core/, scripts/systems/, autoloads)
+BigNumber, Formatter, Balance, Currency, Save, GameState, SceneManager.
+
+### Phase 2 — Core loop (scripts/config/, systems)
+CanvasTiers (10 tiers), TreeStages (5 MVP stages), PaintMastery, Canvas, InspirationTree.
+
+### Phase 3 — Systems
+Workshop, Inventory, Craft (+CraftRecipes), PainterOffice, SkillTree (+SkillTreeNodes), Ascend. GameState aggregates 11 systems with `canvas_gold_multiplier()` / `canvas_speed_multiplier()` and sub-mechanic gating (`is_possible`/`is_active`/`try_activate_mechanic`).
+
+### Phase 4 — UI (this session)
 
 | Module | Role |
 |---|---|
-| `core/BigNumber.gd` | Float wrapper, overflow caps at `MAX_VALUE=1e308` |
-| `core/Formatter.gd` | K/M/B/T display formatting |
-| `core/Balance.gd` | `palier_ascend`, `fame_conversion`, `paint_mastery_*` formulas |
-| `systems/Currency.gd` | 4 pools (inspiration/gold/fame/paint_mastery), atomic spend, `changed` signal |
-| `systems/Save.gd` | Atomic write, versioned, migration stub, fail-loud |
-| `autoloads/GameState.gd` | Signal hub, preload-pattern for Currency + Save children |
-| `autoloads/SceneManager.gd` | Minimal scene loader (expanded Phase 4) |
+| `scripts/ui/views/BaseView.gd` | `_initialize_view` / `_connect_view_signals` / `_initialize_ui` hooks |
+| `scripts/ui/widgets/CurrencyDisplay.gd` | auto-refresh on `Currency.changed` |
+| `scripts/ui/widgets/BottomBar.gd` | 4 currency displays (inspiration/gold/fame/paint_mastery) |
+| `scripts/ui/widgets/Tooltip.gd` | minimal show/hide |
+| `scripts/ui/widgets/TreeVisual.gd` | placeholder circles per part (radius ~ level) |
+| `scripts/ui/widgets/PartUpgradeButton.gd` | per-part gold upgrade |
+| `scripts/ui/views/AccueilView.gd` | tree + parts + possibilities |
+| `scripts/ui/views/PaintingView.gd` | canvas progress + 4 gated popup buttons |
+| `scripts/ui/views/AscendancyView.gd` | palier, fame preview, ascend |
+| `scripts/ui/views/SkillTreeView.gd` | node unlock buttons |
+| `scripts/ui/popups/{Canvas,Inventory,Craft,PainterOffice}Popup.gd` | 4 sub-mechanic popups |
+| `scripts/Main.gd` + `Main.tscn` | root scene: top nav, view stack, bottom bar, `tick(delta)` hub |
 
-### Phase 2 (Core Loop) — `scripts/config/`, plus new systems
+`project.godot` has `run/main_scene="res://Main.tscn"`. The workshop button currently opens `CanvasPopup` (plan note; dedicated workshop UI is a simple swap later).
 
-| Module | Role |
-|---|---|
-| `config/CanvasTiers.gd` | 10 tiers of canvas (gold_value, paint_seconds, upgrade_cost) |
-| `config/TreeStages.gd` | 5 MVP stages (Pousse → Ancien) with parts + unlocks |
-| `systems/PaintMastery.gd` | log-curve multiplier driven by canvas sales |
-| `systems/Canvas.gd` | state machine, tick, sell (emits `sold`) |
-| `systems/InspirationTree.gd` | stages + parts + upgrades + passive tick |
-| `autoloads/GameState.gd` | wires Canvas + PaintMastery + InspirationTree; preload for all subclasses; explicit `tick(delta)` instead of `_process` (deterministic tests) |
-
-### Phase 3 (Systems)
-
-| Module | Role |
-|---|---|
-| `systems/Workshop.gd` | tier upgrade, contributes canvas gold + speed mults |
-| `systems/Inventory.gd` | owned items, per-slot equip, contributes canvas_gold_mult |
-| `config/CraftRecipes.gd` + `systems/Craft.gd` | gold → item crafting |
-| `systems/PainterOffice.gd` | hire workers, contributes canvas speed mult |
-| `config/SkillTreeNodes.gd` + `systems/SkillTree.gd` | fame spend → permanent effects (never resets) |
-| `systems/Ascend.gd` | palier check, fame conversion, orchestrates subsystem reset |
-| `autoloads/GameState.gd` (final form) | 11 preload consts, modifier aggregators (`canvas_gold_multiplier()`, `canvas_speed_multiplier()`), sub-mechanic gating (`_possible_mechanics`/`_active_mechanics` + `try_activate_mechanic`), full save/load |
-
-**Totals: 140 tests passing in the GUT editor panel (Phase 1 + 2 + 3).**
+**Bootstrap loop** (confirmed working): start at 0/0/0/0 → Peinture view → wait 2s → Vendre (+10 gold) → Accueil → upgrade Roots (5g) → inspi flows → upgrade toward stage advance.
 
 ---
 
-## What's next (Phase 4: UI)
+## What's next (post-MVP)
 
-Plan file: `docs/superpowers/plans/2026-04-24-phase4-ui.md` (~25 tasks, 1045 lines).
+Spec §13 and §14 list post-MVP hooks — none of this is blocking MVP shipping:
 
-Scope:
-1. `BaseView` parent class with 3-hook lifecycle (`_initialize_view`, `_connect_view_signals`, `_initialize_ui`)
-2. Widgets: `CurrencyDisplay`, `BottomBar`, `TreeVisual`, `Tooltip`
-3. Four views: `AccueilView` (tree), `PaintingView`, `AscendancyView`, `SkillTreeView`
-4. Four popups: Canvas, Inventory, Craft, PainterOffice
-5. Root `Main.tscn` with view stack + `SceneManager` routing
-6. Wire `GameState.tick(delta)` from `Main._process`
-7. Manual-test checklist (spec §12)
-
-Milestone: runnable game — open `Main.tscn`, see inspiration accumulate on the tree, upgrade parts with gold, sell canvases, ascend, spend fame. All of Phase 3's backend visible and interactive.
-
-**Note:** Phase 4 is UI-heavy. Views attach scripts to existing `.tscn` files (`Scenes/`, `views/`) where possible; `AccueilView` layout is built fresh. See the plan for per-task guidance on "open existing scene and attach" vs "build from scratch in editor".
+- **Visual polish:** replace `TreeVisual` circles with sprites/SVG; add icons to BottomBar (the widget doesn't support `icon_texture` yet); theme the popups.
+- **Dedicated WorkshopPopup:** currently aliased to CanvasPopup. Split once workshop gains its own controls (tier, separate gold mult ladder).
+- **More stages / parts / recipes / nodes:** all data-driven via `config/` — just extend dictionaries.
+- **Offline progress:** save timestamp + compute on load.
+- **Tooltips on every button:** `Tooltip` widget exists but isn't wired anywhere.
+- **Sound:** `floating_text.tscn` still sits unused from the pre-rebuild era.
+- **Pre-rebuild assets cleanup:** `Scenes/{Ascendancy2DView,ClickerPopup,paintingscreen,Animated_Plant,UpgradeButton,tooltipedbtn,floating_text}.tscn` + `Scenes/views/` + `Scenes/controls/ExperienceBar.tscn` are orphaned. Remove in a cleanup PR.
 
 ---
 
 ## How to resume (checklist for next session)
 
-1. **Read this file.** Spec at `docs/superpowers/specs/2026-04-24-artdle-rescope-design.md` for the full design context.
-2. **Verify branch:** `git branch --show-current` → `master`. Decide if you want a `phase4-ui` branch before touching code.
-3. **Verify Phase 1+2+3 still pass:** Open Godot, GUT panel → Run All → expect 140 pass.
-4. **Read Phase 4 plan:** `docs/superpowers/plans/2026-04-24-phase4-ui.md`.
-5. **Push master if you haven't** (`git push Origin master`) — 9 Phase-3 commits are local only.
-6. **Execute tasks:** UI is a lot of small scenes/widgets. Phase 4 will require manual Godot-editor work for `.tscn` scene building — script-only changes can still follow the TDD pattern, but `.tscn` edits need the editor.
+1. **Read this file.**
+2. **Verify branch:** `master`, clean working tree.
+3. **Verify tests:** GUT editor panel → Run All → 140 pass.
+4. **Launch project** (`Main.tscn` = main scene) → walk the bootstrap loop to confirm nothing regressed.
+5. **Decide next scope:** polish (visual), extension (content), or cleanup (orphaned legacy files).
+6. **Push to origin** when ready (`git push Origin master` — 26 commits pending).
 
 ---
 
-## Gotchas (carried forward — re-verify each phase)
+## Gotchas (carried forward)
 
 ### Test execution
-- **GUT CLI is broken.** Always verify via the editor's GUT panel, not CLI.
+- **GUT CLI broken.** Editor panel only.
 
 ### Godot 4.6 strictness
-1. **`class_name` + autoload typing breaks.** Autoloads that type vars against `class_name` may fail to parse. **Workaround:** `const FooClass = preload("res://path/to/Foo.gd")` in the autoload, then `var foo: FooClass`. Applied in Phase 1 + Phase 2 GameState. Phase 3's final GameState will need 11 preload constants (all systems).
-2. **`to_string()` collides with native `Object.to_string`** — becomes an error. Use `_to_string()` (proper virtual).
-3. **`.gdignore` in a directory makes Godot skip it entirely.** Don't leave `.gdignore` in dirs containing real scripts.
+1. **`class_name` + autoload typing breaks.** Use `const FooClass = preload(...)` in autoloads (GameState has 11). Non-autoload `Control`/`Node` scripts can keep `class_name`.
+2. **`to_string()` collides with native `Object.to_string`** — use `_to_string()`.
+3. **`.gdignore` in a directory makes Godot skip it** — don't leave it in dirs with real scripts.
 
 ### Save system
-- `JSON.new().parse()` (not `JSON.parse_string`) avoids engine-level error noise that GUT reports as failures.
-- Use `push_warning` for non-fatal informational messages — `push_error` triggers GUT failure.
+- `JSON.new().parse()` (not `JSON.parse_string`) — avoids GUT false failures.
+- `push_warning` for non-fatal messages; `push_error` triggers GUT failure.
 
 ### Indentation
-Files are internally consistent per-file (some tabs, some 4-space); Godot's editor may auto-convert on save. Don't force-convert, just keep each file consistent with itself. Plan markdown uses 4 spaces — paste as-is.
+Per-file consistency only. Godot's editor auto-converts on save; expect incidental diffs. Project convention trends toward tabs (GameState, Main normalized to tabs).
 
-### Architecture deviations from the plans (applied)
-- **`GameState` exposes explicit `tick(delta)` instead of `_process`** — the main scene in Phase 4 will call it each frame. Keeps integration tests deterministic (no engine frames firing between `before_each` and assertions). Phase 3's plan still shows `_process`; keep the `tick(delta)` pattern.
-- **All autoload subsystem types are `const XClass = preload(...)`**, not `class_name`-typed vars. Apply the same treatment to every new system added in Phase 3.
+### `.tscn` files written by hand in Phase 4
+- Many Phase 4 `.tscn` files were written as plain text (UIDs stripped from new ext_resource lines). Godot regenerates UIDs on first editor load and rewrites the scene file. **Expect incidental `.tscn` diffs after first open of the MVP in the editor** — commit them as a tidy-up.
+- `AccueilView.tscn`, `AscendancyView.tscn`, and `SkillTreeView.tscn` were **completely rewritten** (legacy layouts ejected). Don't search for old nodes — they're gone.
+
+### Architecture invariants (keep)
+- `GameState.tick(delta)` called from `Main._process` (not `GameState._process`). Keeps tests deterministic.
+- All autoload subsystem types are `const XClass = preload(...)`, not `class_name`-typed vars.
 
 ### Orphan nodes in tests
-Phase 1 tests (`test_currency.gd`, `test_save.gd`) now have `after_each` that frees leaked Nodes. Phase 2 tests also free. Keep the pattern in Phase 3: any test that does `SystemName.new()` on a `Node`-based system needs `after_each { .free() }`.
+Any `Node`-based system `.new()` in a test needs `after_each { node.free() }` to keep GUT orphan count at 0.
 
 ### Files not part of the rebuild
-`default_bus_layout.tres` is user work — don't touch it.
+`default_bus_layout.tres` is user work — don't touch.
+
+### Pre-rebuild `.tscn` orphans
+The following still exist on disk but are not wired anywhere in the MVP:
+- `Scenes/{Ascendancy2DView,ClickerPopup,paintingscreen,Animated_Plant,UpgradeButton,tooltipedbtn,floating_text}.tscn`
+- `Scenes/views/` (entire directory)
+- `Scenes/controls/ExperienceBar.tscn`
+- `views/` had legacy contents but all four view `.tscn`s in use were overwritten
+
+These reference deleted scripts; safe to delete in a cleanup pass.
 
 ---
 
-## Phase 4 plan deviations to expect
-
-Based on Phase 2+3 patterns, expect to apply these when executing Phase 4:
-- **`Main._process` calls `GameState.tick(delta)`.** The plan may call this out; if not, wire it. That's where backend ticks now live (Phase 2 moved it off `GameState._process`).
-- **If any view/widget becomes an autoload, preload its class dependencies.** Non-autoload `Control`/`Node` scripts can keep `class_name` typing. Only autoloads need the `const FooClass = preload(...)` pattern.
-- **Skip `godot --headless ...` commands in the plan** — the CLI is broken. Manual UI verification + GUT panel for any new test files.
-- **`.tscn` work:** Godot's editor rewrites the file on save (normalizes node ordering, property keys). Expect whitespace/ordering diffs after opening a scene even with no intentional edits. Commit those if they're incidental to real work.
-- **Orphan node cleanup** — any new `Node.new()`-based test needs `after_each { node.free() }` to keep GUT orphan count at 0.
-
----
-
-## Commits on Phase 3 (merged into master)
+## Phase 4 commits (on `master`, fast-forward-merged from `phase4-ui`)
 
 ```
-9c7c046 normalize GameState indentation to tabs, add Godot .uid files
-434f386 wire all 11 systems into GameState with modifiers and gating
-48f1bdc add Ascend orchestrator: palier, conversion, reset
-49da9e8 add SkillTree: fame spend, permanent effects, gold/speed mults
-1a8bd86 add PainterOffice: hire workers, canvas speed bonus
-14a08e4 add Craft system and recipes config
-f6ba7ca add Inventory: owned items, slot equip, canvas_gold_mult
-f322afe add Workshop system: tier upgrade, canvas gold+speed mults
-eeaa80e update HANDOVER for Phase 2 complete, Phase 3 kickoff
+ce079bb normalize Main.gd indentation to tabs (Godot editor auto-format)
+6ea9c9b harmonize closure capture pattern in AccueilView
+f6be900 wire all views and popups in Main.tscn — MVP playable
+f55c635 add SkillTreeView with node unlocks and fame display
+74bea46 add AscendancyView with palier, fame preview, ascend button
+492ffd0 add PainterOfficePopup with hire button
+256a90a add CraftPopup with recipe buttons
+baeb980 add InventoryPopup with equip/unequip
+392ca32 add CanvasPopup with tier upgrade
+9e40ba9 add PaintingView with canvas progress and sub-mechanic buttons
+1955299 add AccueilView with tree visual, parts upgrades, possibilities
+ed4a267 add Main root scene with top bar and view switcher
+0773ae6 add minimal Tooltip widget
+0fa2a95 rebuild BottomBar with 4 currency displays (no XP bar)
+ba03781 add CurrencyDisplay widget — live refresh on Currency.changed
+1669be6 add BaseView parent with lifecycle hooks
 ```
 
-9 commits on branch `phase3-systems`, fast-forward-merged into `master`, branch deleted.
+16 commits on branch `phase4-ui`, fast-forward-merged into `master`, branch deleted.
 
 ---
 
-## Skill chain being followed
+## Skill chain followed (all 4 phases)
 
-`superpowers:brainstorming` → `superpowers:writing-plans` → `superpowers:executing-plans` → `superpowers:finishing-a-development-branch`
+`superpowers:brainstorming` → `superpowers:writing-plans` (×4) → `superpowers:executing-plans` (×4) → `superpowers:finishing-a-development-branch` (×4)
 
-All 4 phase plans are in `docs/superpowers/plans/`. Phase 4 (UI) still pending after Phase 3.
+All 4 phase plans archived in `docs/superpowers/plans/`. Rebuild done.
 
 ---
 
@@ -157,9 +153,9 @@ All 4 phase plans are in `docs/superpowers/plans/`. Phase 4 (UI) still pending a
 cd /c/Users/mitoufle/Documents/artdle
 git branch --show-current
 git status --short
-git log --oneline master..HEAD   # commits on current phase branch
+git log --oneline Origin/master..HEAD
 
 # Launch Godot (user's install)
 "/c/Users/mitoufle/Downloads/Godot_v4.4.1-stable_win64.exe/Godot_v4.4.1-stable_win64_console.exe" --editor
-# Then Project → Tools → GUT → Run All
+# Then Project → Tools → GUT → Run All  (or F5 to play)
 ```
