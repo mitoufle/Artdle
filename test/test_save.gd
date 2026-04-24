@@ -17,9 +17,10 @@ func test_write_and_read_roundtrip():
     var ok = save.write(payload)
     assert_true(ok)
     var loaded = save.read()
-    assert_ne(loaded, null)
-    assert_eq(loaded["version"], Save.SAVE_VERSION)
-    assert_eq(loaded["currency"]["gold"], 123.0)
+    assert_true(loaded != null, "loaded should not be null")
+    if loaded != null:
+        assert_eq(loaded["version"], Save.SAVE_VERSION)
+        assert_eq(loaded["currency"]["gold"], 123.0)
 
 func test_read_missing_returns_null():
     var save = Save.new()
