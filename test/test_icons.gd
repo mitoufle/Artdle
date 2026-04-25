@@ -15,7 +15,7 @@ func test_bbcode_known_id_default_height():
 
 func test_bbcode_known_id_custom_height():
     var s: String = Icons.bbcode("inspiration", 32)
-    assert_eq(s, "[img height=32]res://artdleAsset/Inspiration.png[/img]")
+    assert_eq(s, "[img height=32]res://artdleAsset/Currency/Inspiration.png[/img]")
 
 func test_bbcode_unknown_returns_empty():
     var s: String = Icons.bbcode("nope")

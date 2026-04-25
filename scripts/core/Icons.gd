@@ -5,7 +5,7 @@ extends RefCounted
 const ICONS: Dictionary = {
     "gold":           "res://artdleAsset/Currency/coin.png",
     "fame":           "res://artdleAsset/Currency/fame.png",
-    "inspiration":    "res://artdleAsset/Inspiration.png",
+    "inspiration":    "res://artdleAsset/Currency/Inspiration.png",
     "paint_mastery":  "res://artdleAsset/Currency/Painting_mastery.png",
 }
 
