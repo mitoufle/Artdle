@@ -45,6 +45,21 @@ Workshop, Inventory, Craft (+CraftRecipes), PainterOffice, SkillTree (+SkillTree
 
 **Bootstrap loop** (confirmed working): start at 0/0/0/0 → Peinture view → wait 2s → Vendre (+10 gold) → Accueil → upgrade Roots (5g) → inspi flows → upgrade toward stage advance.
 
+### Info-panel infra (post-MVP)
+
+The hover info-panel (spec `2026-04-25-info-panel-design.md`, plan `2026-04-25-info-panel.md`) shipped:
+
+- Horizontal `InfoPanel` strip in `Main.tscn` between Content and BottomBar.
+- `Hoverable` child-node helper for any Control to publish hover info via `GameState.push_hover_info(title, body, footer)`.
+- `Icons` registry (`scripts/core/Icons.gd`) for inline currency/element BBCode icons.
+- `GameState.hover_info_pushed` / `hover_info_cleared` signals.
+- AscendButton wired with live palier + projected-fame content_provider as the §6 validation.
+- Deprecated floating `Tooltip` and `CustomTooltip.tscn` deleted.
+
+156 GUT tests pass (140 prior + 16 new for icons/hover-bus/info-panel/hoverable).
+
+**Future gameplay specs reference §6 of the info-panel spec** (mandatory content authoring rule: numbers, live values, costs with icons, no narrative-only blurbs).
+
 ---
 
 ## What's next (post-MVP)
