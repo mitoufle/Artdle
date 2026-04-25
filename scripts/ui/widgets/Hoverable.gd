@@ -22,6 +22,8 @@ func _on_mouse_entered() -> void:
     var f: String = footer
     if content_provider.is_valid():
         var arr: Array = content_provider.call()
+        if arr.size() != 3:
+            push_warning("Hoverable.content_provider returned %d elements, expected 3" % arr.size())
         t = arr[0] if arr.size() > 0 else ""
         b = arr[1] if arr.size() > 1 else ""
         f = arr[2] if arr.size() > 2 else ""

@@ -60,7 +60,8 @@ func clear() -> void
 @export var footer: String = ""
 
 # Optional: when set, called on each hover to produce dynamic content.
-# Must return Array[String] of length 3 — [title, body, footer].
+# Should return Array[String] of length 3 — [title, body, footer].
+# Shorter arrays fall back to empty strings for missing positions and emit a push_warning.
 var content_provider: Callable = Callable()
 ```
 
