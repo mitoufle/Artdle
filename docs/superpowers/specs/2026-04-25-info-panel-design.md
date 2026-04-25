@@ -24,12 +24,12 @@ Layout fixed across all views — info content is always read in the same screen
 
 ### 3.1 `InfoPanel` widget
 
-**File:** `scripts/ui/widgets/InfoPanel.gd`. Attached to the `InfoPanel` node in `Main.tscn`.
+**File:** `scripts/ui/widgets/InfoPanel.gd`. Attached to the `InfoPanel` node in `Main.tscn`. Script `extends PanelContainer`.
 
 **Node tree:**
 
 ```
-InfoPanel (PanelContainer or HBoxContainer, ~100px tall)
+InfoPanel (PanelContainer, ~100px tall, full width)
 └── MarginContainer
     └── HBoxContainer
         ├── TitleLabel (RichTextLabel, bbcode_enabled, ~30% width)
@@ -50,7 +50,7 @@ func clear() -> void
 
 ### 3.2 `Hoverable` helper
 
-**File:** `scripts/ui/widgets/Hoverable.gd`. Attachable script for any `Control`-derived node.
+**File:** `scripts/ui/widgets/Hoverable.gd`. Script `extends Node`, used as a **child node** of any `Control`-derived node that should publish hover info. Adding hover info to any element = adding a `Hoverable` child and setting three strings (or a Callable). Works for both `.tscn`-defined Controls and dynamically built ones (`Button.new()` + `add_child(Hoverable.new())`).
 
 **Exports:**
 
@@ -58,18 +58,19 @@ func clear() -> void
 @export var title: String = ""
 @export var body: String = ""
 @export var footer: String = ""
-@export var content_provider: Callable = Callable()
+
+# Optional: when set, called on each hover to produce dynamic content.
+# Must return Array[String] of length 3 — [title, body, footer].
+var content_provider: Callable = Callable()
 ```
 
-`content_provider`, when set, is called on each hover and must return `Array[String]` `[title, body, footer]`. Used for content that changes (e.g., a cost that drops as a multiplier rises). When unset, the static `@export` strings are used.
+`content_provider` is a regular var (not `@export` — Godot's editor cannot set Callables, and they're always wired from code). When set, it's called on each `mouse_entered` and its three returned strings override the static `@export`s. Used for content that changes (e.g., a cost that drops as a multiplier rises).
 
 **Behavior:**
 
-- On `_ready()` connect `mouse_entered` and `mouse_exited` of its parent `Control` (or of itself if it's the parent).
-- On `mouse_entered`: resolve content (provider or static), call `GameState.push_hover_info(title, body, footer)`.
+- On `_ready()`: walk to the parent `Control`. Error (`push_error`) if the parent is not a `Control`. Connect `parent.mouse_entered` and `parent.mouse_exited`.
+- On `mouse_entered`: resolve content (provider if set, else static), call `GameState.push_hover_info(title, body, footer)`.
 - On `mouse_exited`: call `GameState.clear_hover_info()`.
-
-Single attach point — adding hover info to any new widget = attaching `Hoverable.gd` and setting three strings (or a Callable).
 
 ### 3.3 `Icons` registry
 
@@ -125,28 +126,38 @@ This is auto-clear without placeholder.
 
 ## 6. Usage example
 
-For a static-content button (e.g., "Ascend"):
+**Static content (`.tscn`-defined button):** add a `Hoverable` child node in the editor and set the three strings on it.
 
 ```
-[node name="AscendButton" type="Button" parent="..."]
+[node name="AscendButton" type="Button" parent="VBoxContainer"]
 text = "Ascend"
-script = ExtResource("hoverable_script")  ; attach Hoverable
+
+[node name="Hoverable" type="Node" parent="VBoxContainer/AscendButton"]
+script = ExtResource("hoverable_script")
 title = "Ascendance"
 body = "Réinitialise le run en cours et te donne de la fame proportionnelle à l'inspiration accumulée."
-footer = "Palier requis : %s [icon-inspi-bbcode]"
+footer = "Palier requis : 1000 [img]res://artdleAsset/Inspiration.png[/img]"
 ```
 
-For a dynamic-cost button (e.g., a `PartUpgradeButton`):
+**Dynamic content (button created at runtime, e.g., a `PartUpgradeButton`):**
 
 ```gdscript
-$Hoverable.content_provider = func() -> Array[String]:
-    var lvl = GameState.tree.get_part_level(part_id)
-    var cost = TreeStages.upgrade_cost(GameState.tree.stage_index, part_id, lvl)
-    return [
-        "%s (Lv.%d)" % [part_id.capitalize(), lvl],
-        "Augmente la production d'inspiration de cette partie de l'arbre.",
-        "Coût : %s %s" % [Formatter.short(cost), Icons.bbcode("gold")]
-    ]
+const HoverableScript = preload("res://scripts/ui/widgets/Hoverable.gd")
+
+func setup(p_id: String) -> void:
+    part_id = p_id
+    # ... existing wiring ...
+
+    var hov = HoverableScript.new()
+    hov.content_provider = func() -> Array:
+        var lvl = GameState.tree.get_part_level(part_id)
+        var cost = TreeStages.upgrade_cost(GameState.tree.stage_index, part_id, lvl)
+        return [
+            "%s (Lv.%d)" % [part_id.capitalize(), lvl],
+            "Augmente la production d'inspiration de cette partie de l'arbre.",
+            "Coût : %s %s" % [Formatter.short(cost), Icons.bbcode("gold")]
+        ]
+    add_child(hov)
 ```
 
 ## 7. Tests
