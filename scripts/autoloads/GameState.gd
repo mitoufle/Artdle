@@ -22,6 +22,8 @@ signal ascended(fame_gained: float, ascend_count: int)
 signal stage_entered(stage_index: int)
 signal possibility_unlocked(mechanic_id: String)
 signal sub_mechanic_activated(mechanic_id: String)
+signal hover_info_pushed(title: String, body: String, footer: String)
+signal hover_info_cleared()
 
 # -- Systems --
 var currency: CurrencyClass
@@ -201,3 +203,11 @@ func load_game() -> bool:
 		_possible_mechanics[id] = true
 	tree.external_multiplier = paint_mastery.current_multiplier()
 	return true
+
+# -- Hover info bus --
+
+func push_hover_info(title: String, body: String, footer: String) -> void:
+	hover_info_pushed.emit(title, body, footer)
+
+func clear_hover_info() -> void:
+	hover_info_cleared.emit()
