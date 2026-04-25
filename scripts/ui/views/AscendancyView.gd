@@ -1,9 +1,28 @@
 extends BaseView
 
+const HoverableScript = preload("res://scripts/ui/widgets/Hoverable.gd")
+
 @onready var palier_label: Label = $VBoxContainer/PalierLabel
 @onready var preview_label: Label = $VBoxContainer/FamePreviewLabel
 @onready var ascend_btn: Button = $VBoxContainer/AscendButton
 @onready var status_label: Label = $VBoxContainer/StatusLabel
+
+func _initialize_view() -> void:
+    var hov = HoverableScript.new()
+    hov.content_provider = func() -> Array:
+        var palier: BigNumber  = Balance.palier_ascend(GameState.ascend.ascend_count)
+        var current: BigNumber = GameState.currency.get_amount("inspiration")
+        var preview: BigNumber = Balance.fame_conversion(current)
+        return [
+            "Ascendance",
+            "Réinitialise le run et donne de la fame permanente. Gagne actuellement %s %s." % [
+                Formatter.short(preview), Icons.bbcode("fame")
+            ],
+            "Palier : %s / %s %s" % [
+                Formatter.short(current), Formatter.short(palier), Icons.bbcode("inspiration")
+            ]
+        ]
+    ascend_btn.add_child(hov)
 
 func _connect_view_signals() -> void:
     ascend_btn.pressed.connect(_on_ascend_pressed)
