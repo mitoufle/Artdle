@@ -1,14 +1,16 @@
 # Artdle Rebuild — Session Handover
 
-**Last session:** 2026-04-24
-**Status:** **Phase 4 complete — MVP playable.** 140/140 GUT tests pass. Game verified in-editor: Accueil tree + Peinture canvas + Ascend + Skill Tree all wired, save/load round-trip works.
+**Last session:** 2026-04-25
+**Status:** MVP shipped + info-panel infra shipped + **Canvas + Atelier post-MVP brainstorms closed**. Two WIP design docs ready for promotion to final specs. 156/156 GUT tests pass.
 
 ---
 
 ## Where the project stands
 
-- **Branch:** `master`. **26 commits ahead of `Origin/master`** (10 Phase 3 + 15 Phase 4 + 1 indent normalize). Push when ready.
+- **Branch:** `master`. Pushed to `Origin/master`.
 - **All 4 phases done** per the 2026-04-24 rebuild spec (`docs/superpowers/specs/2026-04-24-artdle-rescope-design.md`). MVP satisfies spec §16 definition of done: 4 currencies, 5 tree stages, painting loop with gated sub-mechanics, ascend + skill tree, save/load, 140 tests.
+- **Info-panel infra** shipped on top (`docs/superpowers/specs/2026-04-25-info-panel-design.md`).
+- **Canvas + Atelier post-MVP brainstorms closed** (this session). WIPs at `docs/superpowers/specs/2026-04-25-canvas-design-WIP.md` and `2026-04-25-atelier-design-WIP.md`.
 - **Godot version:** 4.6.2. **Test framework:** GUT 9.x (editor panel; CLI still broken).
 
 ---
@@ -24,7 +26,7 @@ CanvasTiers (10 tiers), TreeStages (5 MVP stages), PaintMastery, Canvas, Inspira
 ### Phase 3 — Systems
 Workshop, Inventory, Craft (+CraftRecipes), PainterOffice, SkillTree (+SkillTreeNodes), Ascend. GameState aggregates 11 systems with `canvas_gold_multiplier()` / `canvas_speed_multiplier()` and sub-mechanic gating (`is_possible`/`is_active`/`try_activate_mechanic`).
 
-### Phase 4 — UI (this session)
+### Phase 4 — UI
 
 | Module | Role |
 |---|---|
@@ -46,8 +48,6 @@ Workshop, Inventory, Craft (+CraftRecipes), PainterOffice, SkillTree (+SkillTree
 
 ### Info-panel infra (post-MVP)
 
-The hover info-panel (spec `2026-04-25-info-panel-design.md`, plan `2026-04-25-info-panel.md`) shipped:
-
 - Horizontal `InfoPanel` strip in `Main.tscn` between Content and BottomBar.
 - `Hoverable` child-node helper for any Control to publish hover info via `GameState.push_hover_info(title, body, footer)`.
 - `Icons` registry (`scripts/core/Icons.gd`) for inline currency/element BBCode icons.
@@ -59,30 +59,49 @@ The hover info-panel (spec `2026-04-25-info-panel-design.md`, plan `2026-04-25-i
 
 **Future gameplay specs reference §6 of the info-panel spec** (mandatory content authoring rule: numbers, live values, costs with icons, no narrative-only blurbs).
 
+### Canvas + Atelier post-MVP brainstorms (this session, 2026-04-25)
+
+Closed brainstorms for the next two major systems. Two WIP design docs saved as crash-safe persistence (the previous session crashed mid-brainstorm — durable artefacts now exist):
+
+- **`docs/superpowers/specs/2026-04-25-canvas-design-WIP.md`** — Canvas redesign. Sticky-config + observed-loop operating model. ~12 dimensions exposed (taille, style, palette, sujet, gamble, mastery, qualité, etc.). Hidden subject discovery graph (5 starters, all others derived via prereqs). Skill tree Canvas branch (sister to Atelier). Multi-canvas via Painter Office workers. Auto-sale.
+- **`docs/superpowers/specs/2026-04-25-atelier-design-WIP.md`** — Atelier+Inventaire redesign. 8 slots (brush, palette, chapeau, blouse, gants, chevalet, couteau, broche), 6 sets with build archetypes (4 with procs/bursts, 2 continuous), strict B+C items-as-materials, 22-node skill tree Atelier branch (themed sub-branches), two-tier persistence (4 pin slots + 4 craft-permanence), stash management (200-500 cap + single grid + lock-and-auto-clean).
+
+**Tuning north star (Atelier):** *"difficile, long, récompensant"* — hardcore patient ARPG philosophy. All numerical tuning (drop rates, success probabilities, costs) follows it.
+
+The Canvas brainstorm was a forced pivot mid-Atelier-brainstorm — the Atelier affix pool depends on canvas stats. Both designs are coherent and validated. Affix pool fully derived. Build coverage validated (6 specialized + balanced default).
+
 ---
 
-## What's next (post-MVP)
+## What's next
 
-Spec §13 and §14 list post-MVP hooks — none of this is blocking MVP shipping:
+**Immediate priority — promote WIPs to final specs:**
 
-- **Visual polish:** replace `TreeVisual` circles with sprites/SVG; add icons to BottomBar (the widget doesn't support `icon_texture` yet); theme the popups.
-- **Dedicated WorkshopPopup:** currently aliased to CanvasPopup. Split once workshop gains its own controls (tier, separate gold mult ladder).
-- **More stages / parts / recipes / nodes:** all data-driven via `config/` — just extend dictionaries.
-- **Offline progress:** save timestamp + compute on load.
-- **Hoverables on every interactive element:** the `InfoPanel` infra ships, but only `AscendButton` is currently wired. Add `Hoverable` children with `content_provider` lambdas (per spec §6) to every PartUpgradeButton, every popup recipe/item button, every sub-mechanic activation button, every Skill Tree node, etc.
-- **Sound:** `floating_text.tscn` still sits unused from the pre-rebuild era.
-- **Pre-rebuild assets cleanup:** `Scenes/{Ascendancy2DView,ClickerPopup,paintingscreen,Animated_Plant,UpgradeButton,tooltipedbtn,floating_text}.tscn` + `Scenes/views/` + `Scenes/controls/ExperienceBar.tscn` are orphaned. Remove in a cleanup PR.
+1. Read both WIP design docs (canvas + atelier).
+2. Promote `2026-04-25-canvas-design-WIP.md` → `2026-04-25-canvas-design.md` (clean, organize, fill in initial values for the WIP's "Open questions" section).
+3. Promote `2026-04-25-atelier-design-WIP.md` → `2026-04-25-atelier-design.md` (clean, organize, fill in initial values for the "To nail in spec writing" section using the *"difficile, long, récompensant"* north star).
+4. Spec self-review (per brainstorming skill) on each promoted spec.
+5. User reviews. Then `superpowers:writing-plans` for the implementation plan.
+6. **Implementation order:** Canvas first (Atelier affix pool depends on canvas stats), Atelier second.
+
+**Background follow-ups (not blocking, fold in opportunistically):**
+
+- **Visual polish:** replace `TreeVisual` circles with sprites/SVG ; add icons to BottomBar ; theme the popups.
+- **Dedicated WorkshopPopup:** currently aliased to CanvasPopup. Split once workshop gains its own controls.
+- **Hoverables rollout:** only `AscendButton` is currently wired. Add `Hoverable` children to every interactive element per info-panel spec §6.
+- **Offline progress.**
+- **Sound:** `floating_text.tscn` still sits unused.
+- **Pre-rebuild assets cleanup:** `Scenes/{Ascendancy2DView,ClickerPopup,paintingscreen,Animated_Plant,UpgradeButton,tooltipedbtn,floating_text}.tscn` + `Scenes/views/` + `Scenes/controls/ExperienceBar.tscn` are orphaned.
 
 ---
 
 ## How to resume (checklist for next session)
 
 1. **Read this file.**
-2. **Verify branch:** `master`, clean working tree.
-3. **Verify tests:** GUT editor panel → Run All → 140 pass.
-4. **Launch project** (`Main.tscn` = main scene) → walk the bootstrap loop to confirm nothing regressed.
-5. **Decide next scope:** polish (visual), extension (content), or cleanup (orphaned legacy files).
-6. **Push to origin** when ready (`git push Origin master` — 26 commits pending).
+2. **Read the two WIP design docs** (`2026-04-25-canvas-design-WIP.md` + `2026-04-25-atelier-design-WIP.md`).
+3. **Verify branch:** `master`, clean working tree, in sync with `Origin/master`.
+4. **Verify tests:** GUT editor panel → Run All → 156 pass.
+5. **Promote WIPs to final specs** (see "What's next" above).
+6. **Then writing-plans → executing-plans** for implementation, Canvas first.
 
 ---
 
@@ -128,36 +147,13 @@ These reference deleted scripts; safe to delete in a cleanup pass.
 
 ---
 
-## Phase 4 commits (on `master`, fast-forward-merged from `phase4-ui`)
+## Skill chain followed
 
-```
-ce079bb normalize Main.gd indentation to tabs (Godot editor auto-format)
-6ea9c9b harmonize closure capture pattern in AccueilView
-f6be900 wire all views and popups in Main.tscn — MVP playable
-f55c635 add SkillTreeView with node unlocks and fame display
-74bea46 add AscendancyView with palier, fame preview, ascend button
-492ffd0 add PainterOfficePopup with hire button
-256a90a add CraftPopup with recipe buttons
-baeb980 add InventoryPopup with equip/unequip
-392ca32 add CanvasPopup with tier upgrade
-9e40ba9 add PaintingView with canvas progress and sub-mechanic buttons
-1955299 add AccueilView with tree visual, parts upgrades, possibilities
-ed4a267 add Main root scene with top bar and view switcher
-0773ae6 add minimal Tooltip widget
-0fa2a95 rebuild BottomBar with 4 currency displays (no XP bar)
-ba03781 add CurrencyDisplay widget — live refresh on Currency.changed
-1669be6 add BaseView parent with lifecycle hooks
-```
+- **Phases 1-4 (MVP rebuild):** `superpowers:brainstorming` → `superpowers:writing-plans` (×4) → `superpowers:executing-plans` (×4) → `superpowers:finishing-a-development-branch` (×4)
+- **Info-panel infra:** brainstorming → writing-plans → executing-plans
+- **Canvas + Atelier brainstorms (this session):** `superpowers:brainstorming` (closed). Next: spec writing → writing-plans → executing-plans.
 
-16 commits on branch `phase4-ui`, fast-forward-merged into `master`, branch deleted.
-
----
-
-## Skill chain followed (all 4 phases)
-
-`superpowers:brainstorming` → `superpowers:writing-plans` (×4) → `superpowers:executing-plans` (×4) → `superpowers:finishing-a-development-branch` (×4)
-
-All 4 phase plans archived in `docs/superpowers/plans/`. Rebuild done.
+All prior phase plans archived in `docs/superpowers/plans/`.
 
 ---
 
