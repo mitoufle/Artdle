@@ -31,7 +31,6 @@ Workshop, Inventory, Craft (+CraftRecipes), PainterOffice, SkillTree (+SkillTree
 | `scripts/ui/views/BaseView.gd` | `_initialize_view` / `_connect_view_signals` / `_initialize_ui` hooks |
 | `scripts/ui/widgets/CurrencyDisplay.gd` | auto-refresh on `Currency.changed` |
 | `scripts/ui/widgets/BottomBar.gd` | 4 currency displays (inspiration/gold/fame/paint_mastery) |
-| `scripts/ui/widgets/Tooltip.gd` | minimal show/hide |
 | `scripts/ui/widgets/TreeVisual.gd` | placeholder circles per part (radius ~ level) |
 | `scripts/ui/widgets/PartUpgradeButton.gd` | per-part gold upgrade |
 | `scripts/ui/views/AccueilView.gd` | tree + parts + possibilities |
@@ -70,7 +69,7 @@ Spec §13 and §14 list post-MVP hooks — none of this is blocking MVP shipping
 - **Dedicated WorkshopPopup:** currently aliased to CanvasPopup. Split once workshop gains its own controls (tier, separate gold mult ladder).
 - **More stages / parts / recipes / nodes:** all data-driven via `config/` — just extend dictionaries.
 - **Offline progress:** save timestamp + compute on load.
-- **Tooltips on every button:** `Tooltip` widget exists but isn't wired anywhere.
+- **Hoverables on every interactive element:** the `InfoPanel` infra ships, but only `AscendButton` is currently wired. Add `Hoverable` children with `content_provider` lambdas (per spec §6) to every PartUpgradeButton, every popup recipe/item button, every sub-mechanic activation button, every Skill Tree node, etc.
 - **Sound:** `floating_text.tscn` still sits unused from the pre-rebuild era.
 - **Pre-rebuild assets cleanup:** `Scenes/{Ascendancy2DView,ClickerPopup,paintingscreen,Animated_Plant,UpgradeButton,tooltipedbtn,floating_text}.tscn` + `Scenes/views/` + `Scenes/controls/ExperienceBar.tscn` are orphaned. Remove in a cleanup PR.
 
