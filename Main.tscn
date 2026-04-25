@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://dpskjp8x1i7x" path="res://Scenes/BottomBar.tscn" id="2_bottombar"]
-[ext_resource type="PackedScene" path="res://Scenes/InfoPanel.tscn" id="7_infopanel"]
 [ext_resource type="PackedScene" path="res://views/AccueilView.tscn" id="3_accueil"]
 [ext_resource type="PackedScene" path="res://views/PaintingView.tscn" id="4_painting"]
 [ext_resource type="PackedScene" path="res://views/AscendancyView.tscn" id="5_ascendancy"]
 [ext_resource type="PackedScene" path="res://views/SkillTreeView.tscn" id="6_skilltree"]
+[ext_resource type="PackedScene" path="res://Scenes/InfoPanel.tscn" id="7_infopanel"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
