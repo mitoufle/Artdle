@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://bcdmain8artdl0"]
+[gd_scene load_steps=8 format=3 uid="uid://bcdmain8artdl0"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://dpskjp8x1i7x" path="res://Scenes/BottomBar.tscn" id="2_bottombar"]
+[ext_resource type="PackedScene" path="res://Scenes/InfoPanel.tscn" id="7_infopanel"]
 [ext_resource type="PackedScene" path="res://views/AccueilView.tscn" id="3_accueil"]
 [ext_resource type="PackedScene" path="res://views/PaintingView.tscn" id="4_painting"]
 [ext_resource type="PackedScene" path="res://views/AscendancyView.tscn" id="5_ascendancy"]
@@ -60,6 +61,9 @@ text = "x1"
 [node name="Content" type="PanelContainer" parent="MainLayout/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="InfoPanel" parent="MainLayout/VBoxContainer" instance=ExtResource("7_infopanel")]
+layout_mode = 2
 
 [node name="BottomBar" parent="MainLayout/VBoxContainer" instance=ExtResource("2_bottombar")]
 layout_mode = 2
