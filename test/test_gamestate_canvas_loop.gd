@@ -45,12 +45,13 @@ func test_buy_style_ceiling_blocked_at_skill_cap():
 func test_gamble_spends_inspiration_on_canvas_start():
     GameState.currency.add("inspiration", BigNumber.from_float(50.0))
     GameState.canvas_config.set_gamble(10)
-    # Force a fast canvas to fire the start.
-    GameState.slots.paint_time_override = 0.001
+    # Use a long paint_time so the canvas does not auto-restart during tick
+    # (auto-restart would fire canvas_starting again and double-spend).
+    GameState.slots.paint_time_override = 1.0
     GameState.slots.set_slot_count(0)
-    GameState.slots.set_slot_count(1)
-    GameState.tick(0.01)
-    # After one canvas, 10 inspiration consumed.
+    GameState.slots.set_slot_count(1)  # _start_slot fires canvas_starting → spend 10
+    GameState.tick(0.01)               # progresses 0.01/1.0, canvas does not finish
+    # After one canvas-start, 10 inspiration consumed.
     assert_almost_eq(GameState.currency.get_amount("inspiration").value, 40.0, 0.01)
 
 func test_gamble_silently_skipped_when_insufficient_inspiration():
