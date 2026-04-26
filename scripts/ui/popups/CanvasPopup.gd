@@ -9,6 +9,7 @@ const GAMBLE_LABELS: Array = ["Off", "10", "100", "1k", "10k"]
 @onready var _palette_header: Label = $MarginContainer/VBoxContainer/Tabs/Configuration/PaletteRow/PaletteLabel
 @onready var _subject_picker: OptionButton = $MarginContainer/VBoxContainer/Tabs/Configuration/SubjectRow/SubjectPicker
 @onready var _gamble_level: OptionButton = $MarginContainer/VBoxContainer/Tabs/Configuration/GambleRow/GambleLevel
+@onready var _upgrade_tier: Button = $MarginContainer/VBoxContainer/Tabs/Improvement/UpgradeTier
 @onready var _buy_style: Button = $MarginContainer/VBoxContainer/Tabs/Improvement/BuyStyle
 @onready var _buy_palette: Button = $MarginContainer/VBoxContainer/Tabs/Improvement/BuyPalette
 @onready var _close_btn: Button = $MarginContainer/VBoxContainer/CloseButton
@@ -22,6 +23,7 @@ func _ready() -> void:
     _palette_slider.value_changed.connect(_on_palette_changed)
     _subject_picker.item_selected.connect(_on_subject_changed)
     _gamble_level.item_selected.connect(_on_gamble_changed)
+    _upgrade_tier.pressed.connect(_on_upgrade_tier)
     _buy_style.pressed.connect(_on_buy_style)
     _buy_palette.pressed.connect(_on_buy_palette)
     _close_btn.pressed.connect(queue_free)
@@ -68,9 +70,17 @@ func _hint_text_for(sid: String) -> String:
 func _refresh_improvement(cfg: CanvasConfig) -> void:
     var s_cap: int = GameState.skill_tree.style_cap()
     var p_cap: int = GameState.skill_tree.palette_cap()
-    _buy_style.text = "Style ceiling +1 (%s g)" % Formatter.short(BigNumber.from_float(CanvasConfig.style_ceiling_cost(cfg.style_current_ceiling)))
+    var tier: int = GameState._canvas_tier
+    if tier >= CanvasTiers.MAX_TIER:
+        _upgrade_tier.text = "Canvas tier %d (max)" % tier
+        _upgrade_tier.disabled = true
+    else:
+        var tier_cost: BigNumber = CanvasTiers.upgrade_cost(tier)
+        _upgrade_tier.text = "Canvas tier %d → %d (%s gold)" % [tier, tier + 1, Formatter.short(tier_cost)]
+        _upgrade_tier.disabled = not GameState.currency.get_amount("gold").gte(tier_cost)
+    _buy_style.text = "Style ceiling +1 (%s gold)" % Formatter.short(BigNumber.from_float(CanvasConfig.style_ceiling_cost(cfg.style_current_ceiling)))
     _buy_style.disabled = cfg.style_current_ceiling >= s_cap
-    _buy_palette.text = "Palette ceiling +1 (%s g)" % Formatter.short(BigNumber.from_float(CanvasConfig.palette_ceiling_cost(cfg.palette_current_ceiling)))
+    _buy_palette.text = "Palette ceiling +1 (%s gold)" % Formatter.short(BigNumber.from_float(CanvasConfig.palette_ceiling_cost(cfg.palette_current_ceiling)))
     _buy_palette.disabled = cfg.palette_current_ceiling >= p_cap
 
 func _on_style_changed(v: float) -> void:
@@ -88,6 +98,15 @@ func _on_subject_changed(idx: int) -> void:
 
 func _on_gamble_changed(idx: int) -> void:
     GameState.canvas_config.set_gamble(GAMBLE_LEVELS[idx])
+
+func _on_upgrade_tier() -> void:
+    var tier: int = GameState._canvas_tier
+    if tier >= CanvasTiers.MAX_TIER:
+        return
+    var cost: BigNumber = CanvasTiers.upgrade_cost(tier)
+    if GameState.currency.spend("gold", cost):
+        GameState.upgrade_canvas_tier()
+    _refresh_from_state()
 
 func _on_buy_style() -> void:
     GameState.buy_style_ceiling()

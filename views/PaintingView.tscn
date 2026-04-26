@@ -1,10 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://dcm3fck3p2gj7"]
+[gd_scene load_steps=6 format=3 uid="uid://dcm3fck3p2gj7"]
 
 [ext_resource type="Script" path="res://scripts/ui/views/PaintingView.gd" id="1_painting"]
 [ext_resource type="PackedScene" path="res://Scenes/CanvasPopup.tscn" id="2_canvas_popup"]
-[ext_resource type="PackedScene" path="res://Scenes/PainterOfficePopup.tscn" id="3_office_popup"]
-[ext_resource type="PackedScene" path="res://Scenes/Widgets/DropFeed.tscn" id="4_drop_feed"]
-[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="5_hoverable"]
+[ext_resource type="PackedScene" path="res://Scenes/WorkshopPopup.tscn" id="3_workshop_popup"]
+[ext_resource type="PackedScene" path="res://Scenes/PainterOfficePopup.tscn" id="4_office_popup"]
+[ext_resource type="PackedScene" path="res://Scenes/Widgets/DropFeed.tscn" id="5_drop_feed"]
+[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="6_hoverable"]
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3
@@ -15,7 +16,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_painting")
 canvas_popup_scene = ExtResource("2_canvas_popup")
-painter_office_popup_scene = ExtResource("3_office_popup")
+workshop_popup_scene = ExtResource("3_workshop_popup")
+painter_office_popup_scene = ExtResource("4_office_popup")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -33,7 +35,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Drops" parent="VBoxContainer" instance=ExtResource("4_drop_feed")]
+[node name="Drops" parent="VBoxContainer" instance=ExtResource("5_drop_feed")]
 layout_mode = 2
 
 [node name="ButtonsRow" type="HBoxContainer" parent="VBoxContainer"]
@@ -44,15 +46,24 @@ layout_mode = 2
 text = "Canvas"
 
 [node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnCanvas"]
-script = ExtResource("5_hoverable")
+script = ExtResource("6_hoverable")
 title = "Canvas"
-body = "Configure your painting (style, palette, subject, gamble) and buy permanent improvements with gold. Settings stay until you change them."
+body = "Configure your painting and buy permanent improvements."
+
+[node name="BtnWorkshop" type="Button" parent="VBoxContainer/ButtonsRow"]
+layout_mode = 2
+text = "Workshop"
+
+[node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnWorkshop"]
+script = ExtResource("6_hoverable")
+title = "Workshop"
+body = "Upgrade workshop tier to boost canvas gold and paint speed."
 
 [node name="BtnOffice" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
 text = "Painter Office"
 
 [node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnOffice"]
-script = ExtResource("5_hoverable")
+script = ExtResource("6_hoverable")
 title = "Painter Office"
-body = "Hire workers. Each worker paints an additional canvas in parallel."
+body = "Hire workers — each one paints an extra canvas in parallel."

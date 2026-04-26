@@ -5,12 +5,12 @@
 
 [node name="CanvasPopup" type="PopupPanel"]
 title = "Canvas"
-size = Vector2i(560, 360)
+size = Vector2i(560, 400)
 script = ExtResource("1_canvaspopup")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 offset_right = 560.0
-offset_bottom = 360.0
+offset_bottom = 400.0
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
@@ -46,7 +46,7 @@ value = 1.0
 [node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/StyleRow/StyleSlider"]
 script = ExtResource("2_hoverable")
 title = "Style"
-body = "How much detail you put into each canvas. Higher style means higher quality, but also takes more time. Drag between 1 and your current ceiling. Buy a higher ceiling in the Improvement tab; the maximum is raised by skill-tree nodes."
+body = "Detail per canvas. Higher style adds quality but takes more time. Buy a higher ceiling in the Improvement tab."
 
 [node name="PaletteRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Configuration"]
 layout_mode = 2
@@ -68,7 +68,7 @@ value = 1.0
 [node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/PaletteRow/PaletteSlider"]
 script = ExtResource("2_hoverable")
 title = "Palette"
-body = "How many colors you use. Higher palette adds quality with no extra paint time. Drag between 1 and your current ceiling. Buy a higher ceiling in the Improvement tab; the maximum is raised by skill-tree nodes."
+body = "Colors per canvas. Higher palette adds quality with no time cost. Buy a higher ceiling in the Improvement tab."
 
 [node name="SubjectRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Configuration"]
 layout_mode = 2
@@ -86,7 +86,7 @@ size_flags_horizontal = 3
 [node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/SubjectRow/SubjectPicker"]
 script = ExtResource("2_hoverable")
 title = "Subject"
-body = "What you're painting. Each subject has its own mastery progress that boosts quality on canvases of that subject. Locked subjects appear as ? once you have made enough progress on a parent subject."
+body = "What you paint. Mastery builds up per subject and adds quality on canvases of that subject."
 
 [node name="GambleRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Configuration"]
 layout_mode = 2
@@ -104,11 +104,20 @@ size_flags_horizontal = 3
 [node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/GambleRow/GambleLevel"]
 script = ExtResource("2_hoverable")
 title = "Gamble"
-body = "Spend inspiration before each canvas to gamble for higher quality. On success, the canvas's quality is multiplied (more inspiration spent, bigger boost). On failure, quality is halved. Off means no gamble."
+body = "Spend inspiration to multiply this canvas's quality. Failure halves quality instead."
 
 [node name="Improvement" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Tabs"]
 visible = false
 layout_mode = 2
+
+[node name="UpgradeTier" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Improvement"]
+layout_mode = 2
+text = "Upgrade Canvas Tier"
+
+[node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Improvement/UpgradeTier"]
+script = ExtResource("2_hoverable")
+title = "Canvas Tier"
+body = "Larger canvases are worth more gold and paint mastery."
 
 [node name="BuyStyle" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Improvement"]
 layout_mode = 2
@@ -116,8 +125,8 @@ text = "Raise style ceiling +1"
 
 [node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Improvement/BuyStyle"]
 script = ExtResource("2_hoverable")
-title = "Raise style ceiling"
-body = "Lets you push the style slider one step higher. Costs gold; the price triples each time. The maximum ceiling you can buy is set by your skill-tree style cap."
+title = "Style ceiling"
+body = "Lets you set higher style. Cost triples each time. Hard cap raised by skill tree."
 
 [node name="BuyPalette" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Improvement"]
 layout_mode = 2
@@ -125,14 +134,14 @@ text = "Raise palette ceiling +1"
 
 [node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Improvement/BuyPalette"]
 script = ExtResource("2_hoverable")
-title = "Raise palette ceiling"
-body = "Lets you push the palette slider one step higher. Costs gold; the price triples each time. The maximum ceiling you can buy is set by your skill-tree palette cap."
+title = "Palette ceiling"
+body = "Lets you set higher palette. Cost triples each time. Hard cap raised by skill tree."
 
 [node name="HintInfo" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Improvement"]
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Spend gold to push your style and palette ceilings higher. Subject hints come from the skill tree."
+text = "Subject hints (revealing locked subjects) come from the skill tree."
 autowrap_mode = 3
 
 [node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer"]
