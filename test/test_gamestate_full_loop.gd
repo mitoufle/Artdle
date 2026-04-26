@@ -23,7 +23,11 @@ func test_canvas_sale_with_modifiers_applies_all_of_them():
     GameState.workshop.tier = 2  # gold_mult = 1 + 0.25*2 = 1.5
     GameState.currency.add("fame", BigNumber.from_float(5.0))
     GameState.skill_tree.unlock("gilded_frame")  # +0.10 gold
+    # GameState._ready already started slot 0 with formula paint_time (3s).
+    # Restart the slot so the override applies to a fresh canvas.
     GameState.slots.paint_time_override = 0.001
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
     GameState.tick(0.01)
     var expected_mult = (1.0 + 2 * Workshop.GOLD_MULT_PER_TIER) * 1.0 * 1.10
     # Default canvas: tier 1, style 1, palette 1, mastery 0 → quality = 3 → gold = 3 * 1 * 10 = 30

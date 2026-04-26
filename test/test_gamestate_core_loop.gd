@@ -7,14 +7,21 @@ func before_each():
     GameState.tree.reset()
 
 func test_canvas_sell_adds_gold_and_paint_mastery():
+    # GameState._ready already started slot 0 with formula paint_time (3s).
+    # Restart the slot so the override applies to a fresh canvas.
     GameState.slots.paint_time_override = 0.001
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
     GameState.tick(0.01)
     assert_gt(GameState.currency.get_amount("gold").value, 0.0)
     # Canvas at tier 1, default style 1, palette 1, mastery 0 → quality 3 → PM = 0 (sub-threshold).
     # PM gain via paint_mastery.on_canvas_sold requires pm_base > 0; quality 3 yields pm_base 0.
     # To ensure PM is added, use tier 10: quality = 10 + 1 + 1 + 0 = 12 → pm_base = 1.
+    # tier_provider re-reads on each _start_slot, so restart again to pick up tier 10.
     GameState.currency.reset(["gold", "paint_mastery"])
     GameState._canvas_tier = 10
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
     GameState.tick(0.01)
     assert_gt(GameState.currency.get_amount("gold").value, 0.0)
     assert_gt(GameState.currency.get_amount("paint_mastery").value, 0.0)
