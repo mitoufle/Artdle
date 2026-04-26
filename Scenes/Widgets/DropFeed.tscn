@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dropfeed_artdle"]
+
+[ext_resource type="Script" path="res://scripts/ui/widgets/DropFeed.gd" id="1_dropfeed"]
+
+[node name="DropFeed" type="HBoxContainer"]
+script = ExtResource("1_dropfeed")

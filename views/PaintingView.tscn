@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dcm3fck3p2gj7"]
+[gd_scene load_steps=7 format=3 uid="uid://dcm3fck3p2gj7"]
 
 [ext_resource type="Script" path="res://scripts/ui/views/PaintingView.gd" id="1_painting"]
 [ext_resource type="PackedScene" path="res://Scenes/CanvasPopup.tscn" id="2_canvas_popup"]
 [ext_resource type="PackedScene" path="res://Scenes/InventoryPopup.tscn" id="3_inventory_popup"]
 [ext_resource type="PackedScene" path="res://Scenes/CraftPopup.tscn" id="4_craft_popup"]
 [ext_resource type="PackedScene" path="res://Scenes/PainterOfficePopup.tscn" id="5_office_popup"]
+[ext_resource type="PackedScene" path="res://Scenes/Widgets/DropFeed.tscn" id="6_drop_feed"]
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3
@@ -14,7 +15,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_painting")
-workshop_popup_scene = ExtResource("2_canvas_popup")
+canvas_popup_scene = ExtResource("2_canvas_popup")
 inventory_popup_scene = ExtResource("3_inventory_popup")
 craft_popup_scene = ExtResource("4_craft_popup")
 painter_office_popup_scene = ExtResource("5_office_popup")
@@ -27,28 +28,23 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CanvasArea" type="VBoxContainer" parent="VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TierLabel" type="Label" parent="VBoxContainer/CanvasArea"]
+[node name="SlotList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
 layout_mode = 2
-text = "Tier 1"
+size_flags_horizontal = 3
 
-[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer/CanvasArea"]
+[node name="Drops" parent="VBoxContainer" instance=ExtResource("6_drop_feed")]
 layout_mode = 2
-max_value = 1.0
-
-[node name="SellButton" type="Button" parent="VBoxContainer/CanvasArea"]
-layout_mode = 2
-text = "Vendre"
 
 [node name="ButtonsRow" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="BtnWorkshop" type="Button" parent="VBoxContainer/ButtonsRow"]
+[node name="BtnCanvas" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
-text = "Workshop"
+text = "Canvas ⚙"
 
 [node name="BtnInventory" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2

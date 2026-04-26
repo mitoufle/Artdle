@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dtc8ht7cqnva0"]
+
+[ext_resource type="Script" uid="uid://dcxssea31g8xb" path="res://scripts/ui/widgets/CanvasSlotCard.gd" id="1_eyehi"]
+
+[node name="CanvasSlotCard" type="PanelContainer" unique_id=1099217242]
+script = ExtResource("1_eyehi")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1997163346]
+layout_mode = 2
+
+[node name="SubjectLabel" type="Label" parent="VBoxContainer" unique_id=1773038841]
+layout_mode = 2
+
+[node name="Progress" type="ProgressBar" parent="VBoxContainer" unique_id=1714920946]
+layout_mode = 2
+
+[node name="QualityLabel" type="Label" parent="VBoxContainer" unique_id=835575376]
+layout_mode = 2
