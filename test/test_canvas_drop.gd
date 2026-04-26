@@ -34,6 +34,10 @@ func test_drop_chance_at_quality_75():
 func test_drop_event_emitted_when_force_drop():
     slots.force_drop = true  # test-only deterministic switch
     slots.paint_time_override = 1.0
+    # before_each already started a slot with formula-derived paint_time (3s).
+    # Restart so the override actually applies to a fresh canvas.
+    slots.set_slot_count(0)
+    slots.set_slot_count(1)
     var captured: Array = []
     slots.drop_rolled.connect(func(p: Dictionary): captured.append(p))
     slots.tick(1.5)

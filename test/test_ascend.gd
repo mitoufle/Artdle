@@ -86,8 +86,10 @@ func test_perform_preserves_fame_and_paint_mastery():
 func test_perform_resets_subsystems():
 	currency.add("inspiration", Balance.palier_ascend(0))
 	currency.add("gold", BigNumber.from_float(1.0e9))
-	var on_reset_called: bool = false
-	ascend.on_reset = func(): on_reset_called = true
+	# GDScript captures primitives by value in lambdas; use a 1-element array
+	# (reference type) so the lambda can mutate the outer state.
+	var on_reset_called: Array = [false]
+	ascend.on_reset = func(): on_reset_called[0] = true
 	tree.stage_index = 2
 	tree._part_levels = {"roots": 3}
 	workshop.tier = 4
@@ -96,7 +98,7 @@ func test_perform_resets_subsystems():
 
 	ascend.perform()
 
-	assert_true(on_reset_called)
+	assert_true(on_reset_called[0])
 	assert_eq(tree.stage_index, 0)
 	assert_eq(tree.get_part_level("roots"), 0)
 	assert_eq(workshop.tier, 0)

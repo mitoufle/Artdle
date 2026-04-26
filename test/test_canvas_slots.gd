@@ -36,8 +36,11 @@ func test_set_slot_count_creates_canvas_children():
     assert_eq(slots.slot_count(), 1)
 
 func test_tick_drives_canvas_to_finish_and_restarts():
-    # Stub paint time low for fast finish.
+    # Stub paint time low for fast finish. before_each already started a slot
+    # with the formula-derived paint_time (3s); restart so override applies.
     slots.paint_time_override = 1.0
+    slots.set_slot_count(0)
+    slots.set_slot_count(1)
     slots.tick(1.5)
     # After finishing, slot auto-restarts; progress should be > 0 again.
     var c: Canvas = slots.get_canvas(0)
@@ -47,11 +50,14 @@ func test_tick_drives_canvas_to_finish_and_restarts():
 func test_finish_emits_canvas_completed():
     watch_signals(slots)
     slots.paint_time_override = 1.0
+    slots.set_slot_count(0)
+    slots.set_slot_count(1)
     slots.tick(1.5)
     assert_signal_emitted(slots, "canvas_completed")
 
 func test_three_slots_each_finish_independently():
     slots.paint_time_override = 1.0
+    slots.set_slot_count(0)
     slots.set_slot_count(3)
     var captured: Array = []
     slots.canvas_completed.connect(func(p: Dictionary): captured.append(p))
