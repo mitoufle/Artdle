@@ -6,6 +6,7 @@ func before_each():
     GameState.slots.paint_time_override = -1.0
     GameState.skill_tree.unlocked_nodes = {}
     GameState.canvas_config.reset()
+    GameState.subject_mastery.reset()
     GameState.painter_office.reset()
     # Reset slot count back to 1 (tests may have changed it).
     GameState.slots.set_slot_count(0)
@@ -112,16 +113,19 @@ func test_full_canvas_loop_yields_gold_and_mastery():
 func test_chef_doeuvre_overrides_quality_when_proc():
     GameState.currency.add("fame", BigNumber.from_float(20.0))
     GameState.skill_tree.unlock("chef_doeuvre_unlock")
-    GameState.tick(0.0)  # propagate aggregators (chef_doeuvre_chance becomes 0.005)
-    # Force chef_doeuvre to always proc for determinism.
-    GameState.slots.chef_doeuvre_chance = 1.0
-    # Use long paint_time + tick once to overshoot, so canvas finishes once.
+    # Manually push aggregators (we will bypass GameState.tick below to keep
+    # chef_doeuvre_chance at 1.0 — GameState.tick would reset it to 0.005).
+    GameState.slots.style_skill_cap = GameState.skill_tree.style_cap()
+    GameState.slots.palette_skill_cap = GameState.skill_tree.palette_cap()
+    GameState.slots.quality_floor_bonus = GameState.skill_tree.quality_floor_bonus()
+    GameState.slots.chef_doeuvre_chance = 1.0  # force proc deterministically
     GameState.slots.paint_time_override = 1.0
     GameState.slots.set_slot_count(0)
     GameState.slots.set_slot_count(1)
-    GameState.tick(1.5)
-    # ideal_quality = tier + style_skill_cap + palette_skill_cap + 10 + floor_bonus
-    #               = 1 + 10 + 10 + 10 + 0 = 31
+    # Bypass GameState.tick — slots.tick still fires canvas_completed via
+    # signal, so _on_canvas_completed runs and updates currency.
+    GameState.slots.tick(1.5)
+    # ideal_quality = tier(1) + style_skill_cap(10) + palette_skill_cap(10) + 10 + 0 = 31
     # gold = 31 * 1 * 10 * 1.0 = 310
     var observed_gold = GameState.currency.get_amount("gold").value
     assert_almost_eq(observed_gold, 310.0, 1.0)

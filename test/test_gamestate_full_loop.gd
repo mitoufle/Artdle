@@ -9,6 +9,8 @@ func before_each():
     GameState.inventory.reset()
     GameState.painter_office.reset()
     GameState.skill_tree.unlocked_nodes = {}
+    GameState.subject_mastery.reset()
+    GameState.canvas_config.reset()
     GameState.ascend.ascend_count = 0
     GameState._active_mechanics.clear()
     GameState._possible_mechanics.clear()
