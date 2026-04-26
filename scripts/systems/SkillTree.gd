@@ -14,6 +14,9 @@ func unlock(node_id: String) -> bool:
     var node = SkillTreeNodes.get_node(node_id)
     if node.is_empty():
         return false
+    for required in node.get("prereq", []):
+        if not unlocked_nodes.has(required):
+            return false
     var cost = BigNumber.from_float(float(node["cost"]))
     if not currency.spend("fame", cost):
         return false

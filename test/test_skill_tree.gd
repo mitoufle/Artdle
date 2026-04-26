@@ -68,3 +68,14 @@ func test_serialize_roundtrip():
     fresh.deserialize(data)
     assert_true(fresh.unlocked_nodes.has("gilded_frame"))
     fresh.free()
+
+func test_unlock_blocked_when_prereq_unmet():
+    # style_cap_2 requires style_cap_1
+    currency.add("fame", BigNumber.from_float(50.0))
+    assert_false(st.unlock("style_cap_2"))
+    assert_eq(currency.get_amount("fame").value, 50.0)  # fame not spent
+
+func test_unlock_succeeds_when_prereq_met():
+    currency.add("fame", BigNumber.from_float(50.0))
+    assert_true(st.unlock("style_cap_1"))
+    assert_true(st.unlock("style_cap_2"))
