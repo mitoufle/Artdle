@@ -42,3 +42,27 @@ func serialize() -> Dictionary:
 
 func deserialize(data: Dictionary) -> void:
     _state = (data.get("state", {}) as Dictionary).duplicate(true)
+
+const HINT_HALF_TIER: int = 3  # half of Subjects.PREREQ_TIER
+
+func is_unlocked(subject_id: String) -> bool:
+    var s: Dictionary = Subjects.get_subject(subject_id)
+    if s.is_empty():
+        return false
+    if (s["parents"] as Array).is_empty():
+        return true
+    for p in (s["parents"] as Array):
+        if tier_of(p["subject_id"]) < int(p["mastery_tier"]):
+            return false
+    return true
+
+func has_hint(subject_id: String) -> bool:
+    if is_unlocked(subject_id):
+        return false
+    var s: Dictionary = Subjects.get_subject(subject_id)
+    if s.is_empty() or (s["parents"] as Array).is_empty():
+        return false
+    for p in (s["parents"] as Array):
+        if tier_of(p["subject_id"]) >= HINT_HALF_TIER:
+            return true
+    return false

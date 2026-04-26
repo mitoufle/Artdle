@@ -51,3 +51,25 @@ func test_serialize_roundtrip():
     assert_eq(fresh.tier_of("nature"), 1)
     assert_eq(fresh.xp_of("vie"), 100)
     fresh.free()
+
+func test_starter_subjects_unlocked_from_start():
+    assert_true(mastery.is_unlocked("nature"))
+    assert_true(mastery.is_unlocked("vie"))
+
+func test_derived_subject_locked_until_both_parents_at_tier_5():
+    assert_false(mastery.is_unlocked("animaliere"))
+    mastery.gain("nature", SubjectMastery.xp_threshold(1) + SubjectMastery.xp_threshold(2) + SubjectMastery.xp_threshold(3) + SubjectMastery.xp_threshold(4) + SubjectMastery.xp_threshold(5))
+    assert_false(mastery.is_unlocked("animaliere"))  # one parent at tier 5, second still 0
+    mastery.gain("vie", SubjectMastery.xp_threshold(1) + SubjectMastery.xp_threshold(2) + SubjectMastery.xp_threshold(3) + SubjectMastery.xp_threshold(4) + SubjectMastery.xp_threshold(5))
+    assert_true(mastery.is_unlocked("animaliere"))
+
+func test_hint_revealed_when_half_progress_on_a_parent():
+    # Half progress = parent at tier 3 (half of prereq tier 5).
+    var xp_to_tier_3 = SubjectMastery.xp_threshold(1) + SubjectMastery.xp_threshold(2) + SubjectMastery.xp_threshold(3)
+    mastery.gain("nature", xp_to_tier_3)
+    # animaliere requires nature(5) + vie(5); half = nature(3) reached.
+    assert_true(mastery.has_hint("animaliere"))
+    assert_false(mastery.is_unlocked("animaliere"))
+
+func test_no_hint_when_no_progress():
+    assert_false(mastery.has_hint("animaliere"))
