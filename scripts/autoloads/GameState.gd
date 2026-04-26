@@ -121,6 +121,7 @@ func _ready() -> void:
 
 	# -- Signals --
 	slots.canvas_completed.connect(_on_canvas_completed)
+	slots.canvas_starting.connect(_on_canvas_starting)
 	tree.stage_entered.connect(_on_stage_entered)
 	tree.possibility_unlocked.connect(_on_possibility_unlocked)
 	ascend.ascended.connect(_on_ascended)
@@ -152,6 +153,19 @@ func canvas_speed_multiplier() -> float:
 	return workshop.canvas_speed_mult() * painter_office.canvas_speed_mult() * skill_tree.canvas_speed_mult()
 
 # -- Signal handlers --
+
+func _on_canvas_starting(_idx: int) -> void:
+	var n: int = canvas_config.gamble_n_inspi
+	if n <= 0:
+		slots.set_meta("gamble_skipped", false)
+		return
+	var cost: BigNumber = BigNumber.from_float(float(n))
+	if currency.get_amount("inspiration").value < float(n):
+		# Silent skip — canvas runs without gamble.
+		slots.set_meta("gamble_skipped", true)
+		return
+	currency.spend("inspiration", cost)
+	slots.set_meta("gamble_skipped", false)
 
 func _on_canvas_completed(payload: Dictionary) -> void:
 	var tier: int = int(payload["tier"])

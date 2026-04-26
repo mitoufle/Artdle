@@ -41,3 +41,23 @@ func test_buy_style_ceiling_blocked_at_skill_cap():
     while GameState.canvas_config.style_current_ceiling < 10:
         assert_true(GameState.buy_style_ceiling())
     assert_false(GameState.buy_style_ceiling())
+
+func test_gamble_spends_inspiration_on_canvas_start():
+    GameState.currency.add("inspiration", BigNumber.from_float(50.0))
+    GameState.canvas_config.set_gamble(10)
+    # Force a fast canvas to fire the start.
+    GameState.slots.paint_time_override = 0.001
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
+    GameState.tick(0.01)
+    # After one canvas, 10 inspiration consumed.
+    assert_almost_eq(GameState.currency.get_amount("inspiration").value, 40.0, 0.01)
+
+func test_gamble_silently_skipped_when_insufficient_inspiration():
+    GameState.canvas_config.set_gamble(100)
+    GameState.slots.paint_time_override = 0.001
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
+    GameState.tick(0.01)
+    # No spend (insufficient). Inspiration stays at 0.
+    assert_almost_eq(GameState.currency.get_amount("inspiration").value, 0.0, 0.01)

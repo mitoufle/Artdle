@@ -5,6 +5,11 @@ signal canvas_completed(payload: Dictionary)
 # payload keys: slot_index (int), quality (float), tier (int),
 #               subject_id (String), gambled (bool), chef_doeuvre (bool)
 
+signal canvas_starting(slot_index: int)
+# Fired immediately before each canvas's start() call. GameState listens to
+# debit inspiration for gamble. If inspiration is insufficient, GameState
+# sets a "gamble_skipped" meta flag that _on_slot_finished checks.
+
 signal drop_rolled(payload: Dictionary)
 # payload: slot_type (String), set_id (String — empty for no-set), tier (int)
 
@@ -84,6 +89,7 @@ func _start_slot(c: Canvas) -> void:
     # Chef d'œuvre roll happens at finish to keep tests deterministic via stubs.
     var paint_time: float = paint_time_override if paint_time_override > 0.0 \
         else Balance.canvas_time(tier, config.style, style_time_reduction, 1.0)  # speed_mult applied via tick scaling
+    canvas_starting.emit(_slots.find(c))
     c.start(paint_time, base_q)
     c.set_meta("tier", tier)
     c.set_meta("subject_id", subject_id)
@@ -96,7 +102,8 @@ func _on_slot_finished(idx: int, payload: Dictionary) -> void:
     # Gamble resolution
     var gambled: bool = false
     var gambled_q: float = base_q
-    if config != null and config.gamble_n_inspi > 0:
+    var skipped: bool = bool(get_meta("gamble_skipped", false))
+    if config != null and config.gamble_n_inspi > 0 and not skipped:
         gambled = true
         if randf() < gamble_success_chance:
             gambled_q = Balance.gamble_success_quality_with_mult(base_q, config.gamble_n_inspi, gamble_yield_mult)
