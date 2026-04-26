@@ -24,7 +24,8 @@ func _ready() -> void:
 	btn_skill.pressed.connect(func(): _switch_view(skill_tree_scene))
 	btn_speed.pressed.connect(_cycle_speed)
 	_refresh_speed_label()
-	GameState.load_game()
+	# Save/load disabled during canvas+atelier rebuild — every launch is a fresh run.
+	# GameState.load_game()
 	_switch_view(accueil_scene)
 
 func _process(delta: float) -> void:
@@ -47,5 +48,6 @@ func _switch_view(scene: PackedScene) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		GameState.save_game()
+		# Save disabled during rebuild — see _ready().
+		# GameState.save_game()
 		get_tree().quit()

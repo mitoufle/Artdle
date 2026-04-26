@@ -2,13 +2,30 @@ extends GutTest
 
 func before_each():
     GameState.currency.reset(["inspiration", "gold", "fame", "paint_mastery"])
-    GameState.canvas.reset()
+    GameState._canvas_tier = 1
+    GameState.slots.paint_time_override = -1.0
     GameState.tree.reset()
+    GameState.skill_tree.unlocked_nodes = {}
+    # Refresh slot multipliers from the freshly-reset state.
+    GameState.tick(0.0)
 
 func test_canvas_sell_adds_gold_and_paint_mastery():
-    var paint_time = CanvasTiers.get_tier(GameState.canvas.tier)["paint_seconds"]
-    GameState.canvas.tick(paint_time)
-    GameState.canvas.sell()
+    # GameState._ready already started slot 0 with formula paint_time (3s).
+    # Restart the slot so the override applies to a fresh canvas.
+    GameState.slots.paint_time_override = 0.001
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
+    GameState.tick(0.01)
+    assert_gt(GameState.currency.get_amount("gold").value, 0.0)
+    # Canvas at tier 1, default style 1, palette 1, mastery 0 → quality 3 → PM = 0 (sub-threshold).
+    # PM gain via paint_mastery.on_canvas_sold requires pm_base > 0; quality 3 yields pm_base 0.
+    # To ensure PM is added, use tier 10: quality = 10 + 1 + 1 + 0 = 12 → pm_base = 1.
+    # tier_provider re-reads on each _start_slot, so restart again to pick up tier 10.
+    GameState.currency.reset(["gold", "paint_mastery"])
+    GameState._canvas_tier = 10
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
+    GameState.tick(0.01)
     assert_gt(GameState.currency.get_amount("gold").value, 0.0)
     assert_gt(GameState.currency.get_amount("paint_mastery").value, 0.0)
 
@@ -35,21 +52,19 @@ func test_paint_mastery_boosts_tree_rate():
 func test_save_and_load_core_loop_roundtrip():
     GameState.save_system.save_path = "user://test_core_loop.save"
     GameState.currency.add("gold", BigNumber.from_float(500.0))
-    GameState.canvas.tier = 3
-    GameState.canvas.tick(1.5)
+    GameState._canvas_tier = 3
     GameState.tree.stage_index = 1
     GameState.tree._part_levels = {"roots": 2}
 
     assert_true(GameState.save_game())
 
     GameState.currency.reset(["gold"])
-    GameState.canvas.reset()
+    GameState._canvas_tier = 1
     GameState.tree.reset()
 
     assert_true(GameState.load_game())
     assert_eq(GameState.currency.get_amount("gold").value, 500.0)
-    assert_eq(GameState.canvas.tier, 3)
-    assert_eq(GameState.canvas.progress_seconds, 1.5)
+    assert_eq(GameState._canvas_tier, 3)
     assert_eq(GameState.tree.stage_index, 1)
     assert_eq(GameState.tree.get_part_level("roots"), 2)
 

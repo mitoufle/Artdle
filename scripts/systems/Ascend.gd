@@ -4,7 +4,7 @@ extends Node
 signal ascended(fame_gained: float, ascend_count: int)
 
 var currency: Currency
-var canvas: Canvas
+var on_reset: Callable = Callable()
 var tree: InspirationTree
 var workshop: Workshop
 var inventory: Inventory
@@ -24,7 +24,7 @@ func perform() -> bool:
     var fame_gain: BigNumber = Balance.fame_conversion(currency.get_amount("inspiration"))
     currency.add("fame", fame_gain)
     currency.reset(["inspiration", "gold"])
-    if canvas:         canvas.reset()
+    if on_reset.is_valid(): on_reset.call()
     if tree:           tree.reset()
     if workshop:       workshop.reset()
     if inventory:      inventory.reset()

@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://dtc8ht7cqnva0"]
+
+[ext_resource type="Script" uid="uid://dcxssea31g8xb" path="res://scripts/ui/widgets/CanvasSlotCard.gd" id="1_eyehi"]
+[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="2_hoverable"]
+
+[node name="CanvasSlotCard" type="PanelContainer" unique_id=1099217242]
+script = ExtResource("1_eyehi")
+
+[node name="Hoverable" type="Node" parent="."]
+script = ExtResource("2_hoverable")
+title = "Painting in progress"
+body = "Auto-paints, sells on completion, restarts. Gold + paint mastery on each finish."
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1997163346]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="SubjectLabel" type="Label" parent="VBoxContainer" unique_id=1773038841]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="Progress" type="ProgressBar" parent="VBoxContainer" unique_id=1714920946]
+layout_mode = 2
+mouse_filter = 1
+max_value = 1.0
+step = 0.01
