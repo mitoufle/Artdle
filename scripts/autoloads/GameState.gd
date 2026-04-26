@@ -125,11 +125,21 @@ func _ready() -> void:
 	tree.possibility_unlocked.connect(_on_possibility_unlocked)
 	ascend.ascended.connect(_on_ascended)
 	currency.changed.connect(_on_currency_changed)
+	skill_tree.node_unlocked.connect(func(_id): refresh_canvas_slot_count())
+
+	refresh_canvas_slot_count()
 
 # Called explicitly by the main scene (Phase 4). Keeps tests deterministic.
 func tick(delta: float) -> void:
 	tree.tick(delta)
 	slots.canvas_speed_mult = canvas_speed_multiplier()
+	slots.style_time_reduction = inventory.style_time_reduction() if inventory.has_method("style_time_reduction") else 0.0
+	slots.quality_floor_bonus = skill_tree.quality_floor_bonus() + (inventory.quality_floor_bonus() if inventory.has_method("quality_floor_bonus") else 0.0)
+	slots.chef_doeuvre_chance = (0.005 if skill_tree.chef_doeuvre_unlocked() else 0.0) * (inventory.chef_doeuvre_chance_mult() if inventory.has_method("chef_doeuvre_chance_mult") else 1.0)
+	slots.style_skill_cap = skill_tree.style_cap()
+	slots.palette_skill_cap = skill_tree.palette_cap()
+	slots.gamble_yield_mult = inventory.gamble_yield_mult() if inventory.has_method("gamble_yield_mult") else 1.0
+	slots.gamble_success_chance = clamp(0.5 * (inventory.gamble_success_chance_mult() if inventory.has_method("gamble_success_chance_mult") else 1.0), 0.0, 0.95)
 	slots.tick(delta)
 
 # -- Modifier aggregation --
@@ -163,6 +173,11 @@ func _current_canvas_tier() -> int:
 func upgrade_canvas_tier() -> void:
 	if _canvas_tier < CanvasTiers.MAX_TIER:
 		_canvas_tier += 1
+
+func refresh_canvas_slot_count() -> void:
+	var n: int = 1 + skill_tree.multi_canvas_slots_grant() + painter_office.worker_count
+	n = clamp(n, 1, 8)  # spec §12 soft cap
+	slots.set_slot_count(n)
 
 func _on_stage_entered(stage_index: int) -> void:
 	stage_entered.emit(stage_index)
