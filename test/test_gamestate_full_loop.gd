@@ -12,6 +12,10 @@ func before_each():
     GameState.ascend.ascend_count = 0
     GameState._active_mechanics.clear()
     GameState._possible_mechanics.clear()
+    # Refresh slot multipliers from the freshly-reset state, so any
+    # set_slot_count() call later in the test reads zeroed aggregators
+    # (not values left over from a previous test file's tick).
+    GameState.tick(0.0)
 
 func test_default_gold_multiplier_is_one():
     assert_almost_eq(GameState.canvas_gold_multiplier(), 1.0, 0.0001)

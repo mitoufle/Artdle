@@ -5,6 +5,9 @@ func before_each():
     GameState._canvas_tier = 1
     GameState.slots.paint_time_override = -1.0
     GameState.tree.reset()
+    GameState.skill_tree.unlocked_nodes = {}
+    # Refresh slot multipliers from the freshly-reset state.
+    GameState.tick(0.0)
 
 func test_canvas_sell_adds_gold_and_paint_mastery():
     # GameState._ready already started slot 0 with formula paint_time (3s).
