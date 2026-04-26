@@ -62,3 +62,66 @@ func test_gamble_silently_skipped_when_insufficient_inspiration():
     GameState.tick(0.01)
     # No spend (insufficient). Inspiration stays at 0.
     assert_almost_eq(GameState.currency.get_amount("inspiration").value, 0.0, 0.01)
+
+func test_save_load_roundtrip_preserves_canvas_state():
+    GameState.save_system.save_path = "user://test_canvas_loop.save"
+    GameState.currency.add("fame", BigNumber.from_float(50.0))
+    GameState.skill_tree.unlock("style_cap_1")
+    GameState.canvas_config.style_current_ceiling = 5
+    GameState.canvas_config.set_style(3)
+    GameState.canvas_config.set_gamble(100)
+    # Tier 1 threshold = 200 XP. Gaining 250 → tier 1, leftover 50.
+    GameState.subject_mastery.gain("nature", 250)
+    GameState._canvas_tier = 4
+
+    assert_true(GameState.save_game())
+
+    # Reset in-place to simulate a fresh boot.
+    GameState.canvas_config.reset()
+    GameState.subject_mastery.reset()
+    GameState._canvas_tier = 1
+    GameState.skill_tree.unlocked_nodes = {}
+
+    assert_true(GameState.load_game())
+    assert_eq(GameState.canvas_config.style, 3)
+    assert_eq(GameState.canvas_config.style_current_ceiling, 5)
+    assert_eq(GameState.canvas_config.gamble_n_inspi, 100)
+    assert_eq(GameState.subject_mastery.tier_of("nature"), 1)
+    assert_eq(GameState._canvas_tier, 4)
+    assert_true(GameState.skill_tree.unlocked_nodes.has("style_cap_1"))
+
+    if FileAccess.file_exists(GameState.save_system.save_path):
+        DirAccess.remove_absolute(ProjectSettings.globalize_path(GameState.save_system.save_path))
+    GameState.save_system.save_path = "user://artdle.save"
+
+func test_full_canvas_loop_yields_gold_and_mastery():
+    # Default config: tier 1, style 1, palette 1, mastery 0 → quality 3.
+    # Gold = quality * tier * 10 * gold_mult = 3 * 1 * 10 * 1.0 = 30.
+    # Mastery gain = 1 + floor(quality / 20) = 1 + 0 = 1 to "nature".
+    # Force one canvas to fire and stop before auto-restart.
+    GameState.slots.paint_time_override = 1.0
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
+    # Drive the canvas to completion in a single tick big enough to overshoot.
+    GameState.tick(1.5)
+    assert_almost_eq(GameState.currency.get_amount("gold").value, 30.0, 0.5)
+    # Mastery accrued to active subject (nature is the default starter).
+    assert_eq(GameState.subject_mastery.tier_of("nature"), 0)
+    assert_eq(GameState.subject_mastery.xp_of("nature"), 1)
+
+func test_chef_doeuvre_overrides_quality_when_proc():
+    GameState.currency.add("fame", BigNumber.from_float(20.0))
+    GameState.skill_tree.unlock("chef_doeuvre_unlock")
+    GameState.tick(0.0)  # propagate aggregators (chef_doeuvre_chance becomes 0.005)
+    # Force chef_doeuvre to always proc for determinism.
+    GameState.slots.chef_doeuvre_chance = 1.0
+    # Use long paint_time + tick once to overshoot, so canvas finishes once.
+    GameState.slots.paint_time_override = 1.0
+    GameState.slots.set_slot_count(0)
+    GameState.slots.set_slot_count(1)
+    GameState.tick(1.5)
+    # ideal_quality = tier + style_skill_cap + palette_skill_cap + 10 + floor_bonus
+    #               = 1 + 10 + 10 + 10 + 0 = 31
+    # gold = 31 * 1 * 10 * 1.0 = 310
+    var observed_gold = GameState.currency.get_amount("gold").value
+    assert_almost_eq(observed_gold, 310.0, 1.0)
