@@ -79,3 +79,37 @@ func test_unlock_succeeds_when_prereq_met():
     currency.add("fame", BigNumber.from_float(50.0))
     assert_true(st.unlock("style_cap_1"))
     assert_true(st.unlock("style_cap_2"))
+
+func test_style_cap_aggregates_across_chain():
+    currency.add("fame", BigNumber.from_float(100.0))
+    st.unlock("style_cap_1")
+    assert_eq(st.style_cap(), 15)
+    st.unlock("style_cap_2")
+    assert_eq(st.style_cap(), 20)
+
+func test_multi_canvas_slots_aggregates():
+    currency.add("fame", BigNumber.from_float(700.0))
+    st.unlock("multi_canvas_1")
+    assert_eq(st.multi_canvas_slots_grant(), 1)
+    st.unlock("multi_canvas_2")
+    assert_eq(st.multi_canvas_slots_grant(), 2)
+
+func test_chef_doeuvre_unlocked_flag():
+    assert_false(st.chef_doeuvre_unlocked())
+    currency.add("fame", BigNumber.from_float(20.0))
+    st.unlock("chef_doeuvre_unlock")
+    assert_true(st.chef_doeuvre_unlocked())
+
+func test_quality_floor_bonus_aggregates():
+    currency.add("fame", BigNumber.from_float(100.0))
+    st.unlock("quality_floor_1")
+    assert_eq(st.quality_floor_bonus(), 2.0)
+    st.unlock("quality_floor_2")
+    assert_eq(st.quality_floor_bonus(), 4.0)
+
+func test_subject_hint_count_aggregates():
+    currency.add("fame", BigNumber.from_float(50.0))
+    st.unlock("subject_hint_1")
+    assert_eq(st.subject_hint_count(), 1)
+    st.unlock("subject_hint_2")
+    assert_eq(st.subject_hint_count(), 2)
