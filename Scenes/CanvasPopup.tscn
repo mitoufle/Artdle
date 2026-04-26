@@ -129,7 +129,9 @@ title = "Plafond de palette +1"
 body = "Coût gold = 100·3^(plafond actuel − 1). Limité par le cap Skill Tree (10 baseline, +5 par node Plafond de palette)."
 
 [node name="HintInfo" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Improvement"]
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Achète plafonds avec or; sujet hints via skill tree."
 autowrap_mode = 3
 
