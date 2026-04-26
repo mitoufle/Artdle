@@ -19,16 +19,7 @@ func test_default_speed_multiplier_is_one():
     assert_almost_eq(GameState.canvas_speed_multiplier(), 1.0, 0.0001)
 
 func test_canvas_sale_with_modifiers_applies_all_of_them():
-    GameState.workshop.tier = 2  # gold_mult = 1 + 0.25*2 = 1.5
-    GameState.currency.add("fame", BigNumber.from_float(5.0))
-    GameState.skill_tree.unlock("gilded_frame")  # +0.10 gold
-    var base = CanvasTiers.get_tier(GameState.canvas.tier)["gold_value"]
-    var paint_time = CanvasTiers.get_tier(GameState.canvas.tier)["paint_seconds"]
-    GameState.canvas.tick(paint_time)
-    GameState.canvas.sell()
-    var expected_mult = (1.0 + 2 * Workshop.GOLD_MULT_PER_TIER) * 1.0 * 1.10
-    var expected_gold = base * expected_mult
-    assert_almost_eq(GameState.currency.get_amount("gold").value, expected_gold, 0.001)
+    pending("Canvas.sell removed; new gold path via CanvasSlots.canvas_completed in Task 14")
 
 func test_try_activate_mechanic_requires_possibility():
     var ok = GameState.try_activate_mechanic("workshop")
