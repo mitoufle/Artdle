@@ -15,6 +15,8 @@ const CraftClass          = preload("res://scripts/systems/Craft.gd")
 const PainterOfficeClass  = preload("res://scripts/systems/PainterOffice.gd")
 const SkillTreeClass      = preload("res://scripts/systems/SkillTree.gd")
 const AscendClass         = preload("res://scripts/systems/Ascend.gd")
+const SubjectMasteryClass = preload("res://scripts/systems/SubjectMastery.gd")
+const CanvasConfigClass   = preload("res://scripts/systems/CanvasConfig.gd")
 
 # -- Signals --
 signal canvas_sold(tier: int, gold_amount: float)
@@ -37,6 +39,8 @@ var craft: CraftClass
 var painter_office: PainterOfficeClass
 var skill_tree: SkillTreeClass
 var ascend: AscendClass
+var subject_mastery: SubjectMasteryClass
+var canvas_config: CanvasConfigClass
 
 # Sub-mechanics the tree has unlocked as "possible" this run (reset on ascend).
 var _possible_mechanics: Dictionary = {}
@@ -55,6 +59,15 @@ func _ready() -> void:
 	canvas = CanvasClass.new()
 	canvas.name = "Canvas"
 	add_child(canvas)
+
+	subject_mastery = SubjectMasteryClass.new()
+	subject_mastery.name = "SubjectMastery"
+	add_child(subject_mastery)
+
+	canvas_config = CanvasConfigClass.new()
+	canvas_config.name = "CanvasConfig"
+	canvas_config.subject_mastery = subject_mastery
+	add_child(canvas_config)
 
 	paint_mastery = PaintMasteryClass.new()
 	paint_mastery.name = "PaintMastery"
@@ -178,6 +191,8 @@ func save_game() -> bool:
 		"painter_office":     painter_office.serialize(),
 		"skill_tree":         skill_tree.serialize(),
 		"ascend":             ascend.serialize(),
+		"subject_mastery":    subject_mastery.serialize(),
+		"canvas_config":      canvas_config.serialize(),
 		"active_mechanics":   _active_mechanics.keys(),
 		"possible_mechanics": _possible_mechanics.keys(),
 	}
@@ -195,6 +210,8 @@ func load_game() -> bool:
 	if data.has("painter_office"): painter_office.deserialize(data["painter_office"])
 	if data.has("skill_tree"):     skill_tree.deserialize(data["skill_tree"])
 	if data.has("ascend"):         ascend.deserialize(data["ascend"])
+	if data.has("subject_mastery"): subject_mastery.deserialize(data["subject_mastery"])
+	if data.has("canvas_config"):   canvas_config.deserialize(data["canvas_config"])
 	_active_mechanics.clear()
 	for id in data.get("active_mechanics", []):
 		_active_mechanics[id] = true
