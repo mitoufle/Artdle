@@ -1,9 +1,15 @@
-[gd_scene format=3 uid="uid://dtc8ht7cqnva0"]
+[gd_scene load_steps=3 format=3 uid="uid://dtc8ht7cqnva0"]
 
 [ext_resource type="Script" uid="uid://dcxssea31g8xb" path="res://scripts/ui/widgets/CanvasSlotCard.gd" id="1_eyehi"]
+[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="2_hoverable"]
 
 [node name="CanvasSlotCard" type="PanelContainer" unique_id=1099217242]
 script = ExtResource("1_eyehi")
+
+[node name="Hoverable" type="Node" parent="."]
+script = ExtResource("2_hoverable")
+title = "Slot canvas"
+body = "La toile se peint automatiquement. À la complétion: auto-vente (or + paint mastery), gain de maîtrise du sujet, chance de drop d'item (5% + 0.1%·qualité). Restart immédiat avec la même config sticky."
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1997163346]
 layout_mode = 2

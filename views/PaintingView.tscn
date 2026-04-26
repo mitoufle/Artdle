@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dcm3fck3p2gj7"]
+[gd_scene load_steps=8 format=3 uid="uid://dcm3fck3p2gj7"]
 
 [ext_resource type="Script" path="res://scripts/ui/views/PaintingView.gd" id="1_painting"]
 [ext_resource type="PackedScene" path="res://Scenes/CanvasPopup.tscn" id="2_canvas_popup"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/CraftPopup.tscn" id="4_craft_popup"]
 [ext_resource type="PackedScene" path="res://Scenes/PainterOfficePopup.tscn" id="5_office_popup"]
 [ext_resource type="PackedScene" path="res://Scenes/Widgets/DropFeed.tscn" id="6_drop_feed"]
+[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="7_hoverable"]
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3
@@ -46,14 +47,34 @@ layout_mode = 2
 layout_mode = 2
 text = "Canvas ⚙"
 
+[node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnCanvas"]
+script = ExtResource("7_hoverable")
+title = "Canvas"
+body = "Configure le canvas (style, palette, sujet, gamble) et achète des plafonds avec de l'or. Sticky: la config s'applique à toutes les toiles suivantes."
+
 [node name="BtnInventory" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
 text = "Inventory"
+
+[node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnInventory"]
+script = ExtResource("7_hoverable")
+title = "Inventaire"
+body = "Voir et équiper tes items. Débloqué quand le sub-mechanic Inventaire est actif."
 
 [node name="BtnCraft" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
 text = "Craft"
 
+[node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnCraft"]
+script = ExtResource("7_hoverable")
+title = "Craft"
+body = "Crée des items via gold. Débloqué via le sub-mechanic Workshop."
+
 [node name="BtnOffice" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
 text = "Painter Office"
+
+[node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnOffice"]
+script = ExtResource("7_hoverable")
+title = "Painter Office"
+body = "Embauche des workers. Chaque worker ajoute +1 slot canvas parallèle."

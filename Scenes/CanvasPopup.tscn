@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bde7a8f8d7q7j"]
+[gd_scene load_steps=3 format=3 uid="uid://bde7a8f8d7q7j"]
 
 [ext_resource type="Script" path="res://scripts/ui/popups/CanvasPopup.gd" id="1_canvaspopup"]
+[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="2_hoverable"]
 
 [node name="CanvasPopup" type="PopupPanel"]
 title = "Canvas"
@@ -42,6 +43,11 @@ max_value = 1.0
 step = 1.0
 value = 1.0
 
+[node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/StyleRow/StyleSlider"]
+script = ExtResource("2_hoverable")
+title = "Style"
+body = "Détail du dessin. Plus haut = qualité +1 et temps +1s par cran. Plafond achetable via Improvement; cap dur via Skill Tree (Plafonds de style I-III)."
+
 [node name="PaletteRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Configuration"]
 layout_mode = 2
 
@@ -59,6 +65,11 @@ max_value = 1.0
 step = 1.0
 value = 1.0
 
+[node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/PaletteRow/PaletteSlider"]
+script = ExtResource("2_hoverable")
+title = "Palette"
+body = "Diversité chromatique. Plus haut = qualité +1 par cran (sans coût de temps). Plafond achetable via Improvement; cap dur via Skill Tree."
+
 [node name="SubjectRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Configuration"]
 layout_mode = 2
 
@@ -71,6 +82,11 @@ text = "Sujet"
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/SubjectRow/SubjectPicker"]
+script = ExtResource("2_hoverable")
+title = "Sujet courant"
+body = "Sujet du canvas. Sa maîtrise (10 tiers, courbe 200·2^(T-1) XP) ajoute +1 qualité par tier. Sujets dérivés débloqués quand 2 parents atteignent tier 5."
 
 [node name="GambleRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Tabs/Configuration"]
 layout_mode = 2
@@ -85,6 +101,11 @@ custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Configuration/GambleRow/GambleLevel"]
+script = ExtResource("2_hoverable")
+title = "Gamble inspiration"
+body = "Avant chaque canvas, dépense N inspi. Succès (50% base) → qualité × (1 + log10(N)·0.5). Échec → qualité ÷ 2 (min 1). Off = pas de gamble."
+
 [node name="Improvement" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Tabs"]
 visible = false
 layout_mode = 2
@@ -93,9 +114,19 @@ layout_mode = 2
 layout_mode = 2
 text = "Style ceiling +1"
 
+[node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Improvement/BuyStyle"]
+script = ExtResource("2_hoverable")
+title = "Plafond de style +1"
+body = "Coût gold = 100·3^(plafond actuel − 1). Limité par le cap Skill Tree (10 baseline, +5 par node Plafond de style)."
+
 [node name="BuyPalette" type="Button" parent="MarginContainer/VBoxContainer/Tabs/Improvement"]
 layout_mode = 2
 text = "Palette ceiling +1"
+
+[node name="Hoverable" type="Node" parent="MarginContainer/VBoxContainer/Tabs/Improvement/BuyPalette"]
+script = ExtResource("2_hoverable")
+title = "Plafond de palette +1"
+body = "Coût gold = 100·3^(plafond actuel − 1). Limité par le cap Skill Tree (10 baseline, +5 par node Plafond de palette)."
 
 [node name="HintInfo" type="Label" parent="MarginContainer/VBoxContainer/Tabs/Improvement"]
 layout_mode = 2
