@@ -49,3 +49,22 @@ func test_finish_emits_canvas_completed():
     slots.paint_time_override = 1.0
     slots.tick(1.5)
     assert_signal_emitted(slots, "canvas_completed")
+
+func test_three_slots_each_finish_independently():
+    slots.paint_time_override = 1.0
+    slots.set_slot_count(3)
+    var captured: Array = []
+    slots.canvas_completed.connect(func(p: Dictionary): captured.append(p))
+    slots.tick(1.5)
+    # All 3 slots finished one canvas each.
+    assert_eq(captured.size(), 3)
+    var indices: Array = []
+    for p in captured:
+        indices.append(p["slot_index"])
+    indices.sort()
+    assert_eq(indices, [0, 1, 2])
+
+func test_set_slot_count_decreases_frees_excess():
+    slots.set_slot_count(3)
+    slots.set_slot_count(1)
+    assert_eq(slots.slot_count(), 1)
