@@ -1,156 +1,204 @@
 # Artdle Rebuild — Session Handover
 
 **Last session:** 2026-04-26
-**Status:** Canvas redesign — backend complete, UI deferred. **232/232 GUT tests pass** on branch `feat/canvas`. Phase F (UI rebuild, Tasks 22-27) is the only Canvas work remaining; user opted to do it manually in the Godot editor.
+**Status:** Canvas redesign — backend complete, Phase F UI shipped (text-authored .tscn). 232/232 GUT tests pass. **Several UI bugs surfaced after first F5; many fixed in-session, more remain (user said "il y'a encore enormément de bug" — needs hands-on diagnosis next session).** Branch `feat/canvas` is 37 commits ahead of `master`.
 
 ---
 
 ## Where the project stands
 
-- **Branch:** `feat/canvas` (29 commits ahead of `master`). NOT yet merged. `master` still points at `d4bf992` (post-brainstorm WIPs).
-- **Specs shipped:** `docs/superpowers/specs/2026-04-25-canvas-design.md` and `2026-04-25-atelier-design.md` (both promoted from WIPs in the previous session, committed on `master` at `bb22d74`).
-- **Plan shipped:** `docs/superpowers/plans/2026-04-26-canvas-implementation.md` (30 tasks across 7 phases A→G).
-- **Phases A-E + G shipped on `feat/canvas`:** data foundations, sticky configuration, multi-canvas slots, drops, skill tree Canvas branch (17 nodes), improvement panel sinks, gamble inspiration spend, integration tests.
-- **Phase F (Tasks 22-27 — UI rebuild) deferred** to manual user work in the Godot editor. The plan has all the GD code; the user reproduces scene authoring in the editor for `CanvasSlotCard`, `DropFeed`, `PaintingView`, `CanvasPopup` (2-tab), and Hoverable wiring.
-- **Godot version:** 4.6.2. **Test framework:** GUT 9.x (editor panel; CLI still broken).
+- **Branch:** `feat/canvas`. NOT yet merged to `master` (master still at `d4bf992`, post-WIP-promotion).
+- **Specs shipped on master** (`bb22d74`): `docs/superpowers/specs/2026-04-25-canvas-design.md` and `2026-04-25-atelier-design.md`.
+- **Plan shipped on master** (`d6421d8`): `docs/superpowers/plans/2026-04-26-canvas-implementation.md` (30 tasks, phases A→G).
+- **Phases A-G shipped** on `feat/canvas` (commits `a7deb6b` → `1c71d03`).
+- **Godot 4.6.2**, GUT 9.x (editor panel; CLI broken).
+- **Tests:** 232/232 passing.
 
 ---
 
-## What's done
+## What's done (full session arc)
 
-### Phases 1-4 (MVP) + info-panel
-Unchanged from last session — see `git log master`. 156 prior tests still pass.
+### Spec writing (start of session, on master)
+Two WIPs promoted to final specs (`bb22d74`). Items-source resolved to canvas drops (was undefined in WIPs). Tuning values invented per "difficile, long, récompensant" north star, all flagged in §15.
 
-### Canvas + Atelier brainstorms → final specs (2026-04-25 → 2026-04-26)
-- Both WIPs promoted to final specs at `bb22d74` on `master`.
-- Items source resolved as canvas drops (was undefined in WIPs) — flagged in §15.3 of both specs as the #1 architectural assumption to validate.
-- Tuning values invented per "difficile, long, récompensant" north star, all flagged for review in §15 of each spec.
+### Plan writing (start of session, on master)
+30 tasks across 7 phases A-G, written into `docs/superpowers/plans/2026-04-26-canvas-implementation.md` (`d6421d8`).
 
-### Canvas implementation plan written (2026-04-26)
-30 tasks, phases A→G, on `feat/canvas` (commits `a7deb6b` → `bd448a4`).
+### Phase A — Data foundations (Tasks 1-7, on `feat/canvas`)
+- `scripts/config/Subjects.gd` — 20 subjects + prereq graph (5 starters + 15 derived, all with `mastery_tier 5` prereqs)
+- `scripts/systems/SubjectMastery.gd` — Node, exponential XP curve `200·2^(T-1)` to MAX_TIER 10, `is_unlocked`, `has_hint`
+- `scripts/core/Balance.gd` — 9 new static methods covering quality, ideal, gold, PM, time, gamble (success/failure/with_mult)
 
-### Phase A — Data foundations
-- `scripts/config/Subjects.gd` — 20-subject prereq graph (5 starters + 15 derived, all with `mastery_tier 5` prereqs)
-- `scripts/systems/SubjectMastery.gd` — Node, exponential XP curve `200·2^(T-1)` to MAX_TIER 10, carry-over on level-up, `is_unlocked` (AND-of-parents), `has_hint` (any-parent-at-half-tier)
-- `scripts/core/Balance.gd` — 6 new static methods: `canvas_base_quality`, `canvas_ideal_quality`, `canvas_gold`, `canvas_pm_base`, `canvas_pm_burst_eligible`, `canvas_time` (with `STYLE_TIME_REDUCTION_CAP = 0.70` clamp), and 3 gamble methods using `log(x)/log(10.0)` (no `log10` builtin in GDScript)
+### Phase B — Canvas core refactor (Tasks 8-10)
+- `scripts/systems/CanvasConfig.gd` — sticky settings (style/palette/sujet/gamble + per-run ceilings)
+- `scripts/systems/Canvas.gd` REWRITTEN — per-slot, `start(paint_time, quality)`, `tick(delta)`, `signal finished(payload)`. Old API (tier/sell/sold/upgrade_tier/is_ready_to_sell) removed
+- `scripts/autoloads/GameState.gd` wires SubjectMastery + CanvasConfig
 
-### Phase B — Canvas core refactor
-- `scripts/systems/CanvasConfig.gd` — Node holding sticky settings (style/palette/sujet/gamble + per-run ceilings)
-- `scripts/systems/Canvas.gd` — REWRITTEN as per-slot. New API: `start(paint_time, quality)`, `tick(delta)`, `signal finished(payload: Dictionary)`. Old API (`tier`, `sell()`, `sold`, `is_ready_to_sell`, `upgrade_tier`) all removed
-- `scripts/autoloads/GameState.gd` — wires `SubjectMastery` + `CanvasConfig` as autoload children
+### Phase C — Multi-canvas + drops (Tasks 11-14)
+- `scripts/systems/CanvasSlots.gd` — multi-slot orchestrator with `canvas_completed`, `canvas_starting`, `drop_rolled` signals
+- `GameState` rewires from single Canvas to CanvasSlots. New helpers: `_canvas_tier`, `upgrade_canvas_tier()`, `_on_canvas_completed`. Ascend uses `on_reset: Callable`
+- 4 broken pending tests un-stubbed with new API equivalents
 
-### Phase C — Multi-canvas + drops
-- `scripts/systems/CanvasSlots.gd` — multi-slot orchestrator with `canvas_completed`, `canvas_starting`, `drop_rolled` signals. Gamble + chef d'œuvre resolution at finish. Auto-restart chain (spec §3.2)
-- `GameState` rewires from single Canvas to CanvasSlots. New helpers: `_canvas_tier`, `upgrade_canvas_tier()`, `_on_canvas_completed`, `_current_canvas_tier()`. Ascend uses `on_reset: Callable` instead of holding a Canvas ref
-
-### Phase D — Skill tree Canvas branch
-- 17 new entries in `scripts/config/SkillTreeNodes.gd` (chef d'œuvre unlock, style/palette caps ×3 chained, subject hints ×2 chained, multi-canvas ×3 chained, gamble safety net, always-gamble, quality floor ×2 chained, auto-mastery passive). Existing 5 MVP nodes tagged `branch: "mvp"`. Total Canvas-branch fame cost: 970
+### Phase D — Skill tree Canvas branch (Tasks 15-18)
+- 17 new entries in `SkillTreeNodes.gd` with `branch: "canvas"`. MVP nodes tagged `branch: "mvp"`. Total Canvas-branch fame cost: **970** (plan said 935 — arithmetic error in plan, fixed in test)
 - `SkillTree.unlock()` enforces `prereq` array BEFORE debiting fame
-- 9 new aggregator methods on `SkillTree`: `style_cap`, `palette_cap`, `multi_canvas_slots_grant`, `quality_floor_bonus`, `subject_hint_count`, `chef_doeuvre_unlocked`, `always_gamble_unlocked`, `gamble_safety_net`, `auto_mastery_rate`
-- `GameState.tick()` pushes 9 aggregators into `CanvasSlots` each frame; `refresh_canvas_slot_count()` triggered on `skill_tree.node_unlocked` (clamped 1-8 per spec §12)
+- 9 aggregator methods on `SkillTree`
+- `GameState.tick()` pushes 9 aggregators into CanvasSlots; `refresh_canvas_slot_count()` triggers on `node_unlocked`. Slots clamped 1-8
 
-### Phase E — Improvement panel + ceilings
+### Phase E — Improvement panel + ceilings (Tasks 19-21)
 - `CanvasConfig` static cost methods: `style_ceiling_cost(N) = 100·3^(N-1)`, palette same, `subject_hint_cost(N) = 1000·2^N`
-- `GameState.buy_style_ceiling()` / `buy_palette_ceiling()` — atomic gold sinks gated by `skill_tree.style_cap()` / `palette_cap()`
-- `CanvasSlots.canvas_starting` signal + `GameState._on_canvas_starting` debits inspiration when gamble is configured. Silent-skip on insufficient via `gamble_skipped` meta flag
+- `GameState.buy_style_ceiling()` / `buy_palette_ceiling()` — atomic gold sinks
+- `CanvasSlots.canvas_starting` signal + `GameState._on_canvas_starting` debits inspiration. Silent-skip on insufficient via `gamble_skipped` meta flag
 
-### Phase G — Integration tests
-- `test/test_gamestate_canvas_loop.gd` — 10 tests: slot count expansion, quality floor propagation, buy_ceiling sinks (3 tests), gamble spend (2 tests), save/load roundtrip, end-to-end loop, chef d'œuvre override
-- 232 tests total across the project. All green
+### Phase G — Integration tests (Tasks 28-30)
+- `test/test_gamestate_canvas_loop.gd` — 10 tests: slot count expansion, quality floor propagation, buy_ceiling sinks (3), gamble spend (2), save/load roundtrip, end-to-end loop, chef d'œuvre override
 
-### Architectural decisions worth knowing
+### Phase F — UI rebuild (Tasks 22-27, originally deferred but completed in-session)
+- `scripts/ui/widgets/CanvasSlotCard.gd` + `Scenes/Widgets/CanvasSlotCard.tscn` — per-slot card showing "Subject — Tier N — Q X.X" + ProgressBar (max_value 1.0)
+- `scripts/ui/widgets/DropFeed.gd` + `Scenes/Widgets/DropFeed.tscn` — last-5 drops with full English names ("Knife T1 (Legacy)")
+- `views/PaintingView.tscn` + `scripts/ui/views/PaintingView.gd` rebuilt — slot list (in ScrollContainer) + drop feed + 3 buttons: Canvas / Workshop / Painter Office
+- `Scenes/CanvasPopup.tscn` + `scripts/ui/popups/CanvasPopup.gd` rebuilt — TabContainer with **Configuration** (style + palette HSliders, subject OptionButton with hint placeholders, gamble OptionButton) and **Improvement** (Upgrade Canvas Tier + Buy Style Ceiling + Buy Palette Ceiling buttons with live cost labels)
+- `Scenes/WorkshopPopup.tscn` + `scripts/ui/popups/WorkshopPopup.gd` (new) — minimal Workshop tier upgrade popup
+- 11 Hoverable child nodes wired across CanvasPopup (6), CanvasSlotCard (1), PaintingView buttons (3), Workshop placeholder (none yet — could add). All single-line English bodies, player-facing
+- Inventory + Craft buttons REMOVED from PaintingView per spec §2 ("Atelier is one merged mechanic"). The Atelier plan will add a single "Atelier" button when shipped
+
+---
+
+## Bugs surfaced after F5 in this session — fixed
+
+| Bug | Cause | Fix commit |
+|---|---|---|
+| `_ready` crash: `canvas.sold` not found | Phase B removed signal; Phase C didn't fix until Task 14 | `484431a` (interim comment-out, then `002e66e` did proper rewire) |
+| Test `test_ascend.gd:89` runtime error: `canvas.tier = 5` | Same Canvas API removal | `f2a9845` (stub 4 tests as `pending()`, un-stubbed in `002e66e`) |
+| Cross-test leak: `slots.quality_floor_bonus` stuck at 2.0 | Test order: `test_quality_floor_propagates_to_slots_on_tick` ran before `test_canvas_sale_with_modifiers` | `8a209e5` (added `tick(0.0)` to `before_each` to refresh aggregators) |
+| `paint_time_override` set after canvas already started → tick(1.5) doesn't finish | The override applies on `_start_slot`, not on running canvases | `9cc4a8f` (test pattern: `set_slot_count(0); set_slot_count(1)` to force restart with override) |
+| GDScript lambda captures primitive bool by value | `on_reset_called: bool` flag never mutated by callback | `9cc4a8f` (changed to `Array = [false]`, mutated as `[0] = true`) |
+| Gamble test got 30 inspi instead of 40 | `tick(0.01)` finished + auto-restarted canvas → `canvas_starting` fired twice → double-spend | `5dc541d` (use long `paint_time = 1.0`, no auto-restart in tick) |
+| Gold test got 82.5 / 66 / 40 instead of 49.5 / 49.5 / 30 | `subject_mastery` not reset between tests; previous test's nature mastery=1 leaked, raising quality from 3 to 4 | `bd448a4` (added `subject_mastery.reset()` to `before_each` in 2 test files) |
+| `chef_doeuvre_chance = 1.0` overridden back to 0.005 by `GameState.tick()` aggregator pass | Test set chance directly then called full `GameState.tick`, which re-derives chance from skill_tree state | `bd448a4` (use `slots.tick()` directly, bypass GameState aggregator pass) |
+| ProgressBar showing full at 1% | ProgressBar default `max_value = 100`, script wrote 0..1 ratio | `b5c7972` (set `max_value = 1.0` in .tscn) |
+| Stray `Q:3.0` floating below progress bar | Separate QualityLabel below SubjectLabel | `b5c7972` (merged into SubjectLabel as `Nature — Tier 1 — Q 3.0`, removed QualityLabel) |
+| DropFeed garbled `cou/T1 her bru/T1 ate` | 3-char abbreviations + HBox concat | `b5c7972` (full names: `Knife T1 (Legacy)` via SLOT_NAMES + SET_NAMES dicts) |
+| Mixed French/English UI text | Initial Phase F bodies in French | `b5c7972` (full English translation of all 11 Hoverable bodies + UI labels) |
+| 3 buttons (Inventory/Craft/Office) for what should be one Atelier | Conflict with spec §2 | `b5c7972` (removed Inventory + Craft; Atelier plan will replace with one button) |
+| No Workshop button | Removed in cleanup; Workshop is separate from Atelier | `1c71d03` (restored + new minimal `WorkshopPopup.tscn`/`.gd`) |
+| Workshop UI was aliased to old CanvasPopup; new CanvasPopup has no Canvas tier upgrade | Plan §10 said tier upgrade goes in Improvement tab; rewrite forgot to port the OLD popup's upgrade button | `1c71d03` (added "Upgrade Canvas Tier" button to Improvement tab) |
+| Hoverable bodies too verbose, perceived as "random info appearing" | Multi-clause paragraphs | `1c71d03` (trimmed to single-line, focused) |
+
+---
+
+## ⚠️ KNOWN BUGS NOT YET DIAGNOSED — START HERE NEXT SESSION
+
+The user reports more UI bugs after the latest commit (`1c71d03`). Specifically reported in last messages:
+
+1. **"Inspiration production stops abruptly when advancing to a new tree stage"** — Confirmed pre-existing in `InspirationTree._check_stage_advance` line 68: `_part_levels = {}` resets all parts on stage advance. By design (each stage has its own parts), but **user finds this jarring**. Possible fixes:
+   - Carry over part levels for parts that exist in both old and new stage (`roots` exists in stages 0-4 — keep its level)
+   - Auto-purchase the new stage's parts at level 1 on advance (safety floor)
+   - Show clearer feedback ("New stage! Upgrade roots/leaves/branches to resume production")
+   - Leave as-is and accept the design
+
+2. **"Hover info appears randomly when hovering Canvas / Painter Office buttons"** — User claim, not yet diagnosed. After `1c71d03` (verbose-body trim), should be less noisy. **If still happening, need user to describe exactly what text appears unexpectedly.** Possible causes to investigate:
+   - Multiple Hoverables firing in sequence as mouse traverses neighbor controls
+   - InfoPanel layout overlap with the buttons row
+   - A Hoverable on a parent container we forgot about
+
+3. **User said "il y'a encore enormément de bug"** — open-ended. Need user to enumerate.
+
+---
+
+## Architecture decisions worth knowing (carry-forward)
+
 - **Atelier-coupled affixes are NOT pre-coupled to Canvas.** GameState.tick() guards them with `inventory.has_method(...)` checks that return safe defaults. The Atelier plan replaces Inventory with the rolled affix system later.
 - **CanvasSlots.canvas_starting fires on EVERY canvas start, including auto-restart.** In tests, `paint_time_override = 0.001 + tick(0.01)` causes one finish + one auto-restart per tick → 2 canvas_starting fires. Real production with `paint_time` = 3 seconds doesn't see this.
-- **`subject_mastery` MUST be reset in `before_each`** of integration test files. The save/load roundtrip test deliberately preserves nature mastery; without a reset, that state leaks into the next test (was 3 separate test failures during Phase G).
-- **`GameState.tick()` overrides per-slot aggregator fields every frame.** Tests that need to force `chef_doeuvre_chance = 1.0` etc. must call `slots.tick()` directly to bypass the GameState pass.
+- **`subject_mastery` MUST be reset in `before_each`** of integration test files. The save/load roundtrip test deliberately preserves nature mastery; without a reset, that state leaks.
+- **`GameState.tick()` overrides per-slot aggregator fields every frame.** Tests that need to force `chef_doeuvre_chance = 1.0` etc. must call `slots.tick()` directly to bypass.
+- **Path conventions discovered:** existing on-disk layout is `Scenes/Widgets/` (capital W), `views/PaintingView.tscn` (root, NOT `Scenes/views/`), `Scenes/CanvasPopup.tscn` (root, NOT `Scenes/popups/`). The plan's path assumptions were wrong; res:// paths now match disk casing for Linux/Mac portability.
+- **Workshop is a separate mechanic from Atelier.** The Atelier plan merges Inventory + Craft only. Workshop has its own popup (`WorkshopPopup`) and own button.
+- **Canvas tier upgrade lives in CanvasPopup Improvement tab.** Not in WorkshopPopup despite naming confusion in MVP.
 
 ---
 
 ## What's next
 
-### Phase F — UI rebuild (Tasks 22-27 in the plan, USER-DRIVEN)
+### Immediate priority for next session — UI bugfix sweep
 
-Plan reference: `docs/superpowers/plans/2026-04-26-canvas-implementation.md`. Each task has the GD script in full + the scene-tree description. User authors the `.tscn` files in the Godot editor.
+1. **User runs F5, lists every UI bug observed, paste-by-paste.** I diagnose and fix each.
+2. **Tree stage advance behavior** — decide: carry-over part levels, or accept the design.
+3. **Hover info "random"** — once user describes specific repro, fix it.
 
-| # | What to build |
-|---|---|
-| 22 | `Scenes/widgets/CanvasSlotCard.tscn` + `scripts/ui/widgets/CanvasSlotCard.gd` — per-slot progress card |
-| 23 | `Scenes/widgets/DropFeed.tscn` + `scripts/ui/widgets/DropFeed.gd` — last-5-drops badges |
-| 24 | Rebuild `Scenes/views/PaintingView.tscn` + script — slot list + drop feed (currently broken: references removed `GameState.canvas` API) |
-| 25 | Rebuild `Scenes/popups/CanvasPopup.tscn` + script — Configuration tab (style/palette sliders, subject picker, gamble dropdown) |
-| 26 | Add Improvement tab to CanvasPopup (BuyStyle/BuyPalette/RevealHint buttons) |
-| 27 | Wire `Hoverable` children per info-panel spec §6 on every interactive element |
+### Follow-up after bug sweep
 
-**`scripts/ui/popups/CanvasPopup.gd` and `scripts/ui/views/PaintingView.gd` still reference removed Canvas API** (`canvas.tier`, `canvas.sell()`, `canvas.is_ready_to_sell()`, `canvas.upgrade_tier()`). The Peinture view will throw runtime errors if opened before Phase F. Editor still loads (boot is fine since the emergency fix at `484431a` commented out the broken `canvas.sold.connect` line).
+4. **Test in editor that everything works** — full smoke test (all views, all popups, save/load, ascend cycle).
+5. **Commit Godot-generated `.uid` files** — `git status` shows ~13 untracked. Run `git add scripts/**/*.uid test/**/*.uid` then commit as a tidy-up.
+6. **Merge `feat/canvas` → `master`** when stable. 37 commits to integrate. `git merge --no-ff feat/canvas`.
+7. **Start Atelier plan** — `superpowers:writing-plans` on `2026-04-25-atelier-design.md`. The plan will:
+   - Replace Inventory.gd / Craft.gd / InventoryPopup / CraftPopup with merged Atelier system
+   - Add a single "Atelier" button to PaintingView (currently has only Canvas / Workshop / Office)
+   - Implement the affix pool + 8 slots + 6 sets + persistence + skill tree Atelier branch (22 nodes)
+   - Replace placeholder set/tier weights in `CanvasSlots._on_slot_finished` drop block with real §11.2-11.4 logic
 
-### After Phase F: merge `feat/canvas` to `master`, then start the Atelier plan
-
-The Atelier spec is ready (`2026-04-25-atelier-design.md`) and depends on the Canvas affix pool. Atelier is a fresh plan-write → execution cycle.
-
-### Background follow-ups (not blocking)
-- **Visual polish** as in prior HANDOVER (TreeVisual sprites, BottomBar icons, popup theming).
-- **Hoverables rollout** — Phase F adds them for Canvas; the rest of the UI (Accueil, Ascendancy, SkillTree) still has only `AscendButton` wired.
-- **Offline progress.**
-- **Sound:** `floating_text.tscn` still unused.
-- **Pre-rebuild `.tscn` orphans** — see HANDOVER §Pre-rebuild orphans, unchanged.
-- **Untracked `.uid` files** Godot generated when the editor opened during Phase A/B/C — not yet committed (`git status` shows them).
+### Background polish (not blocking)
+- Hoverable wiring on the rest of the UI (Accueil, Ascendancy, SkillTree, BottomBar) — only AscendButton + Canvas UI wired so far
+- `TreeVisual` placeholder circles → sprites
+- `BottomBar` icons via `Icons.bbcode`
+- Workshop UI polish (currently very minimal — just tier label + upgrade button)
+- Live `content_provider` callbacks on hovers that show numbers (e.g., BuyStyle's exact current cost)
+- Sound effects (`floating_text.tscn` still unused)
 
 ---
 
-## How to resume (checklist for next session)
+## How to resume (next session)
 
 1. **Read this file.**
-2. **Verify branch:** `git branch --show-current` should be `feat/canvas`. `git log --oneline master..HEAD` should show 29 commits.
+2. **Verify state:**
+   ```bash
+   git branch --show-current     # feat/canvas
+   git log --oneline master..HEAD | wc -l    # 37
+   git status --short            # clean (or .uid files untracked)
+   ```
 3. **Verify tests:** Godot editor → Project → Tools → GUT → Run All → 232 pass.
-4. **If continuing Phase F manually:** open `docs/superpowers/plans/2026-04-26-canvas-implementation.md` and start at Task 22.
-5. **If skipping to Atelier:** finish Phase F first (PaintingView is currently broken if opened) OR comment out the broken UI files temporarily and start writing the Atelier plan via `superpowers:writing-plans`. Atelier's plan-write should reference the Canvas spec for affix pool details.
-6. **When Phase F lands:** smoke test in F5 — the Peinture view should display 1-8 slot cards with progress bars + a drop feed. CanvasPopup should have 2 tabs.
-7. **Then merge `feat/canvas` → `master`** with `git merge --no-ff feat/canvas` (or PR).
+4. **F5 the project. List every bug observed.** Paste them in chat.
+5. **Decide on tree stage advance behavior** (item #1 in known bugs above).
+6. After UI bugs are flushed: pick option from "What's next" Follow-up section.
 
 ---
 
-## Gotchas (carried forward + new)
+## Gotchas (carried forward)
 
 ### Test execution
 - **GUT CLI broken.** Editor panel only.
-- **Integration tests use the `GameState` autoload directly**, not a fresh-instance pattern. `before_each` in `test_gamestate_canvas_loop.gd` and `test_gamestate_full_loop.gd` resets currency, tree, workshop, inventory, painter_office, skill_tree, **canvas_config, subject_mastery**, and slot count. Plus a `tick(0.0)` to refresh aggregators.
-- **`paint_time_override` only applies on `_start_slot`**, not on a running canvas. Tests that change override mid-test must call `slots.set_slot_count(0); slots.set_slot_count(1)` to force a fresh start.
-- **GDScript captures primitives by value in lambdas.** Tests using callbacks to mutate flags must use a 1-element Array (or Dictionary) — see `test_perform_resets_subsystems` in `test_ascend.gd`.
+- **Integration tests** in `test_gamestate_canvas_loop.gd` and `test_gamestate_full_loop.gd` reset: currency, tree, workshop, inventory, painter_office, skill_tree, **canvas_config, subject_mastery**, slot count, plus `tick(0.0)` to refresh aggregators.
 
 ### Godot 4.6 strictness
-1. `class_name` + autoload typing breaks → use `const FooClass = preload(...)` (GameState has 14 now: Currency, Save, InspirationTree, PaintMastery, Workshop, Inventory, Craft, PainterOffice, SkillTree, Ascend, SubjectMastery, CanvasConfig, CanvasSlots).
+1. `class_name` + autoload typing → use `const FooClass = preload(...)`. GameState has 13 (Currency, Save, InspirationTree, PaintMastery, Workshop, Inventory, Craft, PainterOffice, SkillTree, Ascend, SubjectMastery, CanvasConfig, CanvasSlots).
 2. `to_string()` collides with native — use `_to_string()`.
 3. `.gdignore` in a directory makes Godot skip it.
 4. `log()` is natural log; for log base 10 use `log(x) / log(10.0)`.
-5. **Auto-restart in `_start_slot`** — when a canvas finishes, `_on_slot_finished` calls `_start_slot(c)` synchronously. A single `tick(delta)` with `delta > paint_time` triggers ONE finish + ONE auto-restart in the same tick. `canvas_starting` fires twice in that case.
+5. **Auto-restart in `_start_slot`** — `_on_slot_finished` calls `_start_slot(c)` synchronously. A single `tick(delta)` with `delta > paint_time` triggers ONE finish + ONE auto-restart in the same tick. `canvas_starting` fires twice in that case.
+6. **GDScript lambdas capture primitives BY VALUE.** Mutating a captured `bool`/`int`/`float` inside a lambda is a no-op (silent in editor, warning in test runner: `CONFUSABLE_CAPTURE_REASSIGNMENT`). Use a 1-element `Array` or `Dictionary` instead.
 
 ### Save system
 - `JSON.new().parse()` (not `JSON.parse_string`) — avoids GUT false failures.
-- `push_warning` for non-fatal; `push_error` triggers GUT failure.
 - New save schema keys: `subject_mastery`, `canvas_config`, `canvas_tier` (replaces old `canvas`).
 
 ### Indentation
-- GameState.gd uses TABS. Most other scripts use 4 spaces. Per-file consistency. Godot's editor auto-converts on save.
-- `Subjects.gd`, `SubjectMastery.gd`, `CanvasConfig.gd`, `CanvasSlots.gd` all use 4 spaces.
+- GameState.gd uses TABS. Most other scripts use 4 spaces. Per-file consistency.
+- New systems (`Subjects.gd`, `SubjectMastery.gd`, `CanvasConfig.gd`, `CanvasSlots.gd`) all use 4 spaces.
+- Hoverable script uses tabs (parent: existing `scripts/ui/widgets/Hoverable.gd`).
 
 ### Architecture invariants (keep)
 - `GameState.tick(delta)` called from `Main._process` (not `GameState._process`).
 - Autoload subsystem types are `const XClass = preload(...)`.
-- **CanvasSlots is loosely coupled to GameState.** It receives multipliers via plain field assignment in GameState.tick. This lets CanvasSlots be tested in isolation (with the test directly setting fields).
+- **CanvasSlots is loosely coupled to GameState.** Multipliers pushed via plain field assignment in `GameState.tick()`. Tests can directly set fields on slots to bypass GameState's aggregator overrides.
 
-### `.tscn` files written by hand
-- Phase 4 `.tscn` files were written as plain text. Godot regenerates UIDs on first editor load. Expect incidental diffs.
-- **Phase F will TOUCH these files**: `Scenes/views/PaintingView.tscn`, `Scenes/popups/CanvasPopup.tscn`. User does this in the editor.
-- **Phase F creates new files**: `Scenes/widgets/CanvasSlotCard.tscn`, `Scenes/widgets/DropFeed.tscn`.
+### Path conventions
+- `Scenes/` (root, no popups/ subdir) for popups: CanvasPopup, WorkshopPopup, InventoryPopup, CraftPopup, PainterOfficePopup, BottomBar, InfoPanel.
+- `Scenes/Widgets/` (capital W) for new widgets: CanvasSlotCard, DropFeed.
+- `views/` (root, no Scenes/ prefix) for views: AccueilView, PaintingView, AscendancyView, SkillTreeView.
+- `scripts/ui/{views,widgets,popups}/` for scripts.
 
-### Files broken in `feat/canvas` until Phase F lands
-- `scripts/ui/popups/CanvasPopup.gd` lines 14, 16, 23 reference `GameState.canvas.tier` and `upgrade_tier()`.
-- `scripts/ui/views/PaintingView.gd` lines 17, 30, 31, 34 reference `GameState.canvas.sell()`, `tier`, `is_ready_to_sell()`.
-
-These are lazy errors — they only fire if the popup/view is actually opened. The project boots cleanly. Tests don't touch these files.
-
-### Pre-rebuild orphans
-Unchanged from prior HANDOVER — same list of `.tscn` files in `Scenes/` are still safe to delete.
+### Pre-rebuild orphans (unchanged from prior HANDOVER)
+Same list of `.tscn` files in `Scenes/` are still safe to delete: Animated_Plant, Ascendancy2DView, ClickerPopup, paintingscreen, UpgradeButton, tooltipedbtn, floating_text, plus Scenes/views/CanvasView.tscn (orphan from pre-rebuild). Plus Scenes/controls/ExperienceBar.tscn.
 
 ---
 
@@ -159,8 +207,9 @@ Unchanged from prior HANDOVER — same list of `.tscn` files in `Scenes/` are st
 - **Phases 1-4 (MVP rebuild):** brainstorming → writing-plans (×4) → executing-plans (×4) → finishing-a-development-branch (×4)
 - **Info-panel infra:** brainstorming → writing-plans → executing-plans
 - **Canvas + Atelier brainstorms:** brainstorming (closed)
-- **Canvas spec → plan → backend (this session):** brainstorming (continued, advisor consulted) → writing-plans → subagent-driven-development (Phases A-E + G; ~30 subagent dispatches)
-- **Canvas Phase F:** to be done manually by user
+- **Canvas spec → plan → backend (this session):** brainstorming → writing-plans → subagent-driven-development (Phases A-E + G; ~30 subagent dispatches)
+- **Canvas Phase F (this session):** done by Claude directly (text-authored .tscn) due to subagents' inability to author scenes interactively. UI polish ongoing.
+- **Pending:** Atelier plan → execution.
 
 All prior phase plans archived in `docs/superpowers/plans/`.
 
@@ -172,10 +221,10 @@ All prior phase plans archived in `docs/superpowers/plans/`.
 cd /c/Users/mitoufle/Documents/artdle
 git branch --show-current                    # feat/canvas
 git status --short
-git log --oneline master..HEAD               # 29 commits
+git log --oneline master..HEAD               # 37 commits
 git log --oneline d4bf992..HEAD              # since pre-spec state
 
-# Launch Godot (user's install)
+# Launch Godot
 "/c/Users/mitoufle/Downloads/Godot_v4.4.1-stable_win64.exe/Godot_v4.4.1-stable_win64_console.exe" --editor
 # Then Project → Tools → GUT → Run All  (or F5 to play)
 ```
