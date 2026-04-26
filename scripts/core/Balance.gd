@@ -26,3 +26,11 @@ static func paint_mastery_gain(canvas_tier: int, gold_earned: BigNumber) -> BigN
 
 static func paint_mastery_multiplier(paint_mastery: BigNumber) -> float:
     return 1.0 + PM_LOG_FACTOR * log(paint_mastery.value + 1.0)
+
+# -- Canvas formulas (spec 2026-04-25-canvas-design §6) --
+
+static func canvas_base_quality(taille: int, style: int, palette: int, mastery_tier: int, floor_bonus: float) -> float:
+    return float(taille) + float(style) + float(palette) + float(mastery_tier) + floor_bonus
+
+static func canvas_ideal_quality(taille: int, style_cap: int, palette_cap: int, floor_bonus: float) -> float:
+    return float(taille) + float(style_cap) + float(palette_cap) + 10.0 + floor_bonus
