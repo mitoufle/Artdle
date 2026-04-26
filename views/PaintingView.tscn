@@ -1,12 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dcm3fck3p2gj7"]
+[gd_scene load_steps=5 format=3 uid="uid://dcm3fck3p2gj7"]
 
 [ext_resource type="Script" path="res://scripts/ui/views/PaintingView.gd" id="1_painting"]
 [ext_resource type="PackedScene" path="res://Scenes/CanvasPopup.tscn" id="2_canvas_popup"]
-[ext_resource type="PackedScene" path="res://Scenes/InventoryPopup.tscn" id="3_inventory_popup"]
-[ext_resource type="PackedScene" path="res://Scenes/CraftPopup.tscn" id="4_craft_popup"]
-[ext_resource type="PackedScene" path="res://Scenes/PainterOfficePopup.tscn" id="5_office_popup"]
-[ext_resource type="PackedScene" path="res://Scenes/Widgets/DropFeed.tscn" id="6_drop_feed"]
-[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="7_hoverable"]
+[ext_resource type="PackedScene" path="res://Scenes/PainterOfficePopup.tscn" id="3_office_popup"]
+[ext_resource type="PackedScene" path="res://Scenes/Widgets/DropFeed.tscn" id="4_drop_feed"]
+[ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="5_hoverable"]
 
 [node name="PaintingView" type="Control"]
 layout_mode = 3
@@ -17,9 +15,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_painting")
 canvas_popup_scene = ExtResource("2_canvas_popup")
-inventory_popup_scene = ExtResource("3_inventory_popup")
-craft_popup_scene = ExtResource("4_craft_popup")
-painter_office_popup_scene = ExtResource("5_office_popup")
+painter_office_popup_scene = ExtResource("3_office_popup")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -37,7 +33,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Drops" parent="VBoxContainer" instance=ExtResource("6_drop_feed")]
+[node name="Drops" parent="VBoxContainer" instance=ExtResource("4_drop_feed")]
 layout_mode = 2
 
 [node name="ButtonsRow" type="HBoxContainer" parent="VBoxContainer"]
@@ -45,36 +41,18 @@ layout_mode = 2
 
 [node name="BtnCanvas" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
-text = "Canvas ⚙"
+text = "Canvas"
 
 [node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnCanvas"]
-script = ExtResource("7_hoverable")
+script = ExtResource("5_hoverable")
 title = "Canvas"
-body = "Configure le canvas (style, palette, sujet, gamble) et achète des plafonds avec de l'or. Sticky: la config s'applique à toutes les toiles suivantes."
-
-[node name="BtnInventory" type="Button" parent="VBoxContainer/ButtonsRow"]
-layout_mode = 2
-text = "Inventory"
-
-[node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnInventory"]
-script = ExtResource("7_hoverable")
-title = "Inventaire"
-body = "Voir et équiper tes items. Débloqué quand le sub-mechanic Inventaire est actif."
-
-[node name="BtnCraft" type="Button" parent="VBoxContainer/ButtonsRow"]
-layout_mode = 2
-text = "Craft"
-
-[node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnCraft"]
-script = ExtResource("7_hoverable")
-title = "Craft"
-body = "Crée des items via gold. Débloqué via le sub-mechanic Workshop."
+body = "Configure your painting (style, palette, subject, gamble) and buy permanent improvements with gold. Settings stay until you change them."
 
 [node name="BtnOffice" type="Button" parent="VBoxContainer/ButtonsRow"]
 layout_mode = 2
 text = "Painter Office"
 
 [node name="Hoverable" type="Node" parent="VBoxContainer/ButtonsRow/BtnOffice"]
-script = ExtResource("7_hoverable")
+script = ExtResource("5_hoverable")
 title = "Painter Office"
-body = "Embauche des workers. Chaque worker ajoute +1 slot canvas parallèle."
+body = "Hire workers. Each worker paints an additional canvas in parallel."

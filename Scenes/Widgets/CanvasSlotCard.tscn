@@ -8,8 +8,8 @@ script = ExtResource("1_eyehi")
 
 [node name="Hoverable" type="Node" parent="."]
 script = ExtResource("2_hoverable")
-title = "Slot canvas"
-body = "La toile se peint automatiquement. À la complétion: auto-vente (or + paint mastery), gain de maîtrise du sujet, chance de drop d'item (5% + 0.1%·qualité). Restart immédiat avec la même config sticky."
+title = "Painting in progress"
+body = "The canvas paints automatically. When the bar fills, you earn gold and paint mastery, gain experience on the active subject, and have a small chance to find an item. A new canvas starts immediately with the same configuration."
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1997163346]
 layout_mode = 2
@@ -19,6 +19,5 @@ layout_mode = 2
 
 [node name="Progress" type="ProgressBar" parent="VBoxContainer" unique_id=1714920946]
 layout_mode = 2
-
-[node name="QualityLabel" type="Label" parent="VBoxContainer" unique_id=835575376]
-layout_mode = 2
+max_value = 1.0
+step = 0.01
