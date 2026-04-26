@@ -81,7 +81,7 @@ Two WIPs promoted to final specs (`bb22d74`). Items-source resolved to canvas dr
 | DropFeed garbled `cou/T1 her bru/T1 ate` | 3-char abbreviations + HBox concat | `b5c7972` (full names: `Knife T1 (Legacy)` via SLOT_NAMES + SET_NAMES dicts) |
 | Mixed French/English UI text | Initial Phase F bodies in French | `b5c7972` (full English translation of all 11 Hoverable bodies + UI labels) |
 | 3 buttons (Inventory/Craft/Office) for what should be one Atelier | Conflict with spec §2 | `b5c7972` (removed Inventory + Craft; Atelier plan will replace with one button) |
-| No Workshop button | Removed in cleanup; Workshop is separate from Atelier | `1c71d03` (restored + new minimal `WorkshopPopup.tscn`/`.gd`) |
+| No Workshop button | Removed in cleanup based on misreading of spec ("Atelier+Inventory merged") — actually Workshop IS the English name for Atelier | `1c71d03` (restored + new minimal `WorkshopPopup.tscn`/`.gd` as placeholder for future Atelier panel) |
 | Workshop UI was aliased to old CanvasPopup; new CanvasPopup has no Canvas tier upgrade | Plan §10 said tier upgrade goes in Improvement tab; rewrite forgot to port the OLD popup's upgrade button | `1c71d03` (added "Upgrade Canvas Tier" button to Improvement tab) |
 | Hoverable bodies too verbose, perceived as "random info appearing" | Multi-clause paragraphs | `1c71d03` (trimmed to single-line, focused) |
 
@@ -113,7 +113,8 @@ The user reports more UI bugs after the latest commit (`1c71d03`). Specifically 
 - **`subject_mastery` MUST be reset in `before_each`** of integration test files. The save/load roundtrip test deliberately preserves nature mastery; without a reset, that state leaks.
 - **`GameState.tick()` overrides per-slot aggregator fields every frame.** Tests that need to force `chef_doeuvre_chance = 1.0` etc. must call `slots.tick()` directly to bypass.
 - **Path conventions discovered:** existing on-disk layout is `Scenes/Widgets/` (capital W), `views/PaintingView.tscn` (root, NOT `Scenes/views/`), `Scenes/CanvasPopup.tscn` (root, NOT `Scenes/popups/`). The plan's path assumptions were wrong; res:// paths now match disk casing for Linux/Mac portability.
-- **Workshop is a separate mechanic from Atelier.** The Atelier plan merges Inventory + Craft only. Workshop has its own popup (`WorkshopPopup`) and own button.
+- **Atelier (French) = Workshop (English) — same single mechanic.** The "Workshop" button in PaintingView IS the future Atelier button. Current `WorkshopPopup.tscn` is a minimal placeholder (tier upgrade only); the Atelier plan will expand it into the full merged panel (8 equippable slots, 6 sets, 6 tiers, craft actions, persistence vault, item drops). Do NOT add a separate "Atelier" button — the Workshop button IS it.
+- **MVP `Workshop.gd` system maps to the future Atelier level.** Its `tier` field is conceptually the per-run Atelier-level progression (spec §9.1 "Atelier level"). The cost curve will change (`100·1.15^N` per spec vs MVP's `1000·3^N`) and the multiplier outputs (`canvas_gold_mult`, `canvas_speed_mult`) will migrate to affix-driven items, but the underlying "you grind a level up per run" mechanism is preserved.
 - **Canvas tier upgrade lives in CanvasPopup Improvement tab.** Not in WorkshopPopup despite naming confusion in MVP.
 
 ---
@@ -131,11 +132,13 @@ The user reports more UI bugs after the latest commit (`1c71d03`). Specifically 
 4. **Test in editor that everything works** — full smoke test (all views, all popups, save/load, ascend cycle).
 5. **Commit Godot-generated `.uid` files** — `git status` shows ~13 untracked. Run `git add scripts/**/*.uid test/**/*.uid` then commit as a tidy-up.
 6. **Merge `feat/canvas` → `master`** when stable. 37 commits to integrate. `git merge --no-ff feat/canvas`.
-7. **Start Atelier plan** — `superpowers:writing-plans` on `2026-04-25-atelier-design.md`. The plan will:
-   - Replace Inventory.gd / Craft.gd / InventoryPopup / CraftPopup with merged Atelier system
-   - Add a single "Atelier" button to PaintingView (currently has only Canvas / Workshop / Office)
+7. **Start Atelier plan** — `superpowers:writing-plans` on `2026-04-25-atelier-design.md`. ⚠️ **Atelier = Workshop in English** — the existing Workshop button in PaintingView IS the Atelier entry point. Do NOT add a separate "Atelier" button. The plan will:
+   - Replace `Workshop.gd` (MVP tier-multiplier system), `Inventory.gd`, `Craft.gd`, `InventoryPopup`, `CraftPopup` with the merged Atelier/Workshop system
+   - Replace `WorkshopPopup.tscn` (current minimal placeholder) with the full merged panel: 8 equippable slots, 6 tiers, 6 sets, craft actions, persistence vault per spec §13
+   - Map Atelier "level" (per-run XP) onto the existing `Workshop.tier` field
    - Implement the affix pool + 8 slots + 6 sets + persistence + skill tree Atelier branch (22 nodes)
    - Replace placeholder set/tier weights in `CanvasSlots._on_slot_finished` drop block with real §11.2-11.4 logic
+   - Items provide `canvas_gold_mult`, `canvas_speed_mult`, etc. via affixes — replacing Workshop.gd's flat per-tier bonuses
 
 ### Background polish (not blocking)
 - Hoverable wiring on the rest of the UI (Accueil, Ascendancy, SkillTree, BottomBar) — only AscendButton + Canvas UI wired so far
