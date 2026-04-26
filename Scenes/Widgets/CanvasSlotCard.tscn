@@ -9,15 +9,18 @@ script = ExtResource("1_eyehi")
 [node name="Hoverable" type="Node" parent="."]
 script = ExtResource("2_hoverable")
 title = "Painting in progress"
-body = "The canvas paints automatically. When the bar fills, you earn gold and paint mastery, gain experience on the active subject, and have a small chance to find an item. A new canvas starts immediately with the same configuration."
+body = "Auto-paints, sells on completion, restarts. Gold + paint mastery on each finish."
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1997163346]
 layout_mode = 2
+mouse_filter = 1
 
 [node name="SubjectLabel" type="Label" parent="VBoxContainer" unique_id=1773038841]
 layout_mode = 2
+mouse_filter = 1
 
 [node name="Progress" type="ProgressBar" parent="VBoxContainer" unique_id=1714920946]
 layout_mode = 2
+mouse_filter = 1
 max_value = 1.0
 step = 0.01

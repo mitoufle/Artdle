@@ -73,3 +73,11 @@ func test_hint_revealed_when_half_progress_on_a_parent():
 
 func test_no_hint_when_no_progress():
     assert_false(mastery.has_hint("animaliere"))
+
+func test_has_hint_threshold_param_overrides_default():
+    # C5 fix: skill-tree subject_hint nodes lower the reveal threshold.
+    # Default threshold 3 hides hints below parent tier 3; threshold 1 shows them earlier.
+    mastery.gain("nature", SubjectMastery.xp_threshold(1))  # nature → tier 1
+    assert_false(mastery.has_hint("animaliere"))                       # default (3): no
+    assert_false(mastery.has_hint("animaliere", 2))                    # need tier 2: no
+    assert_true(mastery.has_hint("animaliere", 1))                     # threshold 1: yes

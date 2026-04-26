@@ -71,7 +71,8 @@ func _ready() -> void:
 	slots.config = canvas_config
 	slots.mastery = subject_mastery
 	slots.tier_provider = func(): return _current_canvas_tier()
-	slots.set_slot_count(1)
+	# Slot count is initialized below by refresh_canvas_slot_count(), AFTER
+	# canvas_starting is connected. Setting here would emit before the listener exists.
 	add_child(slots)
 
 	paint_mastery = PaintMasteryClass.new()
@@ -154,18 +155,36 @@ func canvas_speed_multiplier() -> float:
 
 # -- Signal handlers --
 
-func _on_canvas_starting(_idx: int) -> void:
-	var n: int = canvas_config.gamble_n_inspi
+func _on_canvas_starting(idx: int) -> void:
+	# Per-slot meta `gamble_amount` records the inspi actually paid for THIS canvas.
+	# 0 = not gambled (off, insufficient, or auto with nothing affordable).
+	# Stored per-canvas (not on `slots`) so concurrent slots don't clobber each other.
+	var c: Canvas = slots.get_canvas(idx)
+	var n: int = _resolve_gamble_amount()
 	if n <= 0:
-		slots.set_meta("gamble_skipped", false)
+		c.set_meta("gamble_amount", 0)
 		return
 	var cost: BigNumber = BigNumber.from_float(float(n))
 	if currency.get_amount("inspiration").value < float(n):
 		# Silent skip — canvas runs without gamble.
-		slots.set_meta("gamble_skipped", true)
+		c.set_meta("gamble_amount", 0)
 		return
 	currency.spend("inspiration", cost)
-	slots.set_meta("gamble_skipped", false)
+	c.set_meta("gamble_amount", n)
+
+func _resolve_gamble_amount() -> int:
+	# Auto mode (spec §8.3): pick the largest preset the player can afford right now.
+	if canvas_config.auto_gamble:
+		var inspi: float = currency.get_amount("inspiration").value
+		# VALID_GAMBLE_LEVELS = [0, 10, 100, 1000, 10000]. Walk descending, skip 0.
+		var levels: Array = CanvasConfig.VALID_GAMBLE_LEVELS.duplicate()
+		levels.sort()
+		levels.reverse()
+		for level in levels:
+			if int(level) > 0 and inspi >= float(level):
+				return int(level)
+		return 0
+	return canvas_config.gamble_n_inspi
 
 func _on_canvas_completed(payload: Dictionary) -> void:
 	var tier: int = int(payload["tier"])
@@ -173,13 +192,34 @@ func _on_canvas_completed(payload: Dictionary) -> void:
 	var subject_id: String = String(payload["subject_id"])
 	var gold_value: float = Balance.canvas_gold(quality, tier, canvas_gold_multiplier())
 	currency.add("gold", BigNumber.from_float(gold_value))
+	# Paint mastery (spec §6.4): floor(quality/10) * (2 if burst else 1) * pm_gain_mult.
 	var pm_base: int = Balance.canvas_pm_base(quality)
 	if pm_base > 0:
-		paint_mastery.on_canvas_sold(tier, BigNumber.from_float(gold_value))
+		var burst_factor: float = 2.0 if Balance.canvas_pm_burst_eligible(quality) else 1.0
+		var pm_gain: float = float(pm_base) * burst_factor * pm_gain_multiplier()
+		currency.add("paint_mastery", BigNumber.from_float(pm_gain))
+	# Gamble safety net (spec §8.3): refund 50% of inspi on gamble failure when unlocked.
+	if bool(payload.get("gambled", false)) and not bool(payload.get("gamble_succeeded", false)):
+		if skill_tree.gamble_safety_net():
+			var spent: int = int(payload.get("gamble_inspi_spent", 0))
+			if spent > 0:
+				currency.add("inspiration", BigNumber.from_float(float(spent) * 0.5))
 	# Mastery gain to current subject.
 	var mastery_gain: int = 1 + int(quality / 20.0)
 	subject_mastery.gain(subject_id, mastery_gain)
+	# Auto-mastery passive (spec §9): rate * mastery_gain to every other unlocked subject.
+	var auto_rate: float = skill_tree.auto_mastery_rate()
+	if auto_rate > 0.0:
+		var auto_gain: int = int(floor(float(mastery_gain) * auto_rate))
+		if auto_gain > 0:
+			for sid in Subjects.all_ids():
+				if sid != subject_id and subject_mastery.is_unlocked(sid):
+					subject_mastery.gain(sid, auto_gain)
 	canvas_sold.emit(tier, gold_value)
+
+func pm_gain_multiplier() -> float:
+	# Spec §6.4 hook. Skill tree / inventory aggregators land with the Atelier plan.
+	return 1.0
 
 func _current_canvas_tier() -> int:
 	return _canvas_tier

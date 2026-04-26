@@ -7,7 +7,6 @@ const CanvasSlotCardScene = preload("res://Scenes/Widgets/CanvasSlotCard.tscn")
 @export var painter_office_popup_scene: PackedScene
 
 @onready var _slot_list: VBoxContainer = $VBoxContainer/ScrollContainer/SlotList
-@onready var _drops: DropFeed = $VBoxContainer/Drops
 @onready var btn_canvas: Button = $VBoxContainer/ButtonsRow/BtnCanvas
 @onready var btn_workshop: Button = $VBoxContainer/ButtonsRow/BtnWorkshop
 @onready var btn_office: Button = $VBoxContainer/ButtonsRow/BtnOffice
@@ -18,7 +17,6 @@ const CanvasSlotCardScene = preload("res://Scenes/Widgets/CanvasSlotCard.tscn")
 var _cards: Array = []
 
 func _connect_view_signals() -> void:
-    GameState.slots.drop_rolled.connect(_drops.add_drop)
     GameState.skill_tree.node_unlocked.connect(func(_id): _refresh_cards())
     btn_canvas.pressed.connect(func(): _open_popup(canvas_popup_scene))
     btn_workshop.pressed.connect(func(): _open_popup(workshop_popup_scene, "workshop"))

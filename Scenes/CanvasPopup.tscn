@@ -141,7 +141,7 @@ body = "Lets you set higher palette. Cost triples each time. Hard cap raised by 
 custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Subject hints (revealing locked subjects) come from the skill tree."
+text = "Locked subjects reveal their prerequisites as you master parents. Skill-tree Subject Hint nodes reveal them earlier."
 autowrap_mode = 3
 
 [node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer"]

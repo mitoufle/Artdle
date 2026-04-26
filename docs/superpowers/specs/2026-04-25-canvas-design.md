@@ -288,6 +288,8 @@ The skill tree raises the *cap* on style/palette ceiling. The improvement tab ra
 
 ## 11. Items source — drops on canvas completion
 
+> **OBSOLETE (design call 2026-04-26):** Items are now crafted only — no canvas drops. All `drop_rolled` signal/UI/test code has been removed (see HANDOVER §"Architecture decisions"). The Atelier brainstorm must redefine the items source (recipe inputs, currency cost) before the Atelier plan can be written. The text below is preserved for context only.
+
 **This integrates the canvas into the Atelier's items-as-materials economy.** The Atelier WIP did not specify where raw items enter the inventory; this spec defines that source.
 
 ### 11.1 Drop mechanics

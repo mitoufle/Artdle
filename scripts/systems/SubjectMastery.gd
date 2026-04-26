@@ -1,6 +1,8 @@
 class_name SubjectMastery
 extends Node
 
+signal mastery_changed(subject_id: String, tier: int, xp_in_tier: int)
+
 # subject_id -> {tier: int, xp_in_tier: int}
 var _state: Dictionary = {}
 
@@ -33,6 +35,7 @@ func gain(subject_id: String, amount: int) -> void:
     if tier >= MAX_TIER:
         xp = 0
     _state[subject_id] = {"tier": tier, "xp_in_tier": xp}
+    mastery_changed.emit(subject_id, tier, xp)
 
 func reset() -> void:
     _state.clear()
@@ -43,7 +46,7 @@ func serialize() -> Dictionary:
 func deserialize(data: Dictionary) -> void:
     _state = (data.get("state", {}) as Dictionary).duplicate(true)
 
-const HINT_HALF_TIER: int = 3  # half of Subjects.PREREQ_TIER
+const HINT_HALF_TIER: int = 3  # half of Subjects.PREREQ_TIER (default reveal threshold)
 
 func is_unlocked(subject_id: String) -> bool:
     var s: Dictionary = Subjects.get_subject(subject_id)
@@ -56,13 +59,13 @@ func is_unlocked(subject_id: String) -> bool:
             return false
     return true
 
-func has_hint(subject_id: String) -> bool:
+func has_hint(subject_id: String, threshold: int = HINT_HALF_TIER) -> bool:
     if is_unlocked(subject_id):
         return false
     var s: Dictionary = Subjects.get_subject(subject_id)
     if s.is_empty() or (s["parents"] as Array).is_empty():
         return false
     for p in (s["parents"] as Array):
-        if tier_of(p["subject_id"]) >= HINT_HALF_TIER:
+        if tier_of(p["subject_id"]) >= threshold:
             return true
     return false

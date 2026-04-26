@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://dcm3fck3p2gj7"]
+[gd_scene load_steps=5 format=3 uid="uid://dcm3fck3p2gj7"]
 
 [ext_resource type="Script" path="res://scripts/ui/views/PaintingView.gd" id="1_painting"]
 [ext_resource type="PackedScene" path="res://Scenes/CanvasPopup.tscn" id="2_canvas_popup"]
 [ext_resource type="PackedScene" path="res://Scenes/WorkshopPopup.tscn" id="3_workshop_popup"]
 [ext_resource type="PackedScene" path="res://Scenes/PainterOfficePopup.tscn" id="4_office_popup"]
-[ext_resource type="PackedScene" path="res://Scenes/Widgets/DropFeed.tscn" id="5_drop_feed"]
 [ext_resource type="Script" path="res://scripts/ui/widgets/Hoverable.gd" id="6_hoverable"]
 
 [node name="PaintingView" type="Control"]
@@ -34,9 +33,6 @@ size_flags_vertical = 3
 [node name="SlotList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="Drops" parent="VBoxContainer" instance=ExtResource("5_drop_feed")]
-layout_mode = 2
 
 [node name="ButtonsRow" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2

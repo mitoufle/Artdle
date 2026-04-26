@@ -108,6 +108,7 @@ The user reports more UI bugs after the latest commit (`1c71d03`). Specifically 
 
 ## Architecture decisions worth knowing (carry-forward)
 
+- **Items source = crafting only (decision 2026-04-26).** No drops on canvas completion. CanvasSlots no longer rolls drops; the `drop_rolled` signal, `force_drop` field, `SLOT_TYPES`/`SET_IDS` constants, `drop_chance()` static, and the entire `DropFeed` widget were deleted. **Canvas spec §11 is now obsolete** (annotated in-file). The Atelier brainstorm needs to redefine the items source — likely a craft action consuming gold/inspiration/mastery — before the Atelier plan can be written. Affixes/sets/8-slot equipping (Atelier spec §13) remain valid; only the input source changes.
 - **Atelier-coupled affixes are NOT pre-coupled to Canvas.** GameState.tick() guards them with `inventory.has_method(...)` checks that return safe defaults. The Atelier plan replaces Inventory with the rolled affix system later.
 - **CanvasSlots.canvas_starting fires on EVERY canvas start, including auto-restart.** In tests, `paint_time_override = 0.001 + tick(0.01)` causes one finish + one auto-restart per tick → 2 canvas_starting fires. Real production with `paint_time` = 3 seconds doesn't see this.
 - **`subject_mastery` MUST be reset in `before_each`** of integration test files. The save/load roundtrip test deliberately preserves nature mastery; without a reset, that state leaks.

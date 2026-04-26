@@ -7,23 +7,11 @@ signal canvas_completed(payload: Dictionary)
 
 signal canvas_starting(slot_index: int)
 # Fired immediately before each canvas's start() call. GameState listens to
-# debit inspiration for gamble. If inspiration is insufficient, GameState
-# sets a "gamble_skipped" meta flag that _on_slot_finished checks.
+# debit inspiration for gamble and stamps the actual amount paid (0 if not
+# gambled, >0 if paid) onto the canvas as `gamble_amount` meta. The slot
+# manager reads that on finish to resolve the gamble outcome.
 
-signal drop_rolled(payload: Dictionary)
-# payload: slot_type (String), set_id (String — empty for no-set), tier (int)
-
-# Test-only: force every canvas to drop. False in production.
-var force_drop: bool = false
-
-# Atelier-level provided by GameState; -1 means no atelier yet (drop tier always 1).
-var atelier_level: int = 0
-
-const SLOT_TYPES: Array = ["brush", "palette_item", "chapeau", "blouse", "gants", "chevalet", "couteau", "broche"]
-const SET_IDS:    Array = ["risque_tout", "maitre", "rendement", "erudit", "atelier_prolifique", "heritage"]
-
-static func drop_chance(quality: float) -> float:
-    return 0.05 + 0.001 * quality
+# Items source = crafting only (design call 2026-04-26). No drops on canvas finish.
 
 # External refs (set by GameState during boot).
 var config: CanvasConfig = null
@@ -99,14 +87,18 @@ func _on_slot_finished(idx: int, payload: Dictionary) -> void:
     var base_q: float = float(payload["quality"])
     var tier: int = int(c.get_meta("tier", 1))
     var subject_id: String = String(c.get_meta("subject_id", "nature"))
-    # Gamble resolution
+    # Gamble resolution. The amount actually paid is stamped on the canvas at start
+    # (per-slot, not shared via config), so it's stable even if config changes mid-canvas
+    # or another slot started since.
     var gambled: bool = false
+    var gamble_succeeded: bool = false
     var gambled_q: float = base_q
-    var skipped: bool = bool(get_meta("gamble_skipped", false))
-    if config != null and config.gamble_n_inspi > 0 and not skipped:
+    var gamble_amount: int = int(c.get_meta("gamble_amount", 0))
+    if gamble_amount > 0:
         gambled = true
         if randf() < gamble_success_chance:
-            gambled_q = Balance.gamble_success_quality_with_mult(base_q, config.gamble_n_inspi, gamble_yield_mult)
+            gamble_succeeded = true
+            gambled_q = Balance.gamble_success_quality_with_mult(base_q, gamble_amount, gamble_yield_mult)
         else:
             gambled_q = Balance.gamble_failure_quality(base_q)
     # Chef d'œuvre roll
@@ -117,24 +109,14 @@ func _on_slot_finished(idx: int, payload: Dictionary) -> void:
         var ideal: float = Balance.canvas_ideal_quality(tier, style_skill_cap, palette_skill_cap, quality_floor_bonus)
         final_q = max(gambled_q, ideal)
     canvas_completed.emit({
-        "slot_index":   idx,
-        "quality":      final_q,
-        "tier":         tier,
-        "subject_id":   subject_id,
-        "gambled":      gambled,
-        "chef_doeuvre": is_chef,
+        "slot_index":         idx,
+        "quality":            final_q,
+        "tier":               tier,
+        "subject_id":         subject_id,
+        "gambled":            gambled,
+        "gamble_succeeded":   gamble_succeeded,
+        "gamble_inspi_spent": (gamble_amount if gambled else 0),
+        "chef_doeuvre":       is_chef,
     })
-    var should_drop: bool = force_drop or randf() < drop_chance(final_q)
-    if should_drop:
-        var slot_type: String = SLOT_TYPES[randi() % SLOT_TYPES.size()]
-        var set_id: String = ""  # placeholder set roll; full set-affiliation logic lives in Atelier plan.
-        if randf() < 0.6:
-            set_id = SET_IDS[randi() % SET_IDS.size()]
-        var tier_drop: int = 1  # placeholder; atelier-level distribution lives in Atelier plan.
-        drop_rolled.emit({
-            "slot_type": slot_type,
-            "set_id":    set_id,
-            "tier":      tier_drop,
-        })
     # Auto-restart immediately (auto-sale state machine, spec §3.2).
     _start_slot(c)
