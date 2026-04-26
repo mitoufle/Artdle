@@ -52,3 +52,18 @@ static func canvas_time(tier: int, style: int, time_reduction: float, speed_mult
     var raw: float = (float(tier) * 2.0 + float(style) * 1.0)
     var divisor: float = max(speed_mult, 0.0001)  # guard div-by-zero
     return raw * (1.0 - clamped_reduction) / divisor
+
+static func gamble_success_quality(base_quality: float, n_inspi: int) -> float:
+    if n_inspi < 1:
+        return base_quality
+    var bonus: float = log(float(n_inspi)) / log(10.0) * 0.5
+    return base_quality * (1.0 + bonus)
+
+static func gamble_success_quality_with_mult(base_quality: float, n_inspi: int, yield_mult: float) -> float:
+    if n_inspi < 1:
+        return base_quality
+    var bonus: float = log(float(n_inspi)) / log(10.0) * 0.5 * yield_mult
+    return base_quality * (1.0 + bonus)
+
+static func gamble_failure_quality(base_quality: float) -> float:
+    return max(1.0, floor(base_quality / 2.0))

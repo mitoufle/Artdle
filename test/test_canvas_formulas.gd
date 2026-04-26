@@ -44,3 +44,22 @@ func test_canvas_time_formula():
 func test_canvas_time_reduction_capped_at_70_percent():
     # spec §15.1 implies cap, but direct test: 0.95 reduction must be clamped to 0.70
     assert_almost_eq(Balance.canvas_time(1, 1, 0.95, 1.0), 3.0 * 0.30, 0.001)
+
+func test_gamble_success_yield_formula():
+    # spec §8.2: gambled = base * (1 + log10(N) * 0.5)
+    # N=10 → ×1.5
+    assert_almost_eq(Balance.gamble_success_quality(10.0, 10), 15.0, 0.001)
+    # N=100 → ×2.0
+    assert_almost_eq(Balance.gamble_success_quality(10.0, 100), 20.0, 0.001)
+    # N=10_000 → ×3.0
+    assert_almost_eq(Balance.gamble_success_quality(10.0, 10000), 30.0, 0.001)
+
+func test_gamble_failure_halves_quality_floor_1():
+    assert_eq(Balance.gamble_failure_quality(10.0), 5.0)
+    assert_eq(Balance.gamble_failure_quality(1.0), 1.0)
+    assert_eq(Balance.gamble_failure_quality(0.5), 1.0)
+
+func test_gamble_yield_mult_applies():
+    # gamble_yield_mult ×2 doubles the bonus portion (not the base)
+    # base 10, N=100, yield_mult 2.0: bonus = log10(100)*0.5*2 = 2.0 → quality = 10 * (1 + 2.0) = 30
+    assert_almost_eq(Balance.gamble_success_quality_with_mult(10.0, 100, 2.0), 30.0, 0.001)
