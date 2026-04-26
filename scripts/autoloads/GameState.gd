@@ -115,7 +115,8 @@ func _ready() -> void:
 	add_child(ascend)
 
 	# -- Signals --
-	canvas.sold.connect(_on_canvas_sold)
+	# TASK14: canvas.sold removed by Task 9 refactor; _on_canvas_completed replaces this in Task 14.
+	# canvas.sold.connect(_on_canvas_sold)
 	tree.stage_entered.connect(_on_stage_entered)
 	tree.possibility_unlocked.connect(_on_possibility_unlocked)
 	ascend.ascended.connect(_on_ascended)
