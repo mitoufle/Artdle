@@ -5,6 +5,21 @@ signal canvas_completed(payload: Dictionary)
 # payload keys: slot_index (int), quality (float), tier (int),
 #               subject_id (String), gambled (bool), chef_doeuvre (bool)
 
+signal drop_rolled(payload: Dictionary)
+# payload: slot_type (String), set_id (String — empty for no-set), tier (int)
+
+# Test-only: force every canvas to drop. False in production.
+var force_drop: bool = false
+
+# Atelier-level provided by GameState; -1 means no atelier yet (drop tier always 1).
+var atelier_level: int = 0
+
+const SLOT_TYPES: Array = ["brush", "palette_item", "chapeau", "blouse", "gants", "chevalet", "couteau", "broche"]
+const SET_IDS:    Array = ["risque_tout", "maitre", "rendement", "erudit", "atelier_prolifique", "heritage"]
+
+static func drop_chance(quality: float) -> float:
+    return 0.05 + 0.001 * quality
+
 # External refs (set by GameState during boot).
 var config: CanvasConfig = null
 var mastery: SubjectMastery = null
@@ -102,5 +117,17 @@ func _on_slot_finished(idx: int, payload: Dictionary) -> void:
         "gambled":      gambled,
         "chef_doeuvre": is_chef,
     })
+    var should_drop: bool = force_drop or randf() < drop_chance(final_q)
+    if should_drop:
+        var slot_type: String = SLOT_TYPES[randi() % SLOT_TYPES.size()]
+        var set_id: String = ""  # placeholder set roll; full set-affiliation logic lives in Atelier plan.
+        if randf() < 0.6:
+            set_id = SET_IDS[randi() % SET_IDS.size()]
+        var tier_drop: int = 1  # placeholder; atelier-level distribution lives in Atelier plan.
+        drop_rolled.emit({
+            "slot_type": slot_type,
+            "set_id":    set_id,
+            "tier":      tier_drop,
+        })
     # Auto-restart immediately (auto-sale state machine, spec §3.2).
     _start_slot(c)
