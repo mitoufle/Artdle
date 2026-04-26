@@ -73,3 +73,17 @@ func test_serialize_roundtrip():
     assert_eq(fresh.style_current_ceiling, 5)
     assert_eq(fresh.gamble_n_inspi, 100)
     fresh.free()
+
+func test_style_ceiling_buy_cost_curve():
+    # spec §10: cost = 100 * 3^(level-1) for the +1 from current level
+    assert_eq(CanvasConfig.style_ceiling_cost(1), 100.0)   # 1 → 2 costs 100
+    assert_eq(CanvasConfig.style_ceiling_cost(2), 300.0)
+    assert_eq(CanvasConfig.style_ceiling_cost(5), 8100.0)
+
+func test_palette_ceiling_cost_curve_same():
+    assert_eq(CanvasConfig.palette_ceiling_cost(3), 900.0)
+
+func test_subject_hint_cost_curve():
+    # spec §10: 1000 * 2^(reveals_used)
+    assert_eq(CanvasConfig.subject_hint_cost(0), 1000.0)
+    assert_eq(CanvasConfig.subject_hint_cost(2), 4000.0)

@@ -68,3 +68,12 @@ func deserialize(data: Dictionary) -> void:
     gamble_n_inspi = int(data.get("gamble_n_inspi", 0))
     style_current_ceiling = int(data.get("style_current_ceiling", 1))
     palette_current_ceiling = int(data.get("palette_current_ceiling", 1))
+
+static func style_ceiling_cost(current_level: int) -> float:
+    return 100.0 * pow(3.0, float(current_level - 1))
+
+static func palette_ceiling_cost(current_level: int) -> float:
+    return 100.0 * pow(3.0, float(current_level - 1))
+
+static func subject_hint_cost(reveals_used: int) -> float:
+    return 1000.0 * pow(2.0, float(reveals_used))
