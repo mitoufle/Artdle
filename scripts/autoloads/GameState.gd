@@ -6,7 +6,6 @@ extends Node
 
 const CurrencyClass       = preload("res://scripts/systems/Currency.gd")
 const SaveClass           = preload("res://scripts/systems/Save.gd")
-const CanvasClass         = preload("res://scripts/systems/Canvas.gd")
 const InspirationTreeClass = preload("res://scripts/systems/InspirationTree.gd")
 const PaintMasteryClass   = preload("res://scripts/systems/PaintMastery.gd")
 const WorkshopClass       = preload("res://scripts/systems/Workshop.gd")
@@ -17,6 +16,7 @@ const SkillTreeClass      = preload("res://scripts/systems/SkillTree.gd")
 const AscendClass         = preload("res://scripts/systems/Ascend.gd")
 const SubjectMasteryClass = preload("res://scripts/systems/SubjectMastery.gd")
 const CanvasConfigClass   = preload("res://scripts/systems/CanvasConfig.gd")
+const CanvasSlotsClass    = preload("res://scripts/systems/CanvasSlots.gd")
 
 # -- Signals --
 signal canvas_sold(tier: int, gold_amount: float)
@@ -30,7 +30,8 @@ signal hover_info_cleared()
 # -- Systems --
 var currency: CurrencyClass
 var save_system: SaveClass
-var canvas: CanvasClass
+var slots: CanvasSlotsClass
+var _canvas_tier: int = 1
 var tree: InspirationTreeClass
 var paint_mastery: PaintMasteryClass
 var workshop: WorkshopClass
@@ -56,10 +57,6 @@ func _ready() -> void:
 	save_system.name = "Save"
 	add_child(save_system)
 
-	canvas = CanvasClass.new()
-	canvas.name = "Canvas"
-	add_child(canvas)
-
 	subject_mastery = SubjectMasteryClass.new()
 	subject_mastery.name = "SubjectMastery"
 	add_child(subject_mastery)
@@ -68,6 +65,14 @@ func _ready() -> void:
 	canvas_config.name = "CanvasConfig"
 	canvas_config.subject_mastery = subject_mastery
 	add_child(canvas_config)
+
+	slots = CanvasSlotsClass.new()
+	slots.name = "CanvasSlots"
+	slots.config = canvas_config
+	slots.mastery = subject_mastery
+	slots.tier_provider = func(): return _current_canvas_tier()
+	slots.set_slot_count(1)
+	add_child(slots)
 
 	paint_mastery = PaintMasteryClass.new()
 	paint_mastery.name = "PaintMastery"
@@ -107,7 +112,7 @@ func _ready() -> void:
 	ascend = AscendClass.new()
 	ascend.name = "Ascend"
 	ascend.currency = currency
-	ascend.canvas = canvas
+	ascend.on_reset = func(): _canvas_tier = 1; canvas_config.reset()
 	ascend.tree = tree
 	ascend.workshop = workshop
 	ascend.inventory = inventory
@@ -115,8 +120,7 @@ func _ready() -> void:
 	add_child(ascend)
 
 	# -- Signals --
-	# TASK14: canvas.sold removed by Task 9 refactor; _on_canvas_completed replaces this in Task 14.
-	# canvas.sold.connect(_on_canvas_sold)
+	slots.canvas_completed.connect(_on_canvas_completed)
 	tree.stage_entered.connect(_on_stage_entered)
 	tree.possibility_unlocked.connect(_on_possibility_unlocked)
 	ascend.ascended.connect(_on_ascended)
@@ -125,7 +129,8 @@ func _ready() -> void:
 # Called explicitly by the main scene (Phase 4). Keeps tests deterministic.
 func tick(delta: float) -> void:
 	tree.tick(delta)
-	canvas.tick(delta * canvas_speed_multiplier())
+	slots.canvas_speed_mult = canvas_speed_multiplier()
+	slots.tick(delta)
 
 # -- Modifier aggregation --
 # Each sub-mechanic contributes a multiplicative factor. Product is applied at sale/tick.
@@ -138,11 +143,26 @@ func canvas_speed_multiplier() -> float:
 
 # -- Signal handlers --
 
-func _on_canvas_sold(tier: int, base_gold: float) -> void:
-	var final_gold: float = base_gold * canvas_gold_multiplier()
-	currency.add("gold", BigNumber.from_float(final_gold))
-	paint_mastery.on_canvas_sold(tier, BigNumber.from_float(final_gold))
-	canvas_sold.emit(tier, final_gold)
+func _on_canvas_completed(payload: Dictionary) -> void:
+	var tier: int = int(payload["tier"])
+	var quality: float = float(payload["quality"])
+	var subject_id: String = String(payload["subject_id"])
+	var gold_value: float = Balance.canvas_gold(quality, tier, canvas_gold_multiplier())
+	currency.add("gold", BigNumber.from_float(gold_value))
+	var pm_base: int = Balance.canvas_pm_base(quality)
+	if pm_base > 0:
+		paint_mastery.on_canvas_sold(tier, BigNumber.from_float(gold_value))
+	# Mastery gain to current subject.
+	var mastery_gain: int = 1 + int(quality / 20.0)
+	subject_mastery.gain(subject_id, mastery_gain)
+	canvas_sold.emit(tier, gold_value)
+
+func _current_canvas_tier() -> int:
+	return _canvas_tier
+
+func upgrade_canvas_tier() -> void:
+	if _canvas_tier < CanvasTiers.MAX_TIER:
+		_canvas_tier += 1
 
 func _on_stage_entered(stage_index: int) -> void:
 	stage_entered.emit(stage_index)
@@ -185,7 +205,7 @@ func try_activate_mechanic(mechanic_id: String) -> bool:
 func save_game() -> bool:
 	var payload: Dictionary = {
 		"currency":           currency.serialize(),
-		"canvas":             canvas.serialize(),
+		"canvas_tier":        _canvas_tier,
 		"inspi_tree":         tree.serialize(),
 		"workshop":           workshop.serialize(),
 		"inventory":          inventory.serialize(),
@@ -204,7 +224,7 @@ func load_game() -> bool:
 	if data == null:
 		return false
 	if data.has("currency"):       currency.deserialize(data["currency"])
-	if data.has("canvas"):         canvas.deserialize(data["canvas"])
+	_canvas_tier = int(data.get("canvas_tier", 1))
 	if data.has("inspi_tree"):     tree.deserialize(data["inspi_tree"])
 	if data.has("workshop"):       workshop.deserialize(data["workshop"])
 	if data.has("inventory"):      inventory.deserialize(data["inventory"])

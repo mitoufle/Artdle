@@ -2,7 +2,8 @@ extends GutTest
 
 func before_each():
     GameState.currency.reset(["inspiration", "gold", "fame", "paint_mastery"])
-    GameState.canvas.reset()
+    GameState._canvas_tier = 1
+    GameState.slots.paint_time_override = -1.0
     GameState.tree.reset()
     GameState.workshop.reset()
     GameState.inventory.reset()
@@ -19,7 +20,15 @@ func test_default_speed_multiplier_is_one():
     assert_almost_eq(GameState.canvas_speed_multiplier(), 1.0, 0.0001)
 
 func test_canvas_sale_with_modifiers_applies_all_of_them():
-    pending("Canvas.sell removed; new gold path via CanvasSlots.canvas_completed in Task 14")
+    GameState.workshop.tier = 2  # gold_mult = 1 + 0.25*2 = 1.5
+    GameState.currency.add("fame", BigNumber.from_float(5.0))
+    GameState.skill_tree.unlock("gilded_frame")  # +0.10 gold
+    GameState.slots.paint_time_override = 0.001
+    GameState.tick(0.01)
+    var expected_mult = (1.0 + 2 * Workshop.GOLD_MULT_PER_TIER) * 1.0 * 1.10
+    # Default canvas: tier 1, style 1, palette 1, mastery 0 → quality = 3 → gold = 3 * 1 * 10 = 30
+    var expected_gold = 30.0 * expected_mult
+    assert_almost_eq(GameState.currency.get_amount("gold").value, expected_gold, 0.001)
 
 func test_try_activate_mechanic_requires_possibility():
     var ok = GameState.try_activate_mechanic("workshop")
