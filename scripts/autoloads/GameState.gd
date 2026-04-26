@@ -174,6 +174,26 @@ func upgrade_canvas_tier() -> void:
 	if _canvas_tier < CanvasTiers.MAX_TIER:
 		_canvas_tier += 1
 
+func buy_style_ceiling() -> bool:
+	var cur: int = canvas_config.style_current_ceiling
+	if cur >= skill_tree.style_cap():
+		return false
+	var cost: BigNumber = BigNumber.from_float(CanvasConfig.style_ceiling_cost(cur))
+	if not currency.spend("gold", cost):
+		return false
+	canvas_config.buy_style_ceiling(skill_tree.style_cap())
+	return true
+
+func buy_palette_ceiling() -> bool:
+	var cur: int = canvas_config.palette_current_ceiling
+	if cur >= skill_tree.palette_cap():
+		return false
+	var cost: BigNumber = BigNumber.from_float(CanvasConfig.palette_ceiling_cost(cur))
+	if not currency.spend("gold", cost):
+		return false
+	canvas_config.buy_palette_ceiling(skill_tree.palette_cap())
+	return true
+
 func refresh_canvas_slot_count() -> void:
 	var n: int = 1 + skill_tree.multi_canvas_slots_grant() + painter_office.worker_count
 	n = clamp(n, 1, 8)  # spec §12 soft cap
